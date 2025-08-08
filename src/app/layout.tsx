@@ -6,6 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Coupong",
   description: "한별 가족 쿠폰 모음",
+  manifest: "/manifest.json",
 };
 
 const pretendard = localFont({
