@@ -3,6 +3,7 @@
 @theme {
   --font-pretendard: var(--font-pretendard);
   --color-primary: #389970;
+  --color-secondary: #898989;
   --breakpoint-mobile: 480px;
   --breakpoint-tablet: 768px;
   --breakpoint-laptop: 1281px;

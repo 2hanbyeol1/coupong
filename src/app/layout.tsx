@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Coupong",
+  title: "쿠퐁",
   description: "한별 가족 쿠폰 모음",
   manifest: "/manifest.json",
 };

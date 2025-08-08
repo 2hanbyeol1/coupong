@@ -16,7 +16,7 @@ pnpm dev
 
 ## 기술 스택
 
-`next.js` `typescript` `tailwind css`
+`next.js` `typescript` `tailwind css` `pwa (next-pwa)`
 
 <br/>
 
