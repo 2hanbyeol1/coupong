@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 실행 방법
 
-## Getting Started
-
-First, run the development server:
+### 1. 로컬에서 실행
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. 링크
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[아직 배포 안됨!]()
 
-## Learn More
+<br/>
 
-To learn more about Next.js, take a look at the following resources:
+## 기술 스택
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`next.js` `typescript` `tailwind css`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+<br/>
 
-## Deploy on Vercel
+## 요구사항
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [ ] 로그인
+- [ ] 쿠폰 등록
+- [ ] 쿠폰 조회
+  - [ ] 사용 가능한 쿠폰만 보기
+- [ ] 쿠폰 상세 조회
+  - [ ] 쿠폰 사용
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<br/>
+
+## 커밋 prefix
+
+|          | 설명          |
+| :------- | :------------ |
+| feat     | 기능 추가     |
+| fix      | 버그 수정     |
+| style    | 스타일 수정   |
+| refactor | 코드 리팩토링 |
+| docs     | README 수정   |
