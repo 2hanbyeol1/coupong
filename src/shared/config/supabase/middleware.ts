@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { ROUTES } from "../routes";
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -36,8 +38,13 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && !request.nextUrl.pathname.startsWith("/login")) {
-    // no user, potentially respond by redirecting the user to the login page
+  const publicRoutes = [ROUTES.LOGIN, "/api", "/auth/callback"];
+
+  if (
+    !user &&
+    !publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+  ) {
+    // 유저가 없고 공개 경로가 아닌 경우 로그인 페이지로 리다이렉트
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

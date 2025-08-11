@@ -1,7 +1,7 @@
-import { ROUTES } from "@/shared/config";
+import { LoginButton } from "@/features/login/ui";
 import { CenteredView, Logo } from "@/shared/ui";
 
-export function LoginWidget() {
+function LoginWidget() {
   return (
     <CenteredView className="max-w-52 gap-9">
       <div className="flex flex-col items-center gap-5">
@@ -13,9 +13,9 @@ export function LoginWidget() {
           </p>
         </div>
       </div>
-      <a href={ROUTES.LOGIN} className="text-primary text-base font-bold">
-        시작하기
-      </a>
+      <LoginButton />
     </CenteredView>
   );
 }
+
+export default LoginWidget;
