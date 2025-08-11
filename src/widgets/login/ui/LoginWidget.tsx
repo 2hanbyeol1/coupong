@@ -1,7 +1,7 @@
 import { ROUTES } from "@/shared/config";
 import { CenteredView, Logo } from "@/shared/ui";
 
-export function HomeWidget() {
+export function LoginWidget() {
   return (
     <CenteredView className="max-w-52 gap-9">
       <div className="flex flex-col items-center gap-5">

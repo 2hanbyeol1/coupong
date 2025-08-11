@@ -1,7 +1,5 @@
-import { HomeWidget } from "@/widgets/home";
-
-const HomePage = () => {
-  return <HomeWidget />;
-};
+function HomePage() {
+  return <div>홈</div>;
+}
 
 export default HomePage;
