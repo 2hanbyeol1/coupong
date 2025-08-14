@@ -3,8 +3,17 @@
 @theme {
   --font-pretendard: var(--font-pretendard);
   --color-primary: #389970;
-  --color-secondary: #898989;
+  --color-dark: #898989;
+  --color-light: #f0f0f0;
   --breakpoint-mobile: 480px;
   --breakpoint-tablet: 768px;
   --breakpoint-laptop: 1281px;
+}
+
+body {
+  font-synthesis: none;
+}
+
+input {
+  @apply outline-none;
 }

@@ -14,7 +14,39 @@ export type Database = {
   };
   public: {
     Tables: {
-      [_ in never]: never;
+      coupons: {
+        Row: {
+          created_at: string;
+          expire_at: string;
+          id: number;
+          image_path: string;
+          name: string;
+          place: string;
+          uploaded_by: string;
+          used_by: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          expire_at: string;
+          id?: number;
+          image_path: string;
+          name: string;
+          place: string;
+          uploaded_by: string;
+          used_by?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          expire_at?: string;
+          id?: number;
+          image_path?: string;
+          name?: string;
+          place?: string;
+          uploaded_by?: string;
+          used_by?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

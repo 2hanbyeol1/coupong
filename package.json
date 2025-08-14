@@ -7,14 +7,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "supabase": "supabase gen types typescript --project-id ulnpskypjlycjtpxrdua > src/shared/config/supabase/database.types.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.54.0",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.539.0",
     "next": "15.4.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

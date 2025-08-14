@@ -2,7 +2,7 @@ import { ComponentProps } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import Link from "next/link";
 
-import { cn } from "@/shared/lib/cn";
+import { cn } from "@/shared/lib/util/cn";
 
 type ButtonProps = VariantProps<typeof buttonVariants>;
 
@@ -13,6 +13,7 @@ const buttonVariants = cva(
       size: {
         sm: "px-3.5 py-1.5 text-sm",
         md: "px-4 py-2 text-base",
+        lg: "px-4 py-3 text-lg",
       },
       full: {
         true: "w-full",

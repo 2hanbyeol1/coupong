@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { ROUTES } from "@/shared/config";
+import { ROUTES } from "@/shared/config/routes";
 import createClient from "@/shared/config/supabase/server";
 
 export async function GET(request: NextRequest) {

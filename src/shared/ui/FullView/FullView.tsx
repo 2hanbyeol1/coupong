@@ -2,16 +2,16 @@ import { PropsWithChildren } from "react";
 
 import { cn } from "@/shared/lib/util/cn";
 
-interface CenteredViewProps extends PropsWithChildren {
+interface FullViewProps extends PropsWithChildren {
   className?: string;
   withHeader?: boolean;
 }
 
-function CenteredView({ className, children, withHeader }: CenteredViewProps) {
+function FullView({ className, children, withHeader }: FullViewProps) {
   return (
     <div
       className={cn(
-        "mx-auto flex w-full flex-col items-center justify-center",
+        "flex w-full flex-col",
         // header size = 60px
         withHeader ? "h-[calc(100dvh-60px)]" : "h-dvh",
         className,
@@ -22,4 +22,4 @@ function CenteredView({ className, children, withHeader }: CenteredViewProps) {
   );
 }
 
-export default CenteredView;
+export default FullView;
