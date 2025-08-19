@@ -1,44 +1,56 @@
+"use client";
+
 import { ROUTES } from "@/shared/config/routes";
 import { cn } from "@/shared/lib/util/cn";
-import { getExpired } from "@/shared/lib/util/date";
+import { getExpired, getYYYYMMDD } from "@/shared/lib/util/date";
+
+import { CouponType } from "../../api/type";
+import { CouponImage } from "../CouponImage";
 
 interface CouponProps {
-  id: string;
-  name: string;
-  date: string;
-  isUsed: boolean;
+  coupon: CouponType;
 }
 
-function Coupon({ id, name, date, isUsed }: CouponProps) {
-  const isExpired = getExpired(date);
+function Coupon({ coupon }: CouponProps) {
+  const isExpired = getExpired(coupon.expire_at);
+  const isUsed = !!coupon.used_by;
   const isInvalid = isExpired || isUsed;
+
+  const getInvalidMessage = () => {
+    if (isUsed) return "사용 완료";
+    if (isExpired) return "기간 만료";
+    return "";
+  };
 
   return (
     <a
-      href={ROUTES.COUPON_DETAIL(id)}
-      className={cn(
-        "flex items-center gap-2",
-        isInvalid ? "cursor-not-allowed opacity-30" : "",
-      )}
+      href={ROUTES.COUPON_DETAIL(coupon.id.toString())}
+      className="flex items-center gap-2"
     >
+      <div className="relative aspect-square w-20 shrink-0">
+        {isInvalid && (
+          <span className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xs bg-white px-2 py-1 text-xs font-medium whitespace-nowrap text-black">
+            {getInvalidMessage()}
+          </span>
+        )}
+
+        <CouponImage
+          couponName={coupon.name}
+          imagePath={coupon.image_path}
+          isInvalid={isInvalid}
+        />
+      </div>
+
       <div
         className={cn(
-          "relative aspect-square w-20 shrink-0",
-          isInvalid ? "bg-white/90" : "",
+          "flex flex-grow flex-col gap-1.5 px-3",
+          isInvalid && "opacity-20",
         )}
       >
-        {isUsed ? (
-          <div className="absolute top-0 left-0">사용 완료</div>
-        ) : isExpired ? (
-          <div className="absolute top-0 left-0">유효 기간 만료</div>
-        ) : (
-          <></>
-        )}
-        <div className="h-full w-full bg-red-400"></div>
-      </div>
-      <div className="flex flex-grow flex-col gap-1.5 px-3">
-        <div className="text-sm font-medium">{name}</div>
-        <div className="text-dark text-xs">{date}</div>
+        <div className="text-sm font-medium">{coupon.name}</div>
+        <div className="text-dark flex items-center justify-between gap-2 text-xs">
+          {getYYYYMMDD(coupon.expire_at)}
+        </div>
       </div>
     </a>
   );

@@ -4,6 +4,12 @@ import nextPwa from "next-pwa";
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ulnpskypjlycjtpxrdua.supabase.co",
+      },
+    ],
   },
 };
 

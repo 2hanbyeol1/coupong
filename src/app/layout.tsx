@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
+import QueryProvider from "@/shared/lib/query/QueryProvider";
+import { ModalProvider } from "@/shared/ui/Modal/Modal";
 import ToastProvider from "@/shared/ui/Toast/Toast";
 
 import "./globals.css";
@@ -25,7 +27,11 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.variable}`}>
       <body className="font-pretendard">
-        <ToastProvider>{children}</ToastProvider>
+        <QueryProvider>
+          <ToastProvider>
+            <ModalProvider>{children}</ModalProvider>
+          </ToastProvider>
+        </QueryProvider>
       </body>
     </html>
   );

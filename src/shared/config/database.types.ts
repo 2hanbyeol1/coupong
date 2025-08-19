@@ -7,7 +7,7 @@ export type Json =
   | Json[];
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4";
@@ -21,6 +21,7 @@ export type Database = {
           id: number;
           image_path: string;
           name: string;
+          organization_id: number;
           place: string;
           uploaded_by: string;
           used_by: string | null;
@@ -31,6 +32,7 @@ export type Database = {
           id?: number;
           image_path: string;
           name: string;
+          organization_id: number;
           place: string;
           uploaded_by: string;
           used_by?: string | null;
@@ -41,9 +43,71 @@ export type Database = {
           id?: number;
           image_path?: string;
           name?: string;
+          organization_id?: number;
           place?: string;
           uploaded_by?: string;
           used_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "coupons_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organization";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "coupons_uploaded_by_fkey";
+            columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "coupons_used_by_fkey";
+            columns: ["used_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
+      organization: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      users: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          name: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          name?: string;
+          user_id?: string;
         };
         Relationships: [];
       };

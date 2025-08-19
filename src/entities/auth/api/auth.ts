@@ -1,4 +1,4 @@
-import createClient from "@/shared/config/supabase/client";
+import createClient from "@/shared/lib/supabase/client";
 
 export async function signInWithKakao() {
   const supabase = createClient();

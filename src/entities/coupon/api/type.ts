@@ -1,5 +1,5 @@
-import { TablesInsert } from "@/shared/config/supabase/database.types";
+import { Tables, TablesInsert } from "@/shared/config/database.types";
 
-// type CouponTableType = Tables<"coupons">;
+export type CouponType = Tables<"coupons">;
 
 export type InsertCouponType = TablesInsert<"coupons">;

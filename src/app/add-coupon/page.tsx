@@ -4,7 +4,7 @@ import { Header } from "@/widgets/header";
 function AddCouponPage() {
   return (
     <div className="relative">
-      <Header title="쿠폰 등록" />
+      <Header title="쿠폰 등록" withBackButton withOrganizationButton />
 
       <AddCouponFunnel />
     </div>

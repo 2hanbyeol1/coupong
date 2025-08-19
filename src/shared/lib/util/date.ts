@@ -5,6 +5,15 @@
  */
 export const getExpired = (date: string) => {
   const today = new Date();
-  const couponDate = new Date(date);
-  return couponDate < today;
+  const day = new Date(date);
+  return day < today;
+};
+
+export const getYYYYMMDD = (date: string) => {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 };
