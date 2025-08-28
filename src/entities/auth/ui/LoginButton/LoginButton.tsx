@@ -23,7 +23,7 @@ function LoginButton() {
   return (
     <button
       type="button"
-      className="text-primary text-base font-bold disabled:cursor-not-allowed disabled:opacity-50"
+      className="text-primary cursor-pointer text-base font-bold disabled:cursor-not-allowed disabled:opacity-50"
       onClick={handleLogin}
     >
       카카오로 시작하기

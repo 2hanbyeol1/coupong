@@ -53,7 +53,7 @@ export type Database = {
             foreignKeyName: "coupons_organization_id_fkey";
             columns: ["organization_id"];
             isOneToOne: false;
-            referencedRelation: "organization";
+            referencedRelation: "organizations";
             referencedColumns: ["id"];
           },
           {
@@ -72,7 +72,7 @@ export type Database = {
           },
         ];
       };
-      organization: {
+      organizations: {
         Row: {
           created_at: string;
           id: number;
@@ -89,6 +89,42 @@ export type Database = {
           name?: string;
         };
         Relationships: [];
+      };
+      user_organization: {
+        Row: {
+          created_at: string;
+          id: number;
+          organization_id: number;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          organization_id: number;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          organization_id?: number;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_organization_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_organization_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["user_id"];
+          },
+        ];
       };
       users: {
         Row: {

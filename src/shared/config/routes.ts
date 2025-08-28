@@ -8,4 +8,5 @@ export const ROUTES = {
   ADD_COUPON: "/add-coupon", // 쿠폰 등록
   COUPON_DETAIL: (id: string) => `/coupon/${id}`, // 쿠폰 상세
   SEARCH: "/search", // 검색
+  PROFILE: "/profile", // 프로필
 } as const;

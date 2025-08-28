@@ -1,5 +1,12 @@
 "use client";
-import { ComponentProps, forwardRef, useEffect, useId, useState } from "react";
+import {
+  ComponentProps,
+  forwardRef,
+  ReactNode,
+  useEffect,
+  useId,
+  useState,
+} from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
@@ -9,7 +16,8 @@ import { cn } from "@/shared/lib/util/cn";
 interface ImageInputProps
   extends VariantProps<typeof imageInputVariants>,
     ComponentProps<"input"> {
-  className: string;
+  className?: string;
+  previewImageIcon?: ReactNode;
   previewImageClassName?: string;
   onImageChange?: ({
     imageFile,
@@ -20,23 +28,27 @@ interface ImageInputProps
   }) => void;
 }
 
-const imageInputVariants = cva("flex w-full flex-col", {
-  variants: {
-    aspect: {
-      none: "aspect-auto",
-      square: "aspect-square",
-      mobile: "aspect-[9/16]",
+const imageInputVariants = cva(
+  "flex w-full flex-col overflow-hidden rounded-md",
+  {
+    variants: {
+      aspect: {
+        none: "aspect-auto",
+        square: "aspect-square",
+        mobile: "aspect-[9/16]",
+      },
+    },
+    defaultVariants: {
+      aspect: "none",
     },
   },
-  defaultVariants: {
-    aspect: "none",
-  },
-});
+);
 
 const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
   (
     {
       className,
+      previewImageIcon,
       previewImageClassName,
       aspect,
       onImageChange,
@@ -82,7 +94,7 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
         <label
           htmlFor={id}
           className={cn(
-            "relative flex h-full w-full cursor-pointer items-center justify-center rounded-md",
+            "relative flex h-full w-full cursor-pointer items-center justify-center",
             image ? "" : "bg-light",
           )}
         >
@@ -91,10 +103,14 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
               src={image}
               alt="쿠폰 이미지 미리보기"
               fill
-              className={cn("h-full w-full rounded-md", previewImageClassName)}
+              className={cn("h-full w-full", previewImageClassName)}
             />
           ) : (
-            <ImageIcon className="stroke-dark" size={28} />
+            <>
+              {previewImageIcon ?? (
+                <ImageIcon className="stroke-dark" size={28} />
+              )}
+            </>
           )}
         </label>
       </div>

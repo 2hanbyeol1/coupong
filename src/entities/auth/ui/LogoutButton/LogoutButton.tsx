@@ -30,7 +30,7 @@ function LogoutButton() {
   return (
     <button
       type="button"
-      className="text-primary text-base font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+      className="text-primary cursor-pointer text-base font-semibold disabled:cursor-not-allowed disabled:opacity-50"
       onClick={handleLogout}
     >
       로그아웃

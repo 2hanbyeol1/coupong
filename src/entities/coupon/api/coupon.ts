@@ -1,4 +1,4 @@
-import { getUser } from "@/entities/auth/api/auth";
+import { getAuthUser } from "@/entities/auth/api/auth";
 import { OrganizationType } from "@/entities/organization/api/type";
 import { AddCouponFormValues } from "@/features/add-coupon/config/schema";
 import createBrowserClient from "@/shared/lib/supabase/client";
@@ -67,7 +67,7 @@ export const getCoupon = async (couponId: CouponType["id"]) => {
 
 // ! 하나라도 실패하는 경우, rollback 처리 필요
 export const addCoupon = async (coupon: AddCouponFormValues) => {
-  const user = await getUser();
+  const user = await getAuthUser();
   const imagePath = await uploadCouponImage(coupon.imageFile[0]);
   const supabase = createBrowserClient();
 
@@ -117,7 +117,7 @@ export const getSignedUrl = async (path: string) => {
 };
 
 export const changeCouponUse = async (couponId: CouponType["id"]) => {
-  const user = await getUser();
+  const user = await getAuthUser();
   const supabase = createBrowserClient();
 
   const { error } = await supabase

@@ -1,5 +1,5 @@
 import { Tables, TablesInsert } from "@/shared/config/database.types";
 
-export type OrganizationType = Tables<"organization">;
+export type OrganizationType = Tables<"organizations">;
 
-export type InsertOrganizationType = TablesInsert<"organization">;
+export type InsertOrganizationType = TablesInsert<"organizations">;

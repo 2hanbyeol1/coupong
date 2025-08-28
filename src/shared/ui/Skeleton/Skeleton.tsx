@@ -10,17 +10,19 @@ interface SkeletonProps
   wrapper?: boolean;
 }
 
-const skeletonVariants = cva("", {
+const skeletonVariants = cva("rounded-md", {
   variants: {
     textSize: {
+      none: "",
       xs: "h-[12px] my-[2px]",
       sm: "h-[14px] my-[3px]",
       base: "h-[16px] my-[4px]",
       lg: "h-[18px] my-[5px]",
+      "3xl": "h-[30px] my-[3px]",
     },
-    defaultVariants: {
-      textSize: "base",
-    },
+  },
+  defaultVariants: {
+    textSize: "none",
   },
 });
 
@@ -28,7 +30,6 @@ function Skeleton({ className, children, wrapper, textSize }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "rounded-md",
         skeletonVariants({ textSize }),
         wrapper ? "animate-skeleton bg-dark/20" : "bg-dark/20",
         className,

@@ -1,9 +1,13 @@
 "use client";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { ChevronLeft, Search } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { UserType } from "@/entities/user/api/type";
+import { getUser } from "@/entities/user/api/user";
 import { ROUTES } from "@/shared/config/routes";
+import { Avatar } from "@/shared/ui/Avatar";
 
 interface HeaderProps {
   title?: string;
@@ -20,7 +24,13 @@ function Header({
   withSearchButton,
   onBack,
 }: HeaderProps) {
+  const [user, setUser] = useState<UserType | null>(null);
+
   const router = useRouter();
+
+  useEffect(() => {
+    getUser().then((user) => setUser(user));
+  }, []);
 
   const handleBack = () => {
     if (onBack) {
@@ -38,7 +48,7 @@ function Header({
     <header className="sticky top-0 z-50 mb-1 flex h-14 min-h-14 w-full items-center justify-between bg-white px-5 py-3.5">
       <div className="flex items-center gap-2">
         {withBackButton && (
-          <button className="cursor-pointer" onClick={handleBack}>
+          <button className="mr-1 cursor-pointer" onClick={handleBack}>
             <ChevronLeft className="stroke-dark" size={24} />
           </button>
         )}
@@ -52,11 +62,16 @@ function Header({
           </>
         )}
       </div>
-      <div>
+      <div className="flex items-center gap-4">
         {withSearchButton && (
-          <button onClick={handleSearch}>
+          <button onClick={handleSearch} className="cursor-pointer">
             <Search className="stroke-dark stroke-[2.5]" size={24} />
           </button>
+        )}
+        {user && (
+          <Link href={ROUTES.PROFILE}>
+            <Avatar name={user.name} />
+          </Link>
         )}
       </div>
     </header>
