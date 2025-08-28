@@ -4,7 +4,7 @@ import { Logo } from "@/shared/ui";
 function LoginWidget() {
   return (
     <div className="flex flex-col items-center gap-10">
-      <div className="flex flex-col items-center gap-5">
+      <div className="flex flex-col items-center gap-4">
         <Logo size={76} />
 
         <div className="flex flex-col items-center gap-2">

@@ -12,7 +12,7 @@ function UseCouponButton({ couponId }: { couponId: CouponType["id"] }) {
     ...changeCouponToUsedOption(queryClient),
   });
 
-  const { showModal } = useModal();
+  const { showModal, hideModal } = useModal();
 
   const handleShowModal = () => {
     showModal({
@@ -20,6 +20,7 @@ function UseCouponButton({ couponId }: { couponId: CouponType["id"] }) {
       message: "한번 사용 버튼을 누르면 되돌릴 수 없어요.",
       onConfirm: () => {
         changeCouponToUsed(couponId);
+        hideModal();
       },
     });
   };

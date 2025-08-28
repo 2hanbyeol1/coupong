@@ -67,7 +67,7 @@ function CouponDetailPage() {
       <div className="absolute flex min-w-80 flex-col gap-5 rounded-xl bg-white px-6 py-6 shadow-lg">
         <div className="flex flex-col gap-8">
           <div>
-            <div className="text-dark mb-3 text-sm">{coupon.place}</div>
+            <div className="text-dark mb-2 text-sm">{coupon.place}</div>
             <div className="mb-1 text-lg font-medium">{coupon.name}</div>
             <div className="flex justify-between gap-2">
               <div className="text-xs">

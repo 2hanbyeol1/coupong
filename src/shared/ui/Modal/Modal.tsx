@@ -23,7 +23,7 @@ function Modal({ modal }: { modal: ModalType | null }) {
               exit={{ opacity: 0, y: -100 }}
               className="flex min-w-72 flex-col gap-6 rounded-xl bg-white px-6 py-8 shadow-lg"
             >
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-1.5">
                 <div className="text-base font-medium">{modal?.title}</div>
                 <div className="text-sm text-gray-500">{modal.message}</div>
               </div>

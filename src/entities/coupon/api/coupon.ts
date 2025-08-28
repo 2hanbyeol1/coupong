@@ -19,7 +19,7 @@ export const getCoupons = async ({
 }) => {
   const supabase = createBrowserClient();
 
-  const { count, data, error } = await supabase
+  const { data, error } = await supabase
     .from(COUPON_TABLE)
     .select("*")
     .eq("organization_id", organizationId)
@@ -28,9 +28,19 @@ export const getCoupons = async ({
 
   if (error) {
     console.error("쿠폰 목록 조회 에러:", error);
-    throw new Error(`쿠폰 목록을 가져오는 중 오류가 발생했어요`);
+    throw new Error("쿠폰 목록을 가져오는 중 오류가 발생했어요");
   }
-  return { data, hasNext: count ?? 0 > page * limit };
+
+  const { count, error: countError } = await supabase
+    .from(COUPON_TABLE)
+    .select("*", { count: "exact", head: true })
+    .eq("organization_id", organizationId);
+
+  if (countError) {
+    console.error("쿠폰 목록 카운트 조회 에러:", countError);
+    throw new Error("쿠폰 목록의 개수를 가져오는 중 오류가 발생했어요");
+  }
+  return { data, hasNext: (count ?? 0) > page * limit };
 };
 
 export const getCoupon = async (couponId: CouponType["id"]) => {
