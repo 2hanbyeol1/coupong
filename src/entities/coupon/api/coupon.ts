@@ -23,8 +23,9 @@ export const getCoupons = async ({
     .from(COUPON_TABLE)
     .select("*")
     .eq("organization_id", organizationId)
-    .range((page - 1) * limit, page * limit - 1)
-    .order("created_at", { ascending: false });
+    .order("used_by", { nullsFirst: true })
+    .order("expire_at", { ascending: false })
+    .range((page - 1) * limit, page * limit - 1);
 
   if (error) {
     console.error("쿠폰 목록 조회 에러:", error);
