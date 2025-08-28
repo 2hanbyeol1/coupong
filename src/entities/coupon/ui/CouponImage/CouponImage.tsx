@@ -1,45 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-
-import { cn } from "@/shared/lib/util/cn";
-
-import { getCouponImageOption } from "../../api/query";
 import { CouponType } from "../../api/type";
 
-function CouponImage({
-  couponName,
-  imagePath,
-  isInvalid,
-  imageClassName,
-}: {
-  couponName: CouponType["name"];
-  imagePath: CouponType["image_path"];
+import CouponImageWithCouponId from "./CouponImageWithCouponId";
+import CouponImageWithCouponInfo from "./CouponImageWithCouponInfo";
+
+type CouponInfo =
+  | { couponId: CouponType["id"] }
+  | { couponName: CouponType["name"]; imagePath: CouponType["image_path"] };
+
+export interface CommonCouponImageProps {
   isInvalid?: boolean;
   imageClassName?: string;
-}) {
-  const {
-    data: signedUrl,
-    isPending,
-    isError,
-  } = useQuery(getCouponImageOption({ imagePath }));
+}
 
-  if (isPending) return <div className="bg-light h-full w-full"></div>;
-  if (isError) return <div>에러</div>;
+type CouponImageProps = CouponInfo & CommonCouponImageProps;
 
-  return (
-    <div className="relative h-full w-full">
-      <Image
-        src={signedUrl}
-        fill
-        className={cn(
-          "object-cover",
-          isInvalid && "opacity-20 brightness-75",
-          imageClassName,
-        )}
-        alt={couponName}
-      />
-    </div>
-  );
+function CouponImage({ ...props }: CouponImageProps) {
+  const hasCouponDetailInfo = "imagePath" in props;
+
+  if (hasCouponDetailInfo) return <CouponImageWithCouponInfo {...props} />;
+  return <CouponImageWithCouponId {...props} />;
 }
 
 export default CouponImage;

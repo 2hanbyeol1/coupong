@@ -8,6 +8,17 @@
   --breakpoint-mobile: 480px;
   --breakpoint-tablet: 768px;
   --breakpoint-laptop: 1281px;
+
+  --animate-skeleton: skeleton 1s ease-in-out infinite;
+  @keyframes skeleton {
+    0%,
+    100% {
+      filter: opacity(1);
+    }
+    50% {
+      filter: opacity(0.25);
+    }
+  }
 }
 
 body {

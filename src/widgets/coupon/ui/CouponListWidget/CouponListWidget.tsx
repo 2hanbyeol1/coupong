@@ -5,6 +5,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
 import { Coupon } from "@/entities/coupon/ui/Coupon";
+import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 
 interface CouponListWidgetProps {
@@ -29,7 +30,12 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
     }
   }, [inView, fetchNextPage]);
 
-  if (isPending) return <div>로딩</div>;
+  if (isPending)
+    return (
+      <div className="flex flex-col gap-2 px-3 pb-6">
+        <CouponSkeleton count={10} />
+      </div>
+    );
   if (isError) return <div>에러</div>;
 
   const filteredCoupons = keyword
@@ -58,11 +64,7 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
         <Coupon key={coupon.id} coupon={coupon} />
       ))}
 
-      {isFetchingNextPage && (
-        <div className="py-4 text-center text-gray-500">
-          다음 페이지 로딩 중...
-        </div>
-      )}
+      {isFetchingNextPage && <CouponSkeleton count={3} />}
       {hasNextPage && !isFetchingNextPage && <div ref={ref} className="h-4" />}
     </div>
   );
