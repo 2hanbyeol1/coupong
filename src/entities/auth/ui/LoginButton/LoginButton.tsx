@@ -1,5 +1,5 @@
 "use client";
-import { signInWithKakao } from "@/entities/auth/api/auth";
+import { signInWithKakao } from "@/entities/auth/api/api";
 import useToast from "@/shared/lib/hook/useToast";
 
 function LoginButton() {

@@ -4,7 +4,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
-import { addCoupon } from "@/entities/coupon/api/coupon";
+import { addCoupon } from "@/entities/coupon/api/api";
 import { ROUTES } from "@/shared/config/routes";
 import useFunnel from "@/shared/lib/hook/useFunnel";
 import useToast from "@/shared/lib/hook/useToast";

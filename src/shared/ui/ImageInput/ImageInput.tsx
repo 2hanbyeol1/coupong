@@ -17,6 +17,7 @@ interface ImageInputProps
   extends VariantProps<typeof imageInputVariants>,
     ComponentProps<"input"> {
   className?: string;
+  defaultImageUrl?: string | null;
   previewImageIcon?: ReactNode;
   previewImageClassName?: string;
   onImageChange?: ({
@@ -48,6 +49,7 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
   (
     {
       className,
+      defaultImageUrl,
       previewImageIcon,
       previewImageClassName,
       aspect,
@@ -101,14 +103,23 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
           {image ? (
             <Image
               src={image}
-              alt="쿠폰 이미지 미리보기"
+              alt="이미지 미리보기"
               fill
               className={cn("h-full w-full", previewImageClassName)}
             />
           ) : (
             <>
-              {previewImageIcon ?? (
-                <ImageIcon className="stroke-dark" size={28} />
+              {defaultImageUrl ? (
+                <Image
+                  src={defaultImageUrl}
+                  alt="이미지 미리보기"
+                  fill
+                  className={cn("h-full w-full", previewImageClassName)}
+                />
+              ) : (
+                (previewImageIcon ?? (
+                  <ImageIcon className="stroke-dark" size={28} />
+                ))
               )}
             </>
           )}

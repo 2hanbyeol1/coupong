@@ -1,4 +1,4 @@
-import { getAuthUser } from "@/entities/auth/api/auth";
+import { getAuthUser } from "@/entities/auth/api/api";
 import { OrganizationType } from "@/entities/organization/api/type";
 import { AddCouponFormValues } from "@/features/add-coupon/config/schema";
 import createBrowserClient from "@/shared/lib/supabase/client";
@@ -102,7 +102,7 @@ export const uploadCouponImage = async (imageFile: File) => {
   return data.path;
 };
 
-export const getSignedUrl = async (path: string) => {
+export const getImageSignedUrl = async (path: string) => {
   const supabase = createBrowserClient();
 
   const { data, error } = await supabase.storage

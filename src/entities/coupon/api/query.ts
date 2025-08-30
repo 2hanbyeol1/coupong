@@ -5,7 +5,12 @@ import {
   queryOptions,
 } from "@tanstack/react-query";
 
-import { changeCouponUse, getCoupon, getCoupons, getSignedUrl } from "./coupon";
+import {
+  changeCouponUse,
+  getCoupon,
+  getCoupons,
+  getImageSignedUrl,
+} from "./api";
 import { COUPON_QUERY_KEY } from "./query-key";
 import { CouponType } from "./type";
 
@@ -32,7 +37,7 @@ export const getCouponImageOption = ({
 }) =>
   queryOptions({
     queryKey: COUPON_QUERY_KEY.COUPON_IMAGE(imagePath),
-    queryFn: async () => await getSignedUrl(imagePath),
+    queryFn: async () => await getImageSignedUrl(imagePath),
     enabled: !!imagePath,
   });
 

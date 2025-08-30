@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getCouponDetailOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
+import { Avatar } from "@/entities/user/ui/Avatar";
 import { UseCouponButton } from "@/features/use-coupon/ui/UseCouponButton";
 import { getCouponStatus } from "@/shared/lib/util/coupon";
 import { getYYYYMMDD } from "@/shared/lib/util/date";
@@ -71,7 +72,10 @@ function CouponDetailWidget({
             <div className="text-xs">
               {getYYYYMMDD(coupon.expire_at)}까지 사용
             </div>
-            <div className="text-xs">{coupon.upload_username.name}</div>
+            <div className="flex items-center gap-1.5">
+              <Avatar userId={coupon.uploaded_by} size={16} />
+              <div className="text-xs">{coupon.upload_username.name}</div>
+            </div>
           </div>
         </div>
 

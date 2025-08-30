@@ -1,13 +1,11 @@
 "use client";
-import { memo, useEffect, useState } from "react";
+import { memo } from "react";
 import { ChevronLeft, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { UserType } from "@/entities/user/api/type";
-import { getUser } from "@/entities/user/api/user";
+import { Avatar } from "@/entities/user/ui/Avatar";
 import { ROUTES } from "@/shared/config/routes";
-import { Avatar } from "@/shared/ui/Avatar";
 
 interface HeaderProps {
   title?: string;
@@ -24,13 +22,7 @@ function Header({
   withSearchButton,
   onBack,
 }: HeaderProps) {
-  const [user, setUser] = useState<UserType | null>(null);
-
   const router = useRouter();
-
-  useEffect(() => {
-    getUser().then((user) => setUser(user));
-  }, []);
 
   const handleBack = () => {
     if (onBack) {
@@ -68,11 +60,9 @@ function Header({
             <Search className="stroke-dark stroke-[2.5]" size={24} />
           </button>
         )}
-        {user && (
-          <Link href={ROUTES.PROFILE}>
-            <Avatar name={user.name} />
-          </Link>
-        )}
+        <Link href={ROUTES.PROFILE}>
+          <Avatar />
+        </Link>
       </div>
     </header>
   );

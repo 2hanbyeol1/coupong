@@ -5,6 +5,7 @@
   --color-primary: #389970;
   --color-dark: #898989;
   --color-light: #f0f0f0;
+  --color-error: #d61616;
   --breakpoint-mobile: 480px;
   --breakpoint-tablet: 768px;
   --breakpoint-laptop: 1281px;

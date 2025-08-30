@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { signOut } from "@/entities/auth/api/auth";
+import { signOut } from "@/entities/auth/api/api";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
 

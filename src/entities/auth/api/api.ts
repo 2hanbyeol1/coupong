@@ -1,7 +1,7 @@
-import createClient from "@/shared/lib/supabase/client";
+import createBrowserClient from "@/shared/lib/supabase/client";
 
 export async function signInWithKakao() {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "kakao",
     options: {
@@ -15,7 +15,7 @@ export async function signInWithKakao() {
 }
 
 export async function signOut() {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const { error } = await supabase.auth.signOut();
   if (error) {
     console.error(`로그아웃 중 에러 발생: ${error.message}`);
@@ -24,7 +24,7 @@ export async function signOut() {
 }
 
 export async function getAuthUser() {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
   const { data, error } = await supabase.auth.getUser();
   if (error) {
     console.error(`사용자 Auth 정보 조회 중 에러 발생: ${error.message}`);
