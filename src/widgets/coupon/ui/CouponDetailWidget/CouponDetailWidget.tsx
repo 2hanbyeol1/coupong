@@ -4,17 +4,20 @@ import { getCouponDetailOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
 import { Avatar } from "@/entities/user/ui/Avatar";
 import { UseCouponButton } from "@/features/use-coupon/ui/UseCouponButton";
+import { cn } from "@/shared/lib/util/cn";
 import { getCouponStatus } from "@/shared/lib/util/coupon";
 import { getYYYYMMDD } from "@/shared/lib/util/date";
 import { Button } from "@/shared/ui";
 import Skeleton from "@/shared/ui/Skeleton";
 
 interface CouponDetailWidgetProps {
+  className?: string;
   couponId: CouponType["id"];
   handleOpenCoupon: () => void;
 }
 
 function CouponDetailWidget({
+  className,
   couponId,
   handleOpenCoupon,
 }: CouponDetailWidgetProps) {
@@ -27,7 +30,10 @@ function CouponDetailWidget({
   if (isPending)
     return (
       <Skeleton
-        className="absolute flex min-w-80 flex-col gap-5 rounded-xl bg-white px-6 py-6 shadow-lg"
+        className={cn(
+          "absolute flex min-w-80 flex-col gap-5 rounded-xl bg-white px-6 py-6 shadow-lg",
+          className,
+        )}
         wrapper
       >
         <div className="flex flex-col gap-8">
@@ -61,7 +67,12 @@ function CouponDetailWidget({
   };
 
   return (
-    <div className="absolute flex min-w-80 flex-col gap-5 rounded-xl bg-white px-6 py-6 shadow-lg">
+    <div
+      className={cn(
+        "absolute flex min-w-80 flex-col gap-5 rounded-xl bg-white px-6 py-6 shadow-lg",
+        className,
+      )}
+    >
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-1">
           <div className="flex flex-col gap-2">

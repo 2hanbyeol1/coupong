@@ -21,7 +21,10 @@ function SelectOrgButton() {
       >
         <SelectedOrg className="text-primary cursor-pointer items-center gap-1 text-xl font-semibold" />
         <ChevronDown
-          className={cn("stroke-dark duration-200", isOpen && "-rotate-180")}
+          className={cn(
+            "stroke-primary/70 duration-200",
+            isOpen && "-rotate-180",
+          )}
           size={24}
         />
       </button>

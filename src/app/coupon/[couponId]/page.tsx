@@ -37,6 +37,7 @@ function CouponDetailPage() {
       </div>
 
       <CouponDetailWidget
+        className="mx-4"
         couponId={couponId}
         handleOpenCoupon={handleOpenCoupon}
       />
