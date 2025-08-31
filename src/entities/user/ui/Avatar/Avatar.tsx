@@ -30,7 +30,7 @@ const avatarVariants = cva(
 );
 
 interface AvatarProps extends VariantProps<typeof avatarVariants> {
-  userId?: string;
+  userId?: string; // ""이면 본인 아바타
 }
 
 function Avatar({ color, size, userId = "" }: AvatarProps) {

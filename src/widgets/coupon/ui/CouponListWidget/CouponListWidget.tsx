@@ -6,6 +6,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
 import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
+import { useOrganizationStore } from "@/entities/organization/model/store";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 
 interface CouponListWidgetProps {
@@ -14,6 +15,7 @@ interface CouponListWidgetProps {
 
 function CouponListWidget({ keyword }: CouponListWidgetProps) {
   const { ref, inView } = useInView();
+  const { selectedOrgId } = useOrganizationStore();
 
   const {
     data: coupons,
@@ -22,13 +24,24 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery(getInfiniteCouponsOption);
+  } = useInfiniteQuery({
+    ...getInfiniteCouponsOption(selectedOrgId ?? ""),
+    enabled: !!selectedOrgId,
+  });
 
   useEffect(() => {
     if (inView) {
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
+
+  if (!selectedOrgId)
+    return (
+      <InfoMessage
+        title="그룹을 선택해 주세요"
+        description="쿠폰을 확인하려면 그룹을 선택해 주세요"
+      />
+    );
 
   if (isPending)
     return (
@@ -54,7 +67,7 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
     return (
       <InfoMessage
         title="등록된 쿠폰이 없어요"
-        description="우리 가족을 위해 등록하러 가볼까요?"
+        description="화면 하단의 버튼을 눌러 등록해보세요"
       />
     );
 
@@ -64,7 +77,7 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
         <Coupon key={coupon.id} coupon={coupon} />
       ))}
 
-      {isFetchingNextPage && <CouponSkeleton count={3} />}
+      {isFetchingNextPage && <CouponSkeleton count={10} />}
       {hasNextPage && !isFetchingNextPage && <div ref={ref} className="h-4" />}
     </div>
   );

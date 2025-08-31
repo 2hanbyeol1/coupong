@@ -44,7 +44,7 @@ function CouponImageUploader({
   };
 
   return (
-    <div className="flex h-full w-full flex-col justify-between gap-20 p-4">
+    <div className="flex h-full w-full flex-col justify-between gap-16 p-4">
       <div className="flex h-full flex-col gap-6">
         <h1 className="text-2xl leading-snug font-semibold">
           기프티콘을

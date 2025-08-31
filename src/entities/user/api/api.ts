@@ -43,7 +43,7 @@ export async function getUserGroups({
       `
         *,
         organizations (
-          name
+          *
         )
       `,
     )

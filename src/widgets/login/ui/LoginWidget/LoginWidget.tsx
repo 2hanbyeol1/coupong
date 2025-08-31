@@ -10,7 +10,7 @@ function LoginWidget() {
         <div className="flex flex-col items-center gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">쿠퐁</h1>
           <p className="text-dark text-base tracking-tight">
-            우리 가족 쿠폰 모두 여기로
+            쿠폰 한곳에서 관리하기
           </p>
         </div>
       </div>

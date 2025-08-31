@@ -9,7 +9,7 @@ function CouponSkeleton({ count = 1 }: CouponSkeletonProps) {
     <>
       {Array.from({ length: count }).map((_, idx) => (
         <Skeleton
-          key={`skeleton-${idx}`}
+          key={`coupon-skeleton-${idx}`}
           className="flex items-center gap-2"
           wrapper
         >

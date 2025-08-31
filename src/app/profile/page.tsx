@@ -1,8 +1,9 @@
 "use client";
 
+import { LogoutButton } from "@/entities/auth/ui";
 import { FullView } from "@/shared/ui/FullView";
 import { Header } from "@/widgets/header";
-import MyGroupListWidget from "@/widgets/profile/ui/MyGroupListWidget";
+import MyOrgsWidget from "@/widgets/profile/ui/MyOrgsWidget";
 import UserProfileWidget from "@/widgets/profile/ui/UserProfileWidget";
 
 function ProfilePage() {
@@ -12,8 +13,9 @@ function ProfilePage() {
 
       <FullView className="px-6 py-6" withHeader>
         <UserProfileWidget />
-
-        <MyGroupListWidget className="mt-16" />
+        <div className="bg-light mt-6 h-0.5 w-full" />
+        <MyOrgsWidget className="mt-10" title="내 그룹" />
+        <LogoutButton className="mt-20" />
       </FullView>
     </div>
   );

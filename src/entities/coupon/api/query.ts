@@ -5,6 +5,8 @@ import {
   queryOptions,
 } from "@tanstack/react-query";
 
+import { OrganizationType } from "@/entities/organization/api/type";
+
 import {
   changeCouponUse,
   getCoupon,
@@ -14,15 +16,16 @@ import {
 import { COUPON_QUERY_KEY } from "./query-key";
 import { CouponType } from "./type";
 
-export const getInfiniteCouponsOption = infiniteQueryOptions({
-  queryKey: COUPON_QUERY_KEY.LIST,
-  queryFn: async ({ pageParam }) =>
-    await getCoupons({ organizationId: 1, page: pageParam, limit: 10 }),
-  initialPageParam: 1,
-  getNextPageParam: (lastPage, _, pageParam) =>
-    lastPage.hasNext ? pageParam + 1 : undefined,
-  select: (data) => data.pages.flatMap((page) => page.data),
-});
+export const getInfiniteCouponsOption = (orgId: OrganizationType["id"]) =>
+  infiniteQueryOptions({
+    queryKey: COUPON_QUERY_KEY.LIST(orgId),
+    queryFn: async ({ pageParam }) =>
+      await getCoupons({ organizationId: orgId, page: pageParam, limit: 10 }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _, pageParam) =>
+      lastPage.hasNext ? pageParam + 1 : undefined,
+    select: (data) => data.pages.flatMap((page) => page.data),
+  });
 
 export const getCouponDetailOption = (couponId: CouponType["id"]) =>
   queryOptions({

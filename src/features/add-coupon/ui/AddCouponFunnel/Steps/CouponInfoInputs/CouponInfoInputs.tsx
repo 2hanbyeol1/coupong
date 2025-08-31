@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 
-import { INPUT_CONFIG } from "@/features/add-coupon/config/input";
+import { INPUT_CONFIG } from "@/features/add-coupon/lib/input";
 import useToast from "@/shared/lib/hook/useToast";
 import { Button, TextInput } from "@/shared/ui";
 import { FullView } from "@/shared/ui/FullView";
@@ -36,7 +36,7 @@ function CouponInfoInputs({
 
   return (
     <FullView className="relative" withHeader={true}>
-      <div className="flex h-full w-full flex-col justify-between gap-20 p-4">
+      <div className="flex h-full w-full flex-col justify-between gap-16 p-4">
         <div className="flex h-full flex-col gap-6">
           <h1 className="text-2xl leading-snug font-semibold">
             쿠폰에 대한 설명을 입력해주세요

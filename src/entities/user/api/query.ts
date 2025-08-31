@@ -27,7 +27,7 @@ export const getUserOption = (userId: UserType["user_id"]) =>
       userId ? await getUserById(userId) : await getSessionUser(),
   });
 
-export const getInfiniteUserGroupsOption = () =>
+export const getInfiniteOrganizationsOption = () =>
   infiniteQueryOptions({
     queryKey: USER_QUERY_KEY.GROUP_LIST,
     queryFn: async ({ pageParam }) =>
@@ -35,7 +35,10 @@ export const getInfiniteUserGroupsOption = () =>
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, pageParam) =>
       lastPage.hasNext ? pageParam + 1 : undefined,
-    select: (data) => data.pages.flatMap((page) => page.data),
+    select: (data) =>
+      data.pages.flatMap((page) =>
+        page.data.flatMap((org) => org.organizations),
+      ),
   });
 
 export const updateUserProfileOption = () =>

@@ -18,6 +18,7 @@ const skeletonVariants = cva("rounded-md", {
       sm: "h-[14px] my-[3px]",
       base: "h-[16px] my-[4px]",
       lg: "h-[18px] my-[5px]",
+      xl: "h-[20px] my-[4px]",
       "3xl": "h-[30px] my-[3px]",
     },
   },

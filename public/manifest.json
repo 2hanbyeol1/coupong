@@ -1,8 +1,8 @@
 {
   "name": "쿠퐁",
   "short_name": "Coupong",
-  "description": "한별 가족 쿠폰 모음",
-  "start_url": "/",
+  "description": "쿠폰 모으기",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",

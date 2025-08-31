@@ -24,10 +24,7 @@ function CouponDetailPage() {
       <CenteredView>
         <Header title="" withBackButton onBack={handleCloseCoupon} />
 
-        <CouponImage
-          couponId={parseInt(couponId)}
-          imageClassName="object-contain"
-        />
+        <CouponImage couponId={couponId} imageClassName="object-contain" />
       </CenteredView>
     );
 
@@ -36,11 +33,11 @@ function CouponDetailPage() {
       <Header title="" withBackButton withOrganizationButton />
 
       <div className="relative top-0 left-0 h-full w-full brightness-90">
-        <CouponImage couponId={parseInt(couponId)} />
+        <CouponImage couponId={couponId} />
       </div>
 
       <CouponDetailWidget
-        couponId={parseInt(couponId)}
+        couponId={couponId}
         handleOpenCoupon={handleOpenCoupon}
       />
     </CenteredView>

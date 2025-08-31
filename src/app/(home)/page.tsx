@@ -1,4 +1,3 @@
-import { LogoutButton } from "@/entities/auth/ui";
 import { AddCouponButton } from "@/entities/coupon/ui/AddCouponButton";
 import { CouponListWidget } from "@/widgets/coupon/ui/CouponListWidget";
 import Header from "@/widgets/header/Header";
@@ -11,10 +10,6 @@ function HomePage() {
       <CouponListWidget />
 
       <AddCouponButton />
-
-      <div className="flex justify-center pb-10">
-        <LogoutButton />
-      </div>
     </div>
   );
 }

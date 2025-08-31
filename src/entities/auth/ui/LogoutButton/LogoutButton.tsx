@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { signOut } from "@/entities/auth/api/api";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
+import { cn } from "@/shared/lib/util/cn";
 
-function LogoutButton() {
+interface LogoutButtonProps {
+  className?: string;
+}
+function LogoutButton({ className }: LogoutButtonProps) {
   const { addToast } = useToast();
   const router = useRouter();
 
@@ -26,11 +30,13 @@ function LogoutButton() {
     }
   };
 
-  // ! 임시 로그아웃 버튼
   return (
     <button
       type="button"
-      className="text-primary cursor-pointer text-base font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+      className={cn(
+        "text-primary cursor-pointer text-base font-semibold disabled:cursor-not-allowed disabled:opacity-50",
+        className,
+      )}
       onClick={handleLogout}
     >
       로그아웃

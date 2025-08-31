@@ -1,6 +1,6 @@
 import { getAuthUser } from "@/entities/auth/api/api";
 import { OrganizationType } from "@/entities/organization/api/type";
-import { AddCouponFormValues } from "@/features/add-coupon/config/schema";
+import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 import createBrowserClient from "@/shared/lib/supabase/client";
 
 import { CouponType, InsertCouponType } from "./type";
@@ -66,9 +66,12 @@ export const getCoupon = async (couponId: CouponType["id"]) => {
 };
 
 // ! 하나라도 실패하는 경우, rollback 처리 필요
-export const addCoupon = async (coupon: AddCouponFormValues) => {
+export const addCoupon = async (
+  coupon: AddCouponFormValues,
+  orgId: OrganizationType["id"],
+) => {
   const user = await getAuthUser();
-  const imagePath = await uploadCouponImage(coupon.imageFile[0]);
+  const imagePath = await uploadCouponImage(coupon.imageFile[0], orgId);
   const supabase = createBrowserClient();
 
   const { error } = await supabase.from(COUPON_TABLE).insert<InsertCouponType>({
@@ -77,7 +80,7 @@ export const addCoupon = async (coupon: AddCouponFormValues) => {
     expire_at: coupon.expire_at,
     image_path: imagePath,
     uploaded_by: user.id,
-    organization_id: 1, // ! 하드 코딩
+    organization_id: orgId,
   });
 
   if (error) {
@@ -86,12 +89,15 @@ export const addCoupon = async (coupon: AddCouponFormValues) => {
   }
 };
 
-export const uploadCouponImage = async (imageFile: File) => {
+export const uploadCouponImage = async (
+  imageFile: File,
+  orgId: OrganizationType["id"],
+) => {
   const supabase = createBrowserClient();
 
   const { data, error } = await supabase.storage
     .from(COUPON_IMAGE_BUCKET)
-    .upload(`private/${crypto.randomUUID()}`, imageFile, {
+    .upload(`${orgId}/${crypto.randomUUID()}`, imageFile, {
       upsert: false,
     });
 

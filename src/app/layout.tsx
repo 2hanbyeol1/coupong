@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
-import QueryProvider from "@/shared/lib/query/QueryProvider";
+import QueryProvider from "@/shared/lib/provider/QueryProvider";
 import { ModalProvider } from "@/shared/ui/Modal/Modal";
 import ToastProvider from "@/shared/ui/Toast/Toast";
 
@@ -9,7 +9,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "쿠퐁",
-  description: "한별 가족 쿠폰 모음",
+  description: "쿠폰 모으기",
   manifest: "/manifest.json",
 };
 

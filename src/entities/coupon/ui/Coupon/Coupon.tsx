@@ -47,7 +47,9 @@ function Coupon({ coupon }: CouponProps) {
           isInvalid && "opacity-20",
         )}
       >
-        <div className="text-sm font-medium">{coupon.name}</div>
+        <div className="text-sm font-medium">
+          [{coupon.place}] {coupon.name}
+        </div>
         <div className="text-dark flex items-center justify-between gap-2 text-xs">
           {getYYYYMMDD(coupon.expire_at)}까지 사용
         </div>

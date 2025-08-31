@@ -5,13 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
 import { addCoupon } from "@/entities/coupon/api/api";
+import { useOrganizationStore } from "@/entities/organization/model/store";
 import { ROUTES } from "@/shared/config/routes";
 import useFunnel from "@/shared/lib/hook/useFunnel";
 import useToast from "@/shared/lib/hook/useToast";
 import { Funnel, FunnelStep } from "@/shared/ui";
 import { FullView } from "@/shared/ui/FullView";
 
-import { AddCouponFormValues, addCouponSchema } from "../../config/schema";
+import { AddCouponFormValues, addCouponSchema } from "../../lib/schema";
 
 import { CouponImageUploader } from "./Steps/CouponImageUploader";
 import { CouponInfoInputs } from "./Steps/CouponInfoInputs";
@@ -19,6 +20,8 @@ import { CouponInfoInputs } from "./Steps/CouponInfoInputs";
 const addCouponStepNames = ["image-upload", "coupon-title", "success"];
 
 function AddCouponFunnel() {
+  const { selectedOrgId } = useOrganizationStore();
+
   const [couponImage, setCouponImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { step, setStep } = useFunnel("image-upload");
@@ -31,9 +34,18 @@ function AddCouponFunnel() {
   });
 
   const handleSubmit = async (data: AddCouponFormValues) => {
+    if (!selectedOrgId) {
+      addToast({
+        message: "그룹을 선택해주세요",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await addCoupon(data);
+      await addCoupon(data, selectedOrgId);
       addToast({
         message: "새로운 쿠폰이 추가되었어요",
         type: "success",

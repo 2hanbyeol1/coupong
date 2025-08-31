@@ -13,7 +13,7 @@ import useToast from "@/shared/lib/hook/useToast";
 import { cn } from "@/shared/lib/util/cn";
 import Skeleton from "@/shared/ui/Skeleton";
 
-import { changeProfileSchema } from "../../config/schema";
+import { changeProfileSchema } from "../../lib/schema";
 
 interface UserNameInputProps {
   className?: string;

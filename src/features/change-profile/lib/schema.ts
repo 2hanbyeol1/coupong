@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { USER_SCHEMA } from "@/entities/user/config/schema";
+import { USER_SCHEMA } from "@/entities/user/lib/schema";
 
 export const changeProfileSchema = z.object({
   name: USER_SCHEMA.name,

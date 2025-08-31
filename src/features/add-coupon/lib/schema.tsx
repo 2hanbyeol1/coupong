@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { COUPON_SCHEMA } from "@/entities/coupon/config/schema";
+import { COUPON_SCHEMA } from "@/entities/coupon/lib/schema";
 
 // 폼 스키마 정의
 export const addCouponSchema = z.object({
