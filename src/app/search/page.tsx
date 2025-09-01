@@ -8,7 +8,7 @@ import { CouponListWidget } from "@/widgets/coupon/ui/CouponListWidget";
 import { Header } from "@/widgets/header";
 
 function SearchPage() {
-  const tags = ["스타벅스", "CU", "푸라닭", "세븐일레븐", "투썸"];
+  const tags = ["스타벅스", "GS25", "푸라닭"];
   const [keyword, setKeyword] = useState("");
 
   return (

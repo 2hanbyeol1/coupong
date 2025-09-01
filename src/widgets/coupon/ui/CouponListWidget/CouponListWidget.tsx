@@ -52,7 +52,10 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
   if (isError) return <div>에러</div>;
 
   const filteredCoupons = keyword
-    ? coupons.filter((coupon) => coupon.place.includes(keyword))
+    ? coupons.filter(
+        (coupon) =>
+          coupon.place.includes(keyword) || coupon.name.includes(keyword),
+      )
     : coupons;
 
   if (!!keyword && filteredCoupons.length === 0)
