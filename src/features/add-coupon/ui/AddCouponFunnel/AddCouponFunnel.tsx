@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { addCoupon } from "@/entities/coupon/api/api";
+import { addCouponOption } from "@/entities/coupon/api/query";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import { ROUTES } from "@/shared/config/routes";
 import useFunnel from "@/shared/lib/hook/useFunnel";
@@ -20,13 +21,32 @@ import { CouponInfoInputs } from "./Steps/CouponInfoInputs";
 const addCouponStepNames = ["image-upload", "coupon-title", "success"];
 
 function AddCouponFunnel() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
+  const { step, setStep } = useFunnel("image-upload");
   const { selectedOrgId } = useOrganizationStore();
 
   const [couponImage, setCouponImage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { step, setStep } = useFunnel("image-upload");
-  const router = useRouter();
-  const { addToast } = useToast();
+
+  const { mutate: addCoupon, isPending: isAddCouponPending } = useMutation({
+    ...addCouponOption(queryClient),
+    onSuccess: () => {
+      addToast({
+        message: "새로운 쿠폰이 추가되었어요",
+        type: "success",
+        duration: 3000,
+      });
+      router.push(ROUTES.HOME);
+    },
+    onError: () => {
+      addToast({
+        message: "쿠폰 추가에 실패했어요",
+        type: "error",
+        duration: 3000,
+      });
+    },
+  });
 
   const methods = useForm<AddCouponFormValues>({
     mode: "onChange",
@@ -43,27 +63,7 @@ function AddCouponFunnel() {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      await addCoupon(data, selectedOrgId);
-      addToast({
-        message: "새로운 쿠폰이 추가되었어요",
-        type: "success",
-        duration: 3000,
-      });
-      router.push(ROUTES.HOME);
-    } catch (error) {
-      addToast({
-        message:
-          error instanceof Error
-            ? error.message
-            : "알 수 없는 에러가 발생했어요",
-        type: "error",
-        duration: 5000,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    addCoupon({ coupon: data, orgId: selectedOrgId });
   };
 
   return (
@@ -86,7 +86,7 @@ function AddCouponFunnel() {
               <FullView className="relative" withHeader={true}>
                 <CouponInfoInputs
                   couponImage={couponImage}
-                  isSubmitting={isSubmitting}
+                  isSubmitting={isAddCouponPending}
                 />
               </FullView>
             )}

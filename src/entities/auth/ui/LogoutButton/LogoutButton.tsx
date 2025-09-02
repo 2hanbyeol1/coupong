@@ -1,11 +1,13 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { signOut } from "@/entities/auth/api/api";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
 import { cn } from "@/shared/lib/util/cn";
+
+import { signOutOption } from "../../api/query";
 
 interface LogoutButtonProps {
   className?: string;
@@ -13,22 +15,19 @@ interface LogoutButtonProps {
 function LogoutButton({ className }: LogoutButtonProps) {
   const { addToast } = useToast();
   const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
+  const { mutate: signOut } = useMutation({
+    ...signOutOption(),
+    onSuccess: () => {
       router.push(ROUTES.LOGIN);
-    } catch (error) {
+    },
+    onError: () => {
       addToast({
-        message:
-          error instanceof Error
-            ? error.message
-            : "로그아웃 중 오류가 발생했어요",
+        message: "로그아웃 중 오류가 발생했어요",
         type: "error",
         duration: 3000,
       });
-    }
-  };
+    },
+  });
 
   return (
     <button
@@ -37,7 +36,7 @@ function LogoutButton({ className }: LogoutButtonProps) {
         "text-primary cursor-pointer text-base font-semibold disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
-      onClick={handleLogout}
+      onClick={() => signOut()}
     >
       로그아웃
     </button>

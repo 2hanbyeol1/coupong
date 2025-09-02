@@ -6,8 +6,10 @@ import {
 } from "@tanstack/react-query";
 
 import { OrganizationType } from "@/entities/organization/api/type";
+import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 
 import {
+  addCoupon,
   changeCouponUse,
   getCoupon,
   getCoupons,
@@ -43,6 +45,23 @@ export const getCouponImageOption = ({
     queryFn: async () => await getImageSignedUrl(imagePath),
     enabled: !!imagePath,
   });
+
+export const addCouponOption = (queryClient: QueryClient) => {
+  return mutationOptions({
+    mutationFn: async ({
+      coupon,
+      orgId,
+    }: {
+      coupon: AddCouponFormValues;
+      orgId: OrganizationType["id"];
+    }) => await addCoupon(coupon, orgId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COUPON_QUERY_KEY.ALL,
+      });
+    },
+  });
+};
 
 export const changeCouponToUsedOption = (queryClient: QueryClient) => {
   return mutationOptions({

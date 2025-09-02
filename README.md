@@ -16,7 +16,8 @@ pnpm dev
 
 ## 기술 스택
 
-`next.js` `typescript` `tailwind css` `pwa (next-pwa)`
+`next.js` `typescript` `tailwind css` `zustand` `tanstack query`
+`pwa (next-pwa)`
 
 <br/>
 
@@ -42,7 +43,6 @@ pnpm dev
   - [ ] 그룹 멤버 조회
   - [ ] 그룹 나가기
 
-- [ ] 
 - [x] supabase crud 권한 설정
 
 <br/>

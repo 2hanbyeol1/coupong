@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { User } from "lucide-react";
 
-import { getUserImageUrl, uploadUserImage } from "@/entities/user/api/api";
+import { getUserImageUrl } from "@/entities/user/api/api";
 import {
   getUserOption,
   updateUserProfileOption,
+  uploadUserImageOption,
 } from "@/entities/user/api/query";
 import { USER_QUERY_KEY } from "@/entities/user/api/query-key";
 import useToast from "@/shared/lib/hook/useToast";
@@ -21,6 +22,12 @@ function UserImageInput({ className }: UserImageInputProps) {
   const queryClient = useQueryClient();
 
   const { data: user, isPending, isError } = useQuery(getUserOption(""));
+  const { mutate: uploadUserImage } = useMutation({
+    ...uploadUserImageOption(),
+    onSuccess: (data) => {
+      updateUserProfile({ image_path: data });
+    },
+  });
   const { mutate: updateUserProfile } = useMutation({
     ...updateUserProfileOption(),
     onSuccess: () => {
@@ -56,9 +63,7 @@ function UserImageInput({ className }: UserImageInputProps) {
       previewImageClassName="object-cover"
       aspect="square"
       onImageChange={({ imageFile }) => {
-        uploadUserImage(imageFile).then((imagePath) => {
-          updateUserProfile({ image_path: imagePath });
-        });
+        uploadUserImage(imageFile);
       }}
     />
   );
