@@ -1,6 +1,6 @@
 import { type NextRequest } from "next/server";
 
-import { updateSession } from "./shared/config/middleware";
+import { updateSession } from "@/shared/config/middleware";
 
 export async function middleware(request: NextRequest) {
   return await updateSession(request);
@@ -13,8 +13,12 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - manifest.json (PWA manifest file)
+     * - sw.js (service worker file)
+     * - workbox-*.js (workbox files)
+     * - static files (images, fonts, etc.)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.json|sw.js|workbox-.*\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2|ttf|eot)$).*)",
   ],
 };
