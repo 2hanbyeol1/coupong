@@ -49,6 +49,11 @@ export const updateUserProfileOption = () =>
 
 export const uploadUserImageOption = () =>
   mutationOptions({
-    mutationFn: async (newUserImage: File) =>
-      await uploadUserImage(newUserImage),
+    mutationFn: async ({
+      userId,
+      newUserImage,
+    }: {
+      userId: string;
+      newUserImage: File;
+    }) => await uploadUserImage(userId, newUserImage),
   });

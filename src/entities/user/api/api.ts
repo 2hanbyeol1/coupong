@@ -84,12 +84,12 @@ export async function updateUserProfile(newProfile: Partial<UserType>) {
   }
 }
 
-export const uploadUserImage = async (imageFile: File) => {
+export const uploadUserImage = async (userId: string, imageFile: File) => {
   const supabase = createBrowserClient();
 
   const { data, error } = await supabase.storage
     .from(USER_IMAGE_BUCKET)
-    .upload(crypto.randomUUID(), imageFile);
+    .upload(`${userId}/${crypto.randomUUID()}`, imageFile);
 
   if (error) {
     console.error(

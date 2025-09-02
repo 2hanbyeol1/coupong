@@ -63,7 +63,7 @@ function UserImageInput({ className }: UserImageInputProps) {
       previewImageClassName="object-cover"
       aspect="square"
       onImageChange={({ imageFile }) => {
-        uploadUserImage(imageFile);
+        uploadUserImage({ userId: user.user_id, newUserImage: imageFile });
       }}
     />
   );
