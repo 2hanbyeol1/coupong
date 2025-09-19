@@ -54,7 +54,8 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
   const filteredCoupons = keyword
     ? coupons.filter(
         (coupon) =>
-          coupon.place.includes(keyword) || coupon.name.includes(keyword),
+          coupon.place.toUpperCase().includes(keyword) ||
+          coupon.name.toUpperCase().includes(keyword),
       )
     : coupons;
 

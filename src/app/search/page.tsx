@@ -47,7 +47,7 @@ function SearchPage() {
             description="키워드를 입력해서 원하는 쿠폰을 찾아보세요"
           />
         ) : (
-          <CouponListWidget keyword={keyword} />
+          <CouponListWidget keyword={keyword.toUpperCase()} />
         )}
       </div>
     </div>
