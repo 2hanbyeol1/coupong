@@ -27,7 +27,6 @@ function CouponInfoInputs({
         addToast({
           message: errors[input.name]?.message as string, // ! 하드 코딩
           type: "error",
-          duration: 3000,
         });
         return;
       }

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-import { SelectedOrg } from "@/entities/organization/ui/SelectedOrg";
+import { SelectedOrganization } from "@/entities/organization/ui/SelectedOrganization";
 import { cn } from "@/shared/lib/util/cn";
 
 import { MyOrgsList } from "../MyOrgsList";
 
-function SelectOrgButton() {
+function SelectOrganizationButton() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleButtonClick = () => {
@@ -19,7 +19,7 @@ function SelectOrgButton() {
         className="flex cursor-pointer items-center gap-1"
         onClick={handleButtonClick}
       >
-        <SelectedOrg className="text-primary cursor-pointer items-center gap-1 text-xl font-semibold" />
+        <SelectedOrganization className="text-primary cursor-pointer items-center gap-1 text-xl font-semibold" />
         <ChevronDown
           className={cn(
             "stroke-primary/70 duration-200",
@@ -38,4 +38,4 @@ function SelectOrgButton() {
   );
 }
 
-export default SelectOrgButton;
+export default SelectOrganizationButton;

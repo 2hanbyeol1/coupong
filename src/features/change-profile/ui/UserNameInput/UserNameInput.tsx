@@ -23,6 +23,15 @@ function UserNameInput({ className }: UserNameInputProps) {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
+  const {
+    register,
+    setValue,
+    formState: { isValid, errors },
+  } = useForm({
+    mode: "onChange",
+    resolver: zodResolver(changeProfileSchema),
+  });
+
   const { data: user, isPending, isError } = useQuery(getUserOption(""));
   const { mutate: updateUserProfile } = useMutation({
     ...updateUserProfileOption(),
@@ -30,26 +39,15 @@ function UserNameInput({ className }: UserNameInputProps) {
       addToast({
         message: "사용자 이름이 수정되었어요",
         type: "success",
-        duration: 3000,
       });
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEY.USER("") });
     },
-    onError: () => {
+    onError: (error) => {
       addToast({
-        message: "사용자 이름 수정에 실패했어요",
+        message: error.message,
         type: "error",
-        duration: 3000,
       });
     },
-  });
-
-  const {
-    register,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    mode: "onChange",
-    resolver: zodResolver(changeProfileSchema),
   });
 
   useEffect(() => {
@@ -71,6 +69,7 @@ function UserNameInput({ className }: UserNameInputProps) {
         {...register("name", {
           onBlur: (e) => {
             const newName = e.target.value;
+            if (!isValid) return;
             if (newName === user.name) return;
             updateUserProfile({ name: newName });
           },

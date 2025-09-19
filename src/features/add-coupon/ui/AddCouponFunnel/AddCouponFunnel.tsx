@@ -25,7 +25,7 @@ function AddCouponFunnel() {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const { step, setStep } = useFunnel("image-upload");
-  const { selectedOrgId } = useOrganizationStore();
+  const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
   const [couponImage, setCouponImage] = useState<string | null>(null);
 
@@ -35,7 +35,6 @@ function AddCouponFunnel() {
       addToast({
         message: "새로운 쿠폰이 추가되었어요",
         type: "success",
-        duration: 3000,
       });
       router.push(ROUTES.HOME);
     },
@@ -43,7 +42,6 @@ function AddCouponFunnel() {
       addToast({
         message: "쿠폰 추가에 실패했어요",
         type: "error",
-        duration: 3000,
       });
     },
   });
@@ -58,7 +56,6 @@ function AddCouponFunnel() {
       addToast({
         message: "그룹을 선택해주세요",
         type: "error",
-        duration: 3000,
       });
       return;
     }

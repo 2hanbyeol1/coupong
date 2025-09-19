@@ -17,7 +17,7 @@ function UseCouponButton({ couponId }: { couponId: CouponType["id"] }) {
   const handleShowModal = () => {
     showModal({
       title: "쿠폰을 사용하셨나요?",
-      message: "한번 사용 버튼을 누르면 되돌릴 수 없어요.",
+      content: "한번 사용 버튼을 누르면 되돌릴 수 없어요.",
       onConfirm: () => {
         changeCouponToUsed(couponId);
         hideModal();

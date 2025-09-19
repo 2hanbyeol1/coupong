@@ -15,7 +15,7 @@ interface CouponListWidgetProps {
 
 function CouponListWidget({ keyword }: CouponListWidgetProps) {
   const { ref, inView } = useInView();
-  const { selectedOrgId } = useOrganizationStore();
+  const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
   const {
     data: coupons,

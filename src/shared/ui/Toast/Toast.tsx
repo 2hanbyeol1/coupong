@@ -13,7 +13,7 @@ interface ToastProps {
 function Toast({
   // !
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  toast: { id, message, type = "success", duration },
+  toast: { id, message, type = "success", duration = 3000 },
 }: ToastProps) {
   const { deleteToast } = useToast();
 

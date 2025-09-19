@@ -4,7 +4,7 @@ export interface ToastType {
   id: string;
   message: string;
   type: "success" | "error" | "warning" | "info";
-  duration: number; // ms
+  duration?: number; // ms
 }
 
 interface ToastContextType {

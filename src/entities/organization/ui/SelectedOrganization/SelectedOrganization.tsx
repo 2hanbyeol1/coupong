@@ -5,8 +5,8 @@ import { getOrganizationByIdOption } from "@/entities/organization/api/query";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import Skeleton from "@/shared/ui/Skeleton";
 
-function SelectedOrg({ ...props }: ComponentProps<"div">) {
-  const { selectedOrgId } = useOrganizationStore();
+function SelectedOrganization({ ...props }: ComponentProps<"div">) {
+  const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
   const {
     data: organization,
@@ -24,4 +24,4 @@ function SelectedOrg({ ...props }: ComponentProps<"div">) {
   return <div {...props}>{organization.name}</div>;
 }
 
-export default SelectedOrg;
+export default SelectedOrganization;

@@ -34,7 +34,6 @@ function UserImageInput({ className }: UserImageInputProps) {
       addToast({
         message: "사용자 프로필 이미지가 수정되었어요",
         type: "success",
-        duration: 3000,
       });
       queryClient.invalidateQueries({
         queryKey: USER_QUERY_KEY.USER(""),
@@ -44,7 +43,6 @@ function UserImageInput({ className }: UserImageInputProps) {
       addToast({
         message: "사용자 프로필 이미지 수정에 실패했어요",
         type: "error",
-        duration: 3000,
       });
     },
   });

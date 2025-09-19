@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Avatar } from "@/entities/user/ui/Avatar";
-import { SelectOrgButton } from "@/features/select-organization/ui/SelectOrgButton";
+import { SelectOrganizationButton } from "@/features/select-organization/ui/SelectOrganizationButton";
 import { ROUTES } from "@/shared/config/routes";
 
 interface HeaderProps {
@@ -45,7 +45,7 @@ function Header({
             <ChevronLeft className="stroke-dark" size={24} />
           </button>
         )}
-        {withOrganizationButton && <SelectOrgButton />}
+        {withOrganizationButton && <SelectOrganizationButton />}
         {title && (
           <>
             <div className="text-light text-xl font-semibold">/</div>

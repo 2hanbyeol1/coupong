@@ -13,7 +13,6 @@ function LoginButton() {
       addToast({
         message: "로그인에 실패했어요",
         type: "error",
-        duration: 3000,
       });
     },
   });

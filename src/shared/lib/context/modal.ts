@@ -1,9 +1,11 @@
-import { createContext } from "react";
+import { createContext, ReactNode } from "react";
 
 export interface ModalType {
   title?: string;
-  message: string;
-  onConfirm: () => void;
+  content: string | ReactNode;
+  onConfirm?: () => void;
+  confirmButtonText?: string;
+  formId?: string;
 }
 
 interface ModalContextType {

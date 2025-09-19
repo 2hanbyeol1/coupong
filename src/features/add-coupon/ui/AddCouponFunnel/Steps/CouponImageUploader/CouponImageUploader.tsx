@@ -39,7 +39,6 @@ function CouponImageUploader({
     addToast({
       message: imageFileError.message as string, // ! 하드 코딩
       type: "error",
-      duration: 3000,
     });
   };
 

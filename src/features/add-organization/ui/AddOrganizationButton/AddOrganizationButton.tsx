@@ -3,10 +3,10 @@ import Link from "next/link";
 
 import { cn } from "@/shared/lib/util/cn";
 
-interface AddOrgButtonProps {
+interface AddOrganizationButtonProps {
   className?: string;
 }
-function AddOrgButton({ className }: AddOrgButtonProps) {
+function AddOrganizationButton({ className }: AddOrganizationButtonProps) {
   // !
   return null;
 
@@ -18,4 +18,4 @@ function AddOrgButton({ className }: AddOrgButtonProps) {
   );
 }
 
-export default AddOrgButton;
+export default AddOrganizationButton;
