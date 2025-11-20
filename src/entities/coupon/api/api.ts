@@ -25,6 +25,7 @@ export const getCoupons = async ({
     .eq("organization_id", organizationId)
     .order("used_by", { nullsFirst: true })
     .order("expire_at", { ascending: false })
+    .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit - 1);
 
   if (error) {
