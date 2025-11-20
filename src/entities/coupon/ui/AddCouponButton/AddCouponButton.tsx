@@ -8,9 +8,11 @@ import {
   useScroll,
 } from "framer-motion";
 
+import { useOrganizationStore } from "@/entities/organization/model/store";
 import { ROUTES } from "@/shared/config/routes";
 
 function AddCouponButton() {
+  const { selectedOrganizationId } = useOrganizationStore();
   const { scrollY } = useScroll();
   const prevScrollY = useRef(0);
 
@@ -25,6 +27,8 @@ function AddCouponButton() {
     setHidden(false);
     prevScrollY.current = scrollY;
   });
+
+  if (!selectedOrganizationId) return null;
 
   return (
     <AnimatePresence>
