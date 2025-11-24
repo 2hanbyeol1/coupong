@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/entities/user/ui/Avatar";
 import { SelectOrganizationButton } from "@/features/select-organization/ui/SelectOrganizationButton";
 import { ROUTES } from "@/shared/config/routes";
+import { cn } from "@/shared/lib/util/cn";
 
 interface HeaderProps {
   title?: string;
@@ -38,11 +39,11 @@ function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 mb-1 flex h-14 min-h-14 w-full items-center justify-between bg-white px-5 py-3.5">
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-50 flex h-12 min-h-12 w-full items-center justify-between bg-white px-4 py-1">
+      <div className={cn("flex items-center gap-2", withBackButton && "-ml-2")}>
         {withBackButton && (
-          <button className="mr-1 cursor-pointer" onClick={handleBack}>
-            <ChevronLeft className="stroke-dark" size={24} />
+          <button className="cursor-pointer" onClick={handleBack}>
+            <ChevronLeft className="stroke-dark" size={28} />
           </button>
         )}
         {withOrganizationButton && <SelectOrganizationButton />}
@@ -56,11 +57,11 @@ function Header({
       <div className="flex items-center gap-4">
         {withSearchButton && (
           <button onClick={handleSearch} className="cursor-pointer">
-            <Search className="stroke-dark stroke-[2.5]" size={24} />
+            <Search className="stroke-dark/90 stroke-[2.5]" size={24} />
           </button>
         )}
         <Link href={ROUTES.PROFILE}>
-          <Avatar />
+          <Avatar size={28} />
         </Link>
       </div>
     </header>

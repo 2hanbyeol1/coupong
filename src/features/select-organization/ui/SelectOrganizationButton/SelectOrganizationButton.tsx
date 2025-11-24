@@ -22,10 +22,10 @@ function SelectOrganizationButton() {
         <SelectedOrganization className="text-primary cursor-pointer items-center gap-1 text-xl font-semibold" />
         <ChevronDown
           className={cn(
-            "stroke-primary/70 duration-200",
+            "stroke-primary/80 duration-200",
             isOpen && "-rotate-180",
           )}
-          size={24}
+          size={20}
         />
       </button>
       {isOpen && (
