@@ -44,6 +44,8 @@ export const getCouponImageOption = ({
     queryKey: COUPON_QUERY_KEY.COUPON_IMAGE(imagePath),
     queryFn: async () => await getImageSignedUrl(imagePath),
     enabled: !!imagePath,
+    staleTime: 300000, // 5 minutes
+    gcTime: 300000, // 5 minutes
   });
 
 export const addCouponOption = (queryClient: QueryClient) => {

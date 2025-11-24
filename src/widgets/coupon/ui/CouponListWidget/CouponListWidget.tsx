@@ -45,7 +45,7 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
 
   if (isPending)
     return (
-      <div className="flex flex-col gap-2 px-3 pb-6">
+      <div className="flex flex-col gap-2 px-3 pt-1 pb-6">
         <CouponSkeleton count={10} />
       </div>
     );
@@ -76,7 +76,7 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
     );
 
   return (
-    <div className="flex flex-col gap-2 px-3 pb-6">
+    <div className="flex flex-col gap-2 px-3 pt-1 pb-6">
       {filteredCoupons.map((coupon) => (
         <Coupon key={coupon.id} coupon={coupon} />
       ))}

@@ -5,7 +5,12 @@ import { CouponType } from "@/entities/coupon/api/type";
 import useModal from "@/shared/lib/hook/useModal";
 import { Button } from "@/shared/ui";
 
-function UseCouponButton({ couponId }: { couponId: CouponType["id"] }) {
+export interface UseCouponButtonProps {
+  className?: string;
+  couponId: CouponType["id"];
+}
+
+function UseCouponButton({ className, couponId }: UseCouponButtonProps) {
   const queryClient = useQueryClient();
 
   const { mutate: changeCouponToUsed } = useMutation({
@@ -25,7 +30,11 @@ function UseCouponButton({ couponId }: { couponId: CouponType["id"] }) {
     });
   };
 
-  return <Button onClick={handleShowModal}>사용 완료</Button>;
+  return (
+    <Button className={className} onClick={handleShowModal}>
+      사용 완료
+    </Button>
+  );
 }
 
 export default UseCouponButton;

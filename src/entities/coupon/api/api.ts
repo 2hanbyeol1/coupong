@@ -114,7 +114,7 @@ export const getImageSignedUrl = async (path: string) => {
 
   const { data, error } = await supabase.storage
     .from(COUPON_IMAGE_BUCKET)
-    .createSignedUrl(path, 60);
+    .createSignedUrl(path, 300); // expires in 5 minutes
 
   if (error) {
     console.error(`쿠폰 이미지 URL 조회 중 에러 발생: ${error.message}`);

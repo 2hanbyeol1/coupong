@@ -15,15 +15,15 @@ function Modal({ modal }: { modal: ModalType | null }) {
   return (
     <>
       {modal && (
-        <CenteredView className="fixed top-0 left-0 z-50 bg-black/10 backdrop-blur-sm">
+        <CenteredView className="fixed top-0 left-0 z-50 bg-black/15 backdrop-blur-md">
           <AnimatePresence>
             <motion.div
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -100 }}
-              className="flex min-w-72 flex-col gap-6 rounded-xl bg-white px-6 py-8 shadow-lg"
+              className="flex min-w-72 flex-col gap-7 rounded-xl bg-white px-6 py-8 shadow-lg"
             >
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-2 px-1">
                 <div className="text-base font-medium">{modal?.title}</div>
                 <div className="w-full text-sm text-gray-500">
                   {modal.content}
