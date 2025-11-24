@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 import ToastContext, { ToastType } from "@/shared/lib/context/toast";
 import useToast from "@/shared/lib/hook/useToast";
@@ -62,7 +63,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastType[]>([]);
 
   const addToast = useCallback((toast: Omit<ToastType, "id">) => {
-    setToasts((prev) => [...prev, { ...toast, id: crypto.randomUUID() }]);
+    setToasts((prev) => [...prev, { ...toast, id: uuidv4() }]);
   }, []);
 
   const deleteToast = useCallback((id: string) => {

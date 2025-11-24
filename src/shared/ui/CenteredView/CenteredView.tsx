@@ -12,8 +12,8 @@ function CenteredView({ className, children, withHeader }: CenteredViewProps) {
     <div
       className={cn(
         "mx-auto flex w-full flex-col items-center justify-center",
-        // header size = 60px
-        withHeader ? "h-[calc(100dvh-60px)]" : "h-dvh",
+        // header size = 48px
+        withHeader ? "h-[calc(100dvh-48px)]" : "h-dvh",
         className,
       )}
     >

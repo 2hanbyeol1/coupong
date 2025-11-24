@@ -12,8 +12,8 @@ function FullView({ className, children, withHeader }: FullViewProps) {
     <div
       className={cn(
         "flex w-full flex-col",
-        // header size = 60px
-        withHeader ? "h-[calc(100dvh-60px)]" : "h-dvh",
+        // header size = 48px
+        withHeader ? "h-[calc(100dvh-48px)]" : "h-dvh",
         className,
       )}
     >

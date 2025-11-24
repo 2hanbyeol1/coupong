@@ -1,4 +1,15 @@
 /**
+ * 날짜가 지난 날짜인지 확인합니다.
+ * @param dateStr 날짜
+ * @returns 날짜가 지난 날짜인지 여부
+ */
+export const isDayPassed = (dateStr: string) => {
+  const today = new Date();
+  const date = new Date(dateStr);
+  return date < today;
+};
+
+/**
  * 날짜가 유효 기간을 초과했는지 체크, 시간은 무시합니다.
  * @param expireDate 만료되는 날짜
  * @returns 유효 기간이 지났는지 여부

@@ -59,7 +59,7 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
     },
     ref,
   ) => {
-    const [image, setImage] = useState<string | null>(null);
+    const [image, setImage] = useState<string | null>(defaultImageUrl ?? null);
 
     const id = useId();
 
@@ -108,20 +108,9 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
               className={cn("h-full w-full", previewImageClassName)}
             />
           ) : (
-            <>
-              {defaultImageUrl ? (
-                <Image
-                  src={defaultImageUrl}
-                  alt="이미지 미리보기"
-                  fill
-                  className={cn("h-full w-full", previewImageClassName)}
-                />
-              ) : (
-                (previewImageIcon ?? (
-                  <ImageIcon className="stroke-dark" size={28} />
-                ))
-              )}
-            </>
+            (previewImageIcon ?? (
+              <ImageIcon className="stroke-dark" size={28} />
+            ))
           )}
         </label>
       </div>

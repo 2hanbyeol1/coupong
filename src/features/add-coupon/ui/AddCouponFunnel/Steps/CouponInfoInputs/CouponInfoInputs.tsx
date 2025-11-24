@@ -49,12 +49,13 @@ function CouponInfoInputs({
             />
           </div>
           <div className="flex flex-col gap-3">
-            {INPUT_CONFIG.map((input) => (
+            {INPUT_CONFIG.map(({ name, type, placeholder, ...props }) => (
               <TextInput
-                key={input.name}
-                type={input.type}
-                placeholder={input.placeholder}
-                {...register(input.name)}
+                key={name}
+                type={type}
+                placeholder={placeholder}
+                {...register(name)}
+                {...props}
               />
             ))}
           </div>

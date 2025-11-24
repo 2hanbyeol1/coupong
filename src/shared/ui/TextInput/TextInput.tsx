@@ -4,7 +4,12 @@ interface TextInputProps extends ComponentProps<"input"> {
   errorMessage?: string;
 }
 
-function TextInput({ placeholder, errorMessage, ...props }: TextInputProps) {
+function TextInput({
+  placeholder,
+  errorMessage,
+  required,
+  ...props
+}: TextInputProps) {
   const id = useId();
 
   return (
@@ -12,6 +17,7 @@ function TextInput({ placeholder, errorMessage, ...props }: TextInputProps) {
       <div className="flex flex-col gap-1">
         <label htmlFor={id} className="text-dark text-sm">
           {placeholder}
+          {required && <span className="text-error"> *</span>}
         </label>
         <input
           id={id}
