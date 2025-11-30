@@ -52,7 +52,7 @@ function CouponImageUploader({
         </h1>
         <ImageInput
           className="h-full w-full flex-1"
-          previewImageClassName="object-contain object-left"
+          previewImageClassName="object-contain"
           onImageChange={(props) => {
             // ! 임시
             onImageChange(props);
@@ -61,9 +61,11 @@ function CouponImageUploader({
           {...register("imageFile")}
         />
       </div>
-      <Button onClick={handleNextButtonClick} size="lg" full>
-        다음
-      </Button>
+      <div className="flex flex-col gap-1">
+        <Button onClick={handleNextButtonClick} color="primary" size="lg" full>
+          다음
+        </Button>
+      </div>
     </div>
   );
 }

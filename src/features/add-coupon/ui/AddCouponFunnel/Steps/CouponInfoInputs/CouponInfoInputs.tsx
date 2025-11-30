@@ -38,7 +38,9 @@ function CouponInfoInputs({
       <div className="flex h-full w-full flex-col justify-between gap-16 p-4">
         <div className="flex h-full flex-col gap-6">
           <h1 className="text-2xl leading-snug font-semibold">
-            쿠폰에 대한 설명을 입력해주세요
+            쿠폰에 대한 설명을
+            <br />
+            입력해주세요
           </h1>
           <div className="relative h-full w-full flex-1">
             <Image

@@ -45,7 +45,10 @@ function CouponDetailWidget({ className, couponId }: CouponDetailWidgetProps) {
 
   return (
     <div
-      className={cn("flex w-full flex-col gap-5 bg-white px-4 py-3", className)}
+      className={cn(
+        "flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7",
+        className,
+      )}
     >
       <div className="flex flex-col">
         <AnimatePresence>

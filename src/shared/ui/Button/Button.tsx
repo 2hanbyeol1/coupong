@@ -47,6 +47,7 @@ function Button({
 
   return (
     <button
+      type={props.type ?? "button"}
       className={cn(
         buttonVariants({ color, size, full }),
         props.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",

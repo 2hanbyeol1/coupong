@@ -15,7 +15,7 @@ function Funnel({ currentStep, children }: FunnelProps) {
   );
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       <motion.div
         key={currentStep}
         className="h-full w-full"
@@ -23,7 +23,8 @@ function Funnel({ currentStep, children }: FunnelProps) {
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{
-          duration: 0.3,
+          duration: 0.5,
+          ease: "easeInOut",
         }}
       >
         {currentStepElement}

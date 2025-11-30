@@ -18,13 +18,16 @@ import { AddCouponFormValues, addCouponSchema } from "../../lib/schema";
 import { CouponImageUploader } from "./Steps/CouponImageUploader";
 import { CouponInfoInputs } from "./Steps/CouponInfoInputs";
 
-const addCouponStepNames = ["image-upload", "coupon-title", "success"];
+const addCouponStepNames = {
+  IMAGE_UPLOAD: "image-upload",
+  COUPON_TITLE: "coupon-title",
+};
 
 function AddCouponFunnel() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { step, setStep } = useFunnel("image-upload");
+  const { step, setStep } = useFunnel(addCouponStepNames.IMAGE_UPLOAD);
   const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
   const [couponImage, setCouponImage] = useState<string | null>(null);
@@ -67,10 +70,11 @@ function AddCouponFunnel() {
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(handleSubmit)}>
         <Funnel currentStep={step}>
-          <FunnelStep name={addCouponStepNames[0]}>
+          {/* 1-1) 일반 등록 - 기프티콘 이미지 업로드 */}
+          <FunnelStep name={addCouponStepNames.IMAGE_UPLOAD}>
             <FullView className="relative" withHeader={true}>
               <CouponImageUploader
-                onNext={() => setStep(addCouponStepNames[1])}
+                onNext={() => setStep(addCouponStepNames.COUPON_TITLE)}
                 onImageChange={({ imageUrl }) => {
                   setCouponImage(imageUrl);
                 }}
@@ -78,7 +82,8 @@ function AddCouponFunnel() {
             </FullView>
           </FunnelStep>
 
-          <FunnelStep name={addCouponStepNames[1]}>
+          {/* 1-2) 일반 등록 - 쿠폰 정보 입력 */}
+          <FunnelStep name={addCouponStepNames.COUPON_TITLE}>
             {couponImage && (
               <FullView className="relative" withHeader={true}>
                 <CouponInfoInputs
