@@ -1,12 +1,12 @@
 "use client";
-import { useEffect } from "react";
-import { useInView } from "react-intersection-observer";
+import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
 import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
 import { useOrganizationStore } from "@/entities/organization/model/store";
+import { InfiniteScroll } from "@/shared/ui/InfiniteScroll";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 
 interface CouponListWidgetProps {
@@ -14,7 +14,6 @@ interface CouponListWidgetProps {
 }
 
 function CouponListWidget({ keyword }: CouponListWidgetProps) {
-  const { ref, inView } = useInView();
   const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
   const {
@@ -22,18 +21,23 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
     isPending,
     isError,
     fetchNextPage,
-    hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
     ...getInfiniteCouponsOption(selectedOrgId ?? ""),
     enabled: !!selectedOrgId,
   });
 
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
-  }, [inView, fetchNextPage]);
+  const filteredCoupons = useMemo(
+    () =>
+      keyword && coupons
+        ? coupons.filter(
+            (coupon) =>
+              coupon.place.toUpperCase().includes(keyword) ||
+              coupon.name.toUpperCase().includes(keyword),
+          )
+        : (coupons ?? []),
+    [coupons, keyword],
+  );
 
   if (!selectedOrgId)
     return (
@@ -49,15 +53,14 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
         <CouponSkeleton count={10} />
       </div>
     );
-  if (isError) return <div>에러</div>;
 
-  const filteredCoupons = keyword
-    ? coupons.filter(
-        (coupon) =>
-          coupon.place.toUpperCase().includes(keyword) ||
-          coupon.name.toUpperCase().includes(keyword),
-      )
-    : coupons;
+  if (isError)
+    return (
+      <InfoMessage
+        title="쿠폰을 불러오는 중 오류가 발생했습니다"
+        description="잠시 후 다시 시도해 주세요"
+      />
+    );
 
   if (!!keyword && filteredCoupons.length === 0)
     return (
@@ -76,14 +79,16 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
     );
 
   return (
-    <div className="flex flex-col gap-2 px-3 pt-1 pb-6">
+    <InfiniteScroll
+      className="gap-2 px-3 pt-1 pb-6"
+      loader={<CouponSkeleton count={10} />}
+      fetchNextPage={fetchNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+    >
       {filteredCoupons.map((coupon) => (
         <Coupon key={coupon.id} coupon={coupon} />
       ))}
-
-      {isFetchingNextPage && <CouponSkeleton count={10} />}
-      {hasNextPage && !isFetchingNextPage && <div ref={ref} className="h-4" />}
-    </div>
+    </InfiniteScroll>
   );
 }
 

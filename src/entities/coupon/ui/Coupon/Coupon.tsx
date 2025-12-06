@@ -1,5 +1,8 @@
 "use client";
 
+import { memo } from "react";
+import Link from "next/link";
+
 import { ROUTES } from "@/shared/config/routes";
 import { cn } from "@/shared/lib/util/cn";
 import { getExpired, getYYYYMMDD } from "@/shared/lib/util/date";
@@ -23,7 +26,7 @@ function Coupon({ coupon }: CouponProps) {
   };
 
   return (
-    <a
+    <Link
       href={ROUTES.COUPON_DETAIL(coupon.id.toString())}
       className="flex items-center gap-2"
     >
@@ -54,8 +57,8 @@ function Coupon({ coupon }: CouponProps) {
           {getYYYYMMDD(coupon.expire_at)}까지 사용
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
-export default Coupon;
+export default memo(Coupon);

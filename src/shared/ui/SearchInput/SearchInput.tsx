@@ -1,19 +1,26 @@
 import { ComponentProps } from "react";
 import { X } from "lucide-react";
 
+import { cn } from "@/shared/lib/util/cn";
+
 interface SearchInputProps extends ComponentProps<"input"> {
+  className?: string;
   onXButtonClick?: () => void;
 }
 
-function SearchInput({ onXButtonClick, ...props }: SearchInputProps) {
+function SearchInput({
+  className,
+  onXButtonClick,
+  ...props
+}: SearchInputProps) {
   const handleXButtonClick = () => {
     onXButtonClick?.();
   };
 
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <input
-        className="border-light placeholder:text-dark w-full rounded-full border px-5 py-2.5 placeholder:text-sm"
+        className="border-light placeholder:text-dark w-full rounded-full border px-5 py-2 placeholder:text-sm"
         {...props}
       />
       {props.value && (
