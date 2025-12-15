@@ -1,5 +1,7 @@
 "use client";
 import useNotification from "@/shared/lib/hook/useNotification";
+import { Button } from "@/shared/ui";
+import { CenteredView } from "@/shared/ui/CenteredView";
 
 function TestPage() {
   const {
@@ -14,28 +16,28 @@ function TestPage() {
   if (isSupported === null) return <div>Loading...</div>;
 
   return (
-    <div>
+    <CenteredView>
       {isSupported ? (
         <div>
           {subscription ? (
             <div>
-              <button onClick={unsubscribeFromPush}>알림 구독 취소</button>
-              <button
+              <Button
                 onClick={() => sendNotification("쿠퐁", "푸시 알림 테스트")}
               >
-                send notification
-              </button>
+                알림 보내기
+              </Button>
+              <button onClick={unsubscribeFromPush}>알림 구독 취소</button>
             </div>
           ) : (
-            <button onClick={subscribeToPush} disabled={isSubscribing}>
+            <Button onClick={subscribeToPush} disabled={isSubscribing}>
               알림 구독
-            </button>
+            </Button>
           )}
         </div>
       ) : (
         "알림 기능을 지원하지 않는 브라우저예요"
       )}
-    </div>
+    </CenteredView>
   );
 }
 

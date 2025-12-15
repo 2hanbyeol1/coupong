@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { LogoutButton } from "@/entities/auth/ui";
 import { FullView } from "@/shared/ui/FullView";
 import { Header } from "@/widgets/header";
@@ -16,6 +18,9 @@ function ProfilePage() {
         <div className="bg-light mt-6 h-0.5 w-full" />
         <MyOrgsWidget className="mt-10" title="내 그룹" />
         <LogoutButton className="mt-20" />
+        <Link className="mt-auto opacity-0" href="/test">
+          실험실
+        </Link>
       </FullView>
     </div>
   );
