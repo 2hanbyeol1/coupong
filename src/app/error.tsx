@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/shared/ui";
 import { CenteredView } from "@/shared/ui/CenteredView";
 
-function ErrorPage() {
+function ErrorPage({ error }: { error: Error }) {
   const router = useRouter();
 
   return (
@@ -16,8 +16,8 @@ function ErrorPage() {
 
           <div className="flex flex-col items-center gap-2">
             <h1 className="text-2xl font-semibold tracking-tight">쿠퐁</h1>
-            <p className="text-dark text-base tracking-tight">
-              에러가 발생했습니다
+            <p className="text-dark text-center text-base tracking-tight">
+              {error.message ?? "에러가 발생했습니다"}
             </p>
           </div>
         </div>

@@ -15,10 +15,9 @@ export const config = {
      * - favicon.ico (favicon file)
      * - manifest.json (PWA manifest file)
      * - sw.js (service worker file)
-     * - workbox-*.js (workbox files)
      * - static files (images, fonts, etc.)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|manifest.json|sw.js|workbox-.*\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2|ttf|eot)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.json|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2|ttf|eot)$).*)",
   ],
 };
