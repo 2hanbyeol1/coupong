@@ -1,0 +1,2 @@
+export const NOT_FOUND_ERROR_CODE = "PGRST116";
+export const DUPLICATE_ERROR_CODE = "23505";

@@ -1,6 +1,7 @@
 import { getAuthUser } from "@/entities/auth/api/api";
 import { OrganizationType } from "@/entities/organization/api/type";
 import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
+import { NOT_FOUND_ERROR_CODE } from "@/shared/lib/constants/error-code";
 import createBrowserClient from "@/shared/lib/supabase/client";
 
 import { CouponType, InsertCouponType } from "./type";
@@ -60,6 +61,8 @@ export const getCoupon = async (couponId: CouponType["id"]) => {
     .single();
 
   if (error) {
+    if (error.code === NOT_FOUND_ERROR_CODE) return null;
+
     console.error("쿠폰 상세 조회 에러:", error);
     throw new Error(`쿠폰 정보를 가져오는 중 오류가 발생했어요`);
   }

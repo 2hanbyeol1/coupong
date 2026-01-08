@@ -17,7 +17,7 @@ function ProfilePage() {
         <UserProfileWidget />
         <div className="bg-light mt-6 h-0.5 w-full" />
         <MyOrgsWidget className="mt-10" title="내 그룹" />
-        <LogoutButton className="mt-20" />
+        <LogoutButton className="mt-40" />
         <Link className="mt-auto opacity-0" href="/test">
           실험실
         </Link>

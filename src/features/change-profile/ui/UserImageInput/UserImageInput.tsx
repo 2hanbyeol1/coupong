@@ -60,6 +60,7 @@ function UserImageInput({ className }: UserImageInputProps) {
       previewImageIcon={<User className="stroke-dark" size={32} />}
       previewImageClassName="object-cover"
       aspect="square"
+      rounded="full"
       onImageChange={({ imageFile }) => {
         uploadUserImage({ userId: user.user_id, newUserImage: imageFile });
       }}

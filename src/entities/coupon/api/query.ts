@@ -48,7 +48,13 @@ export const getCouponImageOption = ({
     gcTime: 300000, // 5 minutes
   });
 
-export const addCouponOption = (queryClient: QueryClient) => {
+export const addCouponOption = (
+  queryClient: QueryClient,
+  {
+    onSuccess,
+    onError,
+  }: { onSuccess?: () => void; onError?: (error: Error) => void },
+) => {
   return mutationOptions({
     mutationFn: async ({
       coupon,
@@ -61,7 +67,9 @@ export const addCouponOption = (queryClient: QueryClient) => {
       queryClient.invalidateQueries({
         queryKey: COUPON_QUERY_KEY.ALL,
       });
+      onSuccess?.();
     },
+    onError,
   });
 };
 

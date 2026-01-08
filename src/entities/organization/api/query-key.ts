@@ -1,6 +1,7 @@
 import { OrganizationType } from "./type";
 
 export const ORG_QUERY_KEY = {
+  ALL: ["organization"],
   ORGANIZATION: (organizationId: OrganizationType["id"]) => [
     "organization",
     organizationId,

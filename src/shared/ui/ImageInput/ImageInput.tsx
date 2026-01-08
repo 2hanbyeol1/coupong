@@ -38,9 +38,14 @@ const imageInputVariants = cva(
         square: "aspect-square",
         mobile: "aspect-[9/16]",
       },
+      rounded: {
+        md: "rounded-md",
+        full: "rounded-full",
+      },
     },
     defaultVariants: {
       aspect: "none",
+      rounded: "md",
     },
   },
 );
@@ -53,6 +58,7 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
       previewImageIcon,
       previewImageClassName,
       aspect,
+      rounded,
       onImageChange,
       onChange,
       ...props
@@ -80,7 +86,7 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
     };
 
     return (
-      <div className={cn(imageInputVariants({ aspect }), className)}>
+      <div className={cn(imageInputVariants({ aspect, rounded }), className)}>
         <input
           ref={ref}
           id={id}
@@ -96,8 +102,9 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
         <label
           htmlFor={id}
           className={cn(
-            "border-light relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full border-4",
+            "border-light relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden border-4",
             image ? "" : "bg-light",
+            rounded === "full" && "rounded-full",
           )}
         >
           {image ? (
