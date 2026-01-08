@@ -96,7 +96,7 @@ const ImageInput = forwardRef<HTMLInputElement, ImageInputProps>(
         <label
           htmlFor={id}
           className={cn(
-            "relative flex h-full w-full cursor-pointer items-center justify-center",
+            "border-light relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full border-4",
             image ? "" : "bg-light",
           )}
         >
