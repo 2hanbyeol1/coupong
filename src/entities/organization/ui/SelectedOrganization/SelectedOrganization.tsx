@@ -16,8 +16,7 @@ interface SuspensedSelectedOrganizationProps extends SelectedOrganizationProps {
 }
 
 function SelectedOrganization({ className }: SelectedOrganizationProps) {
-  const { selectedOrganizationId, isHydrated, resetSelectedOrganizationId } =
-    useOrganizationStore();
+  const { selectedOrganizationId, isHydrated } = useOrganizationStore();
 
   if (!isHydrated) return <Skeleton className="w-20" textSize="xl" />;
   if (!selectedOrganizationId)
