@@ -12,6 +12,7 @@ export interface CouponImageProps {
   couponName: CouponType["name"];
   isInvalid?: boolean;
   imageClassName?: string;
+  sizes: string;
 }
 
 function CouponImage({
@@ -19,6 +20,7 @@ function CouponImage({
   couponName,
   isInvalid,
   imageClassName,
+  sizes,
 }: CouponImageProps) {
   const {
     data: signedUrl,
@@ -40,6 +42,7 @@ function CouponImage({
           imageClassName,
         )}
         alt={couponName}
+        sizes={sizes}
       />
     </div>
   );

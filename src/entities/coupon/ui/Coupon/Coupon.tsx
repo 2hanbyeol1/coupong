@@ -30,7 +30,7 @@ function Coupon({ coupon }: CouponProps) {
       href={ROUTES.COUPON_DETAIL(coupon.id.toString())}
       className="flex items-center gap-2"
     >
-      <div className="relative aspect-square w-20 shrink-0">
+      <div className="relative size-20 shrink-0">
         {isInvalid && (
           <span className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xs bg-white px-2 py-1 text-xs font-medium whitespace-nowrap text-black">
             {getInvalidMessage()}
@@ -41,6 +41,7 @@ function Coupon({ coupon }: CouponProps) {
           couponName={coupon.name}
           imagePath={coupon.image_path}
           isInvalid={isInvalid}
+          sizes="5rem"
         />
       </div>
 

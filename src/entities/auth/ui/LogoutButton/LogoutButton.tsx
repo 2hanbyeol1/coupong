@@ -1,5 +1,4 @@
 "use client";
-
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +11,7 @@ import { signOutOption } from "../../api/query";
 interface LogoutButtonProps {
   className?: string;
 }
+
 function LogoutButton({ className }: LogoutButtonProps) {
   const { addToast } = useToast();
   const router = useRouter();

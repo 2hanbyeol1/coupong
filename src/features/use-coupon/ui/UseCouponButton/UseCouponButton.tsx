@@ -1,3 +1,4 @@
+"use client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { changeCouponToUsedOption } from "@/entities/coupon/api/query";

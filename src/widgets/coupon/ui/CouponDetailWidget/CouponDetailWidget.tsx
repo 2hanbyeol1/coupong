@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { notFound, useParams } from "next/navigation";
@@ -9,30 +9,16 @@ import { getCouponDetailOption } from "@/entities/coupon/api/query";
 import { CouponImage } from "@/entities/coupon/ui/CouponImage";
 import { Avatar } from "@/entities/user/ui/Avatar";
 import { UseCouponButton } from "@/features/use-coupon/ui/UseCouponButton";
-import { cn } from "@/shared/lib/util/cn";
 import { getCouponStatus } from "@/shared/lib/util/coupon";
 import { getYYYYMMDD } from "@/shared/lib/util/date";
 import { Button } from "@/shared/ui";
 
-import CouponDetailWidgetSkeleton from "./CouponDetailWidgetSkeleton";
-
-interface CouponDetailWidgetProps {
-  className?: string;
-}
-
-function CouponDetailWidget({ className }: CouponDetailWidgetProps) {
+function CouponDetailWidget() {
   const { couponId } = useParams<{ couponId: string }>();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCouponInfoVisible, setIsCouponInfoVisible] = useState(false);
 
-  const {
-    data: coupon,
-    isPending,
-    isError,
-  } = useQuery(getCouponDetailOption(couponId));
-
-  if (isPending) return <CouponDetailWidgetSkeleton className={className} />;
-  if (isError) return <div>에러</div>;
+  const { data: coupon } = useSuspenseQuery(getCouponDetailOption(couponId));
   if (!coupon) notFound();
 
   const { isExpired, isUsed, isInvalid } = getCouponStatus(coupon);
@@ -59,6 +45,7 @@ function CouponDetailWidget({ className }: CouponDetailWidgetProps) {
           imagePath={coupon.image_path}
           couponName={coupon.name}
           imageClassName={isExpanded ? "object-cover" : "object-contain"}
+          sizes="100vw"
         />
         <button
           className="absolute right-4 bottom-2 rounded-full bg-white p-2 shadow-lg"
@@ -71,12 +58,7 @@ function CouponDetailWidget({ className }: CouponDetailWidgetProps) {
           )}
         </button>
       </div>
-      <div
-        className={cn(
-          "flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7",
-          className,
-        )}
-      >
+      <div className="flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7">
         <div className="flex flex-col">
           <AnimatePresence>
             {isCouponInfoVisible && (

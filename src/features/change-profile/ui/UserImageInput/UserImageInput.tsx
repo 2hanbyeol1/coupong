@@ -1,3 +1,4 @@
+"use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { User } from "lucide-react";
 
@@ -22,12 +23,14 @@ function UserImageInput({ className }: UserImageInputProps) {
   const queryClient = useQueryClient();
 
   const { data: user, isPending, isError } = useQuery(getUserOption(""));
+
   const { mutate: uploadUserImage } = useMutation({
     ...uploadUserImageOption(),
     onSuccess: (data) => {
       updateUserProfile({ image_path: data });
     },
   });
+
   const { mutate: updateUserProfile } = useMutation({
     ...updateUserProfileOption(),
     onSuccess: () => {

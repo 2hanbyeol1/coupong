@@ -57,6 +57,7 @@ function Avatar({ color, size, userId = "" }: AvatarProps) {
           src={imageSource ?? ""}
           alt={user.name}
           fill
+          sizes={`${size}px`}
         />
       ) : (
         user.name[0]

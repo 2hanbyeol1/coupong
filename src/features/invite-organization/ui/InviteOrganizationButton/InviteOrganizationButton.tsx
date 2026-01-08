@@ -1,3 +1,4 @@
+"use client";
 import { UserPlus } from "lucide-react";
 
 import { OrganizationType } from "@/entities/organization/api/type";
