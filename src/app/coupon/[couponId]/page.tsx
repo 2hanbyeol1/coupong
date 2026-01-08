@@ -16,10 +16,7 @@ function CouponDetailPage() {
 
       <DetailCouponImage couponId={couponId} />
 
-      <CouponDetailWidget
-        className="fixed bottom-0 left-0"
-        couponId={couponId}
-      />
+      <CouponDetailWidget couponId={couponId} />
     </CenteredView>
   );
 }
