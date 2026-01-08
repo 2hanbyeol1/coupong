@@ -25,7 +25,7 @@ export async function getUserById(userId: UserType["user_id"]) {
     .single();
   if (error) {
     console.error(`사용자 정보 조회 중 에러 발생: ${error.message}`);
-    throw Error(getUserErrorMessage(error, "사용자 정보 조회에 실패했어요"));
+    throw Error(getUserErrorMessage(error) ?? "사용자 정보 조회에 실패했어요");
   }
   return data;
 }
@@ -81,7 +81,7 @@ export async function updateUserProfile(newProfile: Partial<UserType>) {
     console.error("사용자 정보 수정 에러:", error);
     // *
     throw new Error(
-      getUserErrorMessage(error, "사용자 정보 수정에 실패했어요"),
+      getUserErrorMessage(error) ?? "사용자 정보 수정에 실패했어요",
     );
   }
 }

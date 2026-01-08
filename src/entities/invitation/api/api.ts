@@ -48,6 +48,19 @@ export const addInvitation = async (
   const supabase = createBrowserClient();
   const token = crypto.randomUUID();
 
+  const { data: duplicateInvitation, error: getDuplicateInvitationError } =
+    await supabase
+      .from(INVITATION_TABLE)
+      .select()
+      .eq("invite_email", inviteEmail)
+      .eq("organization_id", organizationId)
+      .eq("accepted", false)
+      .limit(1);
+  if (getDuplicateInvitationError)
+    throw new Error("초대 정보 조회에 실패했어요");
+  if (duplicateInvitation.length > 0)
+    throw Error("이미 해당 그룹에 초대 중인 이메일이예요");
+
   const { error } = await supabase
     .from(INVITATION_TABLE)
     .insert<InsertInvitationType>({
