@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 
 import { COUPON_INFO } from "@/entities/coupon/lib/schema";
+import useToast from "@/shared/lib/hook/useToast";
 import { TextInput } from "@/shared/ui";
 
 interface CouponInfoInputsProps {
@@ -21,7 +23,26 @@ const INPUT_CONFIG = [
 ];
 
 function CouponInfoInputs({ couponImage }: CouponInfoInputsProps) {
-  const { register } = useFormContext();
+  const {
+    register,
+    formState: { isValid, errors },
+  } = useFormContext();
+
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    if (isValid) return;
+
+    for (const { name } of INPUT_CONFIG) {
+      if (errors?.[name]) {
+        addToast({
+          message: errors[name].message as string, // ! 하드 코딩
+          type: "error",
+        });
+        break;
+      }
+    }
+  }, [isValid, errors, addToast]);
 
   return (
     <div className="flex h-full flex-col gap-6">

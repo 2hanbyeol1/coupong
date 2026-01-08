@@ -10,7 +10,7 @@ export const COUPON_INFO = {
     type: "text",
     placeholder: "쿠폰 이름",
     maxLength: 20,
-    minLength: 0,
+    minLength: 1,
   },
   place: {
     label: "사용처",
@@ -18,7 +18,7 @@ export const COUPON_INFO = {
     type: "text",
     placeholder: "사용처",
     maxLength: 10,
-    minLength: 0,
+    minLength: 1,
   },
   expire_at: {
     label: "유효 기간",
@@ -35,20 +35,22 @@ export const COUPON_INFO = {
 
 export const COUPON_SCHEMA = {
   name: z
-    .string("쿠폰 이름을 입력해주세요")
+    .string()
     .min(COUPON_INFO.name.minLength, "쿠폰 이름을 입력해주세요")
     .max(
       COUPON_INFO.name.maxLength,
       `${COUPON_INFO.name.maxLength}자 이내로 입력해주세요`,
     ),
   place: z
-    .string("사용처를 입력해주세요")
+    .string()
+    .min(COUPON_INFO.place.minLength, "사용처를 입력해주세요")
     .max(
       COUPON_INFO.place.maxLength,
       `${COUPON_INFO.place.maxLength}자 이내로 입력해주세요`,
     ),
   expire_at: z
-    .string("쿠폰의 유효 기간을 입력해주세요")
+    .string()
+    .min(1, "쿠폰의 유효 기간을 입력해주세요")
     .refine((dateStr) => !isDayPassed(dateStr), {
       message: "유효 기간이 지난 쿠폰은 등록할 수 없어요",
     }),
