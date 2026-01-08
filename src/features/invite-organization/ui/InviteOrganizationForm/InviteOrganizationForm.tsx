@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { sendEmailOption } from "@/entities/email/query";
 import { addInvitationOption } from "@/entities/invitation/api/query";
 import { OrganizationType } from "@/entities/organization/api/type";
+import useModal from "@/shared/lib/hook/useModal";
 import useToast from "@/shared/lib/hook/useToast";
 import { TextInput } from "@/shared/ui";
 
@@ -25,6 +26,7 @@ function InviteOrganizationForm({
   organization,
 }: InviteOrganizationFormProps) {
   const { addToast } = useToast();
+  const { hideModal } = useModal();
 
   const { mutateAsync: addInvitation } = useMutation({
     ...addInvitationOption(),
@@ -43,6 +45,7 @@ function InviteOrganizationForm({
         message: "초대를 보냈어요!",
         type: "success",
       });
+      hideModal();
     },
     onError: (error) => {
       addToast({
