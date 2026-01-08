@@ -66,6 +66,7 @@ function UserNameInput({ className }: UserNameInputProps) {
           className,
         )}
         maxLength={8}
+        autoComplete="off"
         {...register("name", {
           onBlur: (e) => {
             const newName = e.target.value;

@@ -19,12 +19,7 @@ function AddCouponButton() {
   const [isHidden, setHidden] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (scrollY) => {
-    if (scrollY > prevScrollY.current && scrollY > 0) {
-      // 스크롤 내림
-      setHidden(true);
-      return;
-    }
-    setHidden(false);
+    setHidden(scrollY > prevScrollY.current && scrollY > 0); // 스크롤 내리면 버튼 숨기기
     prevScrollY.current = scrollY;
   });
 
