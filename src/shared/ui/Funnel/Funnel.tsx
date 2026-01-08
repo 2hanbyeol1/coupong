@@ -23,7 +23,7 @@ function Funnel({ currentStep, children }: FunnelProps) {
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{
-          duration: 0.5,
+          duration: 0.3,
           ease: "easeInOut",
         }}
       >

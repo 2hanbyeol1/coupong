@@ -10,8 +10,8 @@ import useToast from "@/shared/lib/hook/useToast";
 import { TextInput } from "@/shared/ui";
 
 import {
-    AddOrganizationFormValues,
-    addOrganizationSchema,
+  AddOrganizationFormValues,
+  addOrganizationSchema,
 } from "../../lib/schema";
 
 const INPUT_CONFIG = [
