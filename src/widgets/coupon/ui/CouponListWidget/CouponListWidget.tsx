@@ -14,7 +14,8 @@ interface CouponListWidgetProps {
 }
 
 function CouponListWidget({ keyword }: CouponListWidgetProps) {
-  const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
+  const { selectedOrganizationId: selectedOrgId, isHydrated } =
+    useOrganizationStore();
 
   const {
     data: coupons,
@@ -38,6 +39,13 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
         : (coupons ?? []),
     [coupons, keyword],
   );
+
+  if (!isHydrated)
+    return (
+      <div className="flex flex-col gap-2 px-3 pt-1 pb-6">
+        <CouponSkeleton count={10} />
+      </div>
+    );
 
   if (!selectedOrgId)
     return (

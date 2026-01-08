@@ -6,8 +6,11 @@ import { useOrganizationStore } from "@/entities/organization/model/store";
 import Skeleton from "@/shared/ui/Skeleton";
 
 function SelectedOrganization({ ...props }: ComponentProps<"div">) {
-  const { selectedOrganizationId: selectedOrgId, resetSelectedOrganizationId } =
-    useOrganizationStore();
+  const {
+    selectedOrganizationId: selectedOrgId,
+    isHydrated,
+    resetSelectedOrganizationId,
+  } = useOrganizationStore();
 
   const {
     data: organization,
@@ -30,6 +33,7 @@ function SelectedOrganization({ ...props }: ComponentProps<"div">) {
     resetSelectedOrganizationId,
   ]);
 
+  if (!isHydrated) return <Skeleton className="w-20" textSize="xl" />;
   if (!selectedOrgId) return <div {...props}>그룹 선택</div>;
   if (isPending) return <Skeleton className="w-20" textSize="xl" />;
   if (isError) return <div>에러</div>;
