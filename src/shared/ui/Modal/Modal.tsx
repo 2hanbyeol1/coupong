@@ -33,7 +33,12 @@ function Modal({ modal }: { modal: ModalType | null }) {
                 <Button color="light" size="sm" onClick={hideModal}>
                   취소
                 </Button>
-                <Button size="sm" onClick={modal.onConfirm} form={modal.formId}>
+                <Button
+                  type={modal.formId ? "submit" : "button"}
+                  size="sm"
+                  onClick={modal.onConfirm}
+                  form={modal.formId}
+                >
                   {modal.confirmButtonText ?? "확인"}
                 </Button>
               </div>
