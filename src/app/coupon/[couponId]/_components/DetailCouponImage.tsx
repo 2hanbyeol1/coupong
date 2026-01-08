@@ -27,7 +27,7 @@ function DetailCouponImage({ couponId }: { couponId: string }) {
       <CouponImage
         imagePath={coupon.image_path}
         couponName={coupon.name}
-        imageClassName={isExpanded ? "object-contain" : "object-cover"}
+        imageClassName={isExpanded ? "object-cover" : "object-contain"}
       />
       <button
         className="absolute right-4 bottom-2 rounded-full bg-white p-2 shadow-lg"
