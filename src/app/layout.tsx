@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
 import QueryProvider from "@/shared/lib/provider/QueryProvider";
@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "쿠퐁",
   description: "쿠폰 모으기",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
+  userScalable: false,
 };
 
 const pretendard = localFont({
