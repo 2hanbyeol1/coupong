@@ -47,12 +47,10 @@ function Header({
           </button>
         )}
         {withOrganizationButton && <SelectOrganizationButton />}
-        {title && (
-          <>
-            <div className="text-light text-xl font-semibold">/</div>
-            <div className="text-xl font-semibold">{title}</div>
-          </>
+        {withOrganizationButton && title && (
+          <div className="text-light text-xl font-semibold">/</div>
         )}
+        {title && <div className="text-xl font-semibold">{title}</div>}
       </div>
       <div className="flex items-center gap-4">
         {withSearchButton && (

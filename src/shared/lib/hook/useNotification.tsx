@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import {
-  sendNotification,
-  subscribeUser,
-  unsubscribeUser,
-} from "@/app/actions";
+import { subscribeUser, unsubscribeUser } from "@/app/actions";
+
+import { getIsNotificationSupported } from "../util/notification";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -22,14 +20,14 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 function useNotification() {
-  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+  const [isSupported, setIsSupported] = useState<boolean | null>(null); // ! null이면 값을 가져오는 중..? 비동기가 아닌데 뭐지
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null,
   );
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   useEffect(() => {
-    const isSupported = "serviceWorker" in navigator && "PushManager" in window;
+    const isSupported = getIsNotificationSupported();
     setIsSupported(isSupported);
 
     if (isSupported) {
@@ -75,7 +73,6 @@ function useNotification() {
     isSupported,
     isSubscribing,
     subscription,
-    sendNotification,
     unsubscribeFromPush,
     subscribeToPush,
   };

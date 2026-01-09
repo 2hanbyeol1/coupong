@@ -24,7 +24,11 @@ export async function unsubscribeUser() {
   return { success: true };
 }
 
-export async function sendNotification(title: string, message: string) {
+export async function sendNotification(
+  title: string,
+  message: string,
+  url?: string,
+) {
   if (!subscription) {
     console.error("푸시 알림을 보내기 위한 구독 정보가 없음");
     throw new Error("구독 정보가 없어서 푸시 알림을 보낼 수 없어요");
@@ -36,6 +40,7 @@ export async function sendNotification(title: string, message: string) {
       JSON.stringify({
         title,
         body: message,
+        url,
       }),
     );
     return { success: true };

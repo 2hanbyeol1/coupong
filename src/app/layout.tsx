@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import NotificationProvider from "@/shared/lib/provider/NotificationProvider";
 import QueryProvider from "@/shared/lib/provider/QueryProvider";
 import { ModalProvider } from "@/shared/ui/Modal/Modal";
 import ToastProvider from "@/shared/ui/Toast/Toast";
@@ -32,9 +33,11 @@ export default function RootLayout({
     <html lang="ko" className={`${pretendard.variable}`}>
       <body className="font-pretendard">
         <QueryProvider>
-          <ToastProvider>
-            <ModalProvider>{children}</ModalProvider>
-          </ToastProvider>
+          <NotificationProvider>
+            <ToastProvider>
+              <ModalProvider>{children}</ModalProvider>
+            </ToastProvider>
+          </NotificationProvider>
         </QueryProvider>
       </body>
     </html>
