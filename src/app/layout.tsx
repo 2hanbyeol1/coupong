@@ -35,13 +35,7 @@ export default function RootLayout({
         <QueryProvider>
           <NotificationProvider>
             <ToastProvider>
-              <ModalProvider>
-                <div className="bg-light">
-                  <div className="tablet:max-w-[800px] mx-auto min-h-dvh bg-white">
-                    {children}
-                  </div>
-                </div>
-              </ModalProvider>
+              <ModalProvider>{children}</ModalProvider>
             </ToastProvider>
           </NotificationProvider>
         </QueryProvider>

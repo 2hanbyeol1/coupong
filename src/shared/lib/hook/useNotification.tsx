@@ -6,7 +6,7 @@ import {
   subscribeUser,
   unsubscribeUser,
 } from "@/app/actions";
-import { useNotificationStore } from "@/entities/notification/model/store";
+import { useSubscriptionStore } from "@/entities/notification/model/store";
 
 import { getIsNotificationSupported } from "../util/notification";
 
@@ -28,7 +28,7 @@ function urlBase64ToUint8Array(base64String: string) {
 
 function useNotification() {
   const [isSupported, setIsSupported] = useState<boolean | null>(null); // ! null이면 값을 가져오는 중..? 비동기가 아닌데 뭐지
-  const { subscription, setSubscription } = useNotificationStore();
+  const { subscription, setSubscription } = useSubscriptionStore();
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -38,6 +38,7 @@ function useNotification() {
     if (isSupported) {
       registerServiceWorker();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function registerServiceWorker() {
