@@ -1,11 +1,9 @@
 "use client";
 import { PropsWithChildren, useEffect, useRef } from "react";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { useQuery } from "@tanstack/react-query";
 
 import { useNotificationStore } from "@/entities/notification/model/store";
 import { useOrganizationStore } from "@/entities/organization/model/store";
-import { getMyInfoOption } from "@/entities/user/api/query";
 
 import useNotification from "../hook/useNotification";
 import createClient from "../supabase/client";
@@ -16,7 +14,6 @@ function NotificationProvider({ children }: PropsWithChildren) {
   const { isNotificationEnabled, isCouponRegistrationNotiEnabled } =
     useNotificationStore();
   const { selectedOrganizationId } = useOrganizationStore();
-  const { data: user } = useQuery(getMyInfoOption());
 
   const channelRef = useRef<RealtimeChannel | null>(null);
 
@@ -32,8 +29,6 @@ function NotificationProvider({ children }: PropsWithChildren) {
       channelRef.current = null;
       return;
     }
-
-    if (!user) return;
 
     const supabase = createClient();
 
