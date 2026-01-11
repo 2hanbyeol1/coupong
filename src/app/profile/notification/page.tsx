@@ -7,7 +7,7 @@ import { Header } from "@/widgets/header";
 function NotificationPage() {
   const isSupported = getIsNotificationSupported();
 
-  if (isSupported) {
+  if (!isSupported) {
     return (
       <div className="relative">
         <Header withBackButton />
