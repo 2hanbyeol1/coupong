@@ -1,9 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import { subscribeUser, unsubscribeUser } from "@/app/actions";
+import {
+  sendNotification as sendNotificationAction,
+  subscribeUser,
+  unsubscribeUser,
+} from "@/app/actions";
+import { useNotificationStore } from "@/entities/notification/model/store";
 
 import { getIsNotificationSupported } from "../util/notification";
+
+import useToast from "./useToast";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -21,10 +28,8 @@ function urlBase64ToUint8Array(base64String: string) {
 
 function useNotification() {
   const [isSupported, setIsSupported] = useState<boolean | null>(null); // ! null이면 값을 가져오는 중..? 비동기가 아닌데 뭐지
-  const [subscription, setSubscription] = useState<PushSubscription | null>(
-    null,
-  );
-  const [isSubscribing, setIsSubscribing] = useState(false);
+  const { subscription, setSubscription } = useNotificationStore();
+  const { addToast } = useToast();
 
   useEffect(() => {
     const isSupported = getIsNotificationSupported();
@@ -45,7 +50,6 @@ function useNotification() {
   }
 
   async function subscribeToPush() {
-    setIsSubscribing(true);
     if (subscription) {
       console.error("이미 구독 정보가 존재해요");
       return;
@@ -60,7 +64,6 @@ function useNotification() {
     setSubscription(sub);
     const serializedSub = JSON.parse(JSON.stringify(sub));
     await subscribeUser(serializedSub);
-    setIsSubscribing(false);
   }
 
   async function unsubscribeFromPush() {
@@ -69,12 +72,28 @@ function useNotification() {
     await unsubscribeUser();
   }
 
+  async function sendNotification(title: string, message: string) {
+    try {
+      await sendNotificationAction(title, message);
+    } catch (error) {
+      console.error(error);
+
+      addToast({
+        message:
+          error instanceof Error
+            ? error.message
+            : "알 수 없는 에러가 발생했어요",
+        type: "error",
+      });
+    }
+  }
+
   return {
     isSupported,
-    isSubscribing,
     subscription,
     unsubscribeFromPush,
     subscribeToPush,
+    sendNotification,
   };
 }
 

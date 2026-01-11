@@ -3,7 +3,6 @@ import { PropsWithChildren, useEffect, useRef } from "react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 
-import { sendNotification } from "@/app/actions";
 import { useNotificationStore } from "@/entities/notification/model/store";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import { getMyInfoOption } from "@/entities/user/api/query";
@@ -12,7 +11,8 @@ import useNotification from "../hook/useNotification";
 import createClient from "../supabase/client";
 
 function NotificationProvider({ children }: PropsWithChildren) {
-  const { subscribeToPush, unsubscribeFromPush } = useNotification();
+  const { subscribeToPush, unsubscribeFromPush, sendNotification } =
+    useNotification();
   const { isNotificationEnabled, isCouponRegistrationNotiEnabled } =
     useNotificationStore();
   const { selectedOrganizationId } = useOrganizationStore();
