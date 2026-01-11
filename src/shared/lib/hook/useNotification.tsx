@@ -51,10 +51,8 @@ function useNotification() {
   }
 
   async function subscribeToPush() {
-    if (subscription) {
-      console.error("이미 구독 정보가 존재해요");
-      return;
-    }
+    if (subscription) return;
+
     const registration = await navigator.serviceWorker.ready;
     const sub = await registration.pushManager.subscribe({
       userVisibleOnly: true,

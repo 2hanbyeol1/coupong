@@ -5,7 +5,7 @@ import useNotification from "@/shared/lib/hook/useNotification";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 
 function NotificationSettingListWidget() {
-  const { isSupported, sendNotification } = useNotification();
+  const { isSupported } = useNotification();
 
   if (isSupported === false) {
     return (
@@ -23,9 +23,6 @@ function NotificationSettingListWidget() {
         <NotificationSubscribeToggleButton />
       </div>
       <NotificationSettingList />
-      <button onClick={() => sendNotification("test", "test")}>
-        알림 보내기 테스트
-      </button>
     </div>
   );
 }

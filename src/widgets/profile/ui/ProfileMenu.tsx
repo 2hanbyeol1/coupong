@@ -13,11 +13,11 @@ function ProfileMenu({ menu, link, isTest }: ProfileMenuProps) {
       href={link}
       className="hover:bg-light/40 flex items-center justify-between px-2 py-2"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <span className="text-lg font-medium">{menu}</span>
         {isTest && (
           <span className="bg-dark rounded-md px-2 py-1 text-xs text-white">
-            테스트 중
+            Beta
           </span>
         )}
       </div>
