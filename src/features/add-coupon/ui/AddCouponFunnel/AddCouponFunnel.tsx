@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import { Funnel, FunnelStep } from "@/shared/ui";
 import { FullView } from "@/shared/ui/FullView";
 
 import { AddCouponFormValues, addCouponSchema } from "../../lib/schema";
+import { getFirstCouponInfoErrorMessage } from "../../lib/util";
 
 import { CouponImageUploader } from "./Steps/CouponImageUploader";
 import { CouponInfoInputs } from "./Steps/CouponInfoInputs";
@@ -81,12 +82,30 @@ function AddCouponFunnel() {
     addCoupons({ formValues: data, orgId: selectedOrgId });
   };
 
+  const handleInvalid: SubmitErrorHandler<AddCouponFormValues> = (errors) => {
+    if (errors.imageFile?.message) {
+      addToast({ message: errors.imageFile.message as string, type: "error" });
+      return;
+    }
+
+    const couponErrors = errors.coupons;
+    if (!Array.isArray(couponErrors)) return;
+
+    for (const couponError of couponErrors) {
+      const message = getFirstCouponInfoErrorMessage(couponError);
+      if (message) {
+        addToast({ message, type: "error" });
+        return;
+      }
+    }
+  };
+
   const submitLabel =
     imagePreviews.length > 1 ? `${imagePreviews.length}개 쿠폰 등록` : "등록";
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(handleSubmit)}>
+      <form onSubmit={methods.handleSubmit(handleSubmit, handleInvalid)}>
         <Funnel currentStep={step}>
           {/* 1) 기프티콘 이미지 업로드 (여러 장) */}
           <FunnelStep name={addCouponStepNames.IMAGE_UPLOAD}>

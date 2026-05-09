@@ -14,6 +14,7 @@ import {
   AddCouponFormValues,
   CouponInfoFormValues,
 } from "@/features/add-coupon/lib/schema";
+import { getFirstCouponInfoErrorMessage } from "@/features/add-coupon/lib/util";
 import useToast from "@/shared/lib/hook/useToast";
 import { Button, Checkbox, TextInput } from "@/shared/ui";
 
@@ -138,12 +139,11 @@ function CouponInfoInputs({
     event?.preventDefault();
     const valid = await trigger(`coupons.${currentIndex}`);
     if (!valid) {
-      const fieldErrors = errors.coupons?.[currentIndex];
-      const firstError = INPUT_CONFIG.map(
-        ({ name }) => fieldErrors?.[name as InfoFieldName]?.message,
-      ).find(Boolean);
-      if (firstError) {
-        addToast({ message: firstError as string, type: "error" });
+      const message = getFirstCouponInfoErrorMessage(
+        errors.coupons?.[currentIndex],
+      );
+      if (message) {
+        addToast({ message, type: "error" });
       }
       return;
     }
