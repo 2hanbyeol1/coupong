@@ -9,7 +9,7 @@ import { OrganizationType } from "@/entities/organization/api/type";
 import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 
 import {
-  addCoupon,
+  addCoupons,
   changeCouponUse,
   getCoupon,
   getCoupons,
@@ -48,7 +48,7 @@ export const getCouponImageOption = ({
     gcTime: 300000, // 5 minutes
   });
 
-export const addCouponOption = (
+export const addCouponsOption = (
   queryClient: QueryClient,
   {
     onSuccess,
@@ -57,12 +57,12 @@ export const addCouponOption = (
 ) => {
   return mutationOptions({
     mutationFn: async ({
-      coupon,
+      formValues,
       orgId,
     }: {
-      coupon: AddCouponFormValues;
+      formValues: AddCouponFormValues;
       orgId: OrganizationType["id"];
-    }) => await addCoupon(coupon, orgId),
+    }) => await addCoupons(formValues, orgId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: COUPON_QUERY_KEY.ALL,

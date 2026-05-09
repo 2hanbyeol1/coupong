@@ -70,22 +70,28 @@ export const getCoupon = async (couponId: CouponType["id"]) => {
 };
 
 // ! 하나라도 실패하는 경우, rollback 처리 필요
-export const addCoupon = async (
-  coupon: AddCouponFormValues,
+export const addCoupons = async (
+  formValues: AddCouponFormValues,
   orgId: OrganizationType["id"],
 ) => {
   const user = await getAuthUser();
-  const imagePath = await uploadCouponImage(coupon.imageFile[0], orgId);
   const supabase = createBrowserClient();
 
-  const { error } = await supabase.from(COUPON_TABLE).insert<InsertCouponType>({
+  const files = Array.from(formValues.imageFile as FileList);
+  const imagePaths = await Promise.all(
+    files.map((file) => uploadCouponImage(file, orgId)),
+  );
+
+  const rows = formValues.coupons.map((coupon, index) => ({
     name: coupon.name,
     place: coupon.place,
     expire_at: coupon.expire_at,
-    image_path: imagePath,
+    image_path: imagePaths[index],
     uploaded_by: user.id,
     organization_id: orgId,
-  });
+  })) satisfies InsertCouponType[];
+
+  const { error } = await supabase.from(COUPON_TABLE).insert(rows);
 
   if (error) {
     console.error(`쿠폰 정보를 업로드하는 중 에러 발생: ${error.message}`);

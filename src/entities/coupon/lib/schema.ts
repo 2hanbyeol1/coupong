@@ -28,8 +28,7 @@ export const COUPON_INFO = {
     required: true,
   },
   imageFile: {
-    maxLength: 1,
-    minLength: 0,
+    minLength: 1,
   },
 };
 
@@ -61,7 +60,9 @@ export const COUPON_SCHEMA = {
           .instanceof(FileList, {
             message: "쿠폰 이미지를 업로드해주세요",
           })
-          .refine((fileList) => [...fileList].length === 1, {
-            message: "쿠폰 이미지를 업로드해주세요",
-          }),
+          .refine(
+            (fileList) =>
+              [...fileList].length >= COUPON_INFO.imageFile.minLength,
+            { message: "쿠폰 이미지를 업로드해주세요" },
+          ),
 };
