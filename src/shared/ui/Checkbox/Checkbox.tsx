@@ -10,10 +10,8 @@ import { Check } from "lucide-react";
 
 import { cn } from "@/shared/lib/util/cn";
 
-interface CheckboxProps extends Omit<
-  ComponentProps<"input">,
-  "type" | "onChange"
-> {
+interface CheckboxProps
+  extends Omit<ComponentProps<"input">, "type" | "onChange"> {
   children?: ReactNode;
   className?: string;
   onChange?: (isChecked: boolean) => void;

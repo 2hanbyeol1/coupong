@@ -1,7 +1,7 @@
 "use client";
 import z from "zod";
 
-import { isDayPassed } from "@/shared/lib/util/date";
+import { getExpired } from "@/shared/lib/util/date";
 
 export const COUPON_INFO = {
   name: {
@@ -50,7 +50,7 @@ export const COUPON_SCHEMA = {
   expire_at: z
     .string()
     .min(1, "쿠폰의 유효 기간을 입력해주세요")
-    .refine((dateStr) => !isDayPassed(dateStr), {
+    .refine((dateStr) => !getExpired(dateStr), {
       message: "유효 기간이 지난 쿠폰은 등록할 수 없어요",
     }),
   imageFile:
