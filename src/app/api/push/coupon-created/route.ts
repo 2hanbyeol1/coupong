@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { filterUsersByPreference } from "@/shared/lib/push/prefs";
 import { sendPushToUsers } from "@/shared/lib/push/send";
 import createAdminClient from "@/shared/lib/supabase/admin";
 
@@ -47,9 +48,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const recipientIds = (members ?? [])
+  const memberIds = (members ?? [])
     .map((m) => m.user_id)
     .filter((id) => id !== coupon.uploaded_by);
+
+  const recipientIds = await filterUsersByPreference(
+    memberIds,
+    "coupon_created",
+  );
 
   const result = await sendPushToUsers(recipientIds, {
     title: "새로운 쿠폰이 등록되었어요",

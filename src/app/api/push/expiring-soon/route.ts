@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { filterUsersByPreference } from "@/shared/lib/push/prefs";
 import { sendPushToUsers } from "@/shared/lib/push/send";
 import createAdminClient from "@/shared/lib/supabase/admin";
 
@@ -78,7 +79,17 @@ export async function POST(request: Request) {
     const userIds = orgMembers.get(coupon.organization_id) ?? [];
     if (userIds.length === 0) continue;
 
-    const result = await sendPushToUsers(userIds, {
+    const recipientIds = await filterUsersByPreference(
+      userIds,
+      "expiring_soon",
+    );
+    if (recipientIds.length === 0) {
+      // 전원 수신 거부여도 중복 발송 방지를 위해 처리한 것으로 마킹
+      notifiedCouponIds.push(coupon.id);
+      continue;
+    }
+
+    const result = await sendPushToUsers(recipientIds, {
       title: "쿠폰 마감이 1일 남았어요",
       body: `[${coupon.place}] ${coupon.name}`,
       url: "/",

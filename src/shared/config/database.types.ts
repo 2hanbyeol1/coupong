@@ -210,6 +210,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_notification_preferences: {
+        Row: {
+          coupon_created: boolean;
+          expiring_soon: boolean;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          coupon_created?: boolean;
+          expiring_soon?: boolean;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          coupon_created?: boolean;
+          expiring_soon?: boolean;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       user_organization: {
         Row: {
           created_at: string;
