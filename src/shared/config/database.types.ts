@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           created_at: string;
           expire_at: string;
+          expiry_notified_at: string | null;
           id: string;
           image_path: string;
           name: string;
@@ -29,6 +30,7 @@ export type Database = {
         Insert: {
           created_at?: string;
           expire_at: string;
+          expiry_notified_at?: string | null;
           id?: string;
           image_path: string;
           name: string;
@@ -40,6 +42,7 @@ export type Database = {
         Update: {
           created_at?: string;
           expire_at?: string;
+          expiry_notified_at?: string | null;
           id?: string;
           image_path?: string;
           name?: string;
@@ -50,7 +53,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "coupons_organization_uuid_fkey";
+            foreignKeyName: "coupons_organization_id_fkey";
             columns: ["organization_id"];
             isOneToOne: false;
             referencedRelation: "organizations";
@@ -117,6 +120,51 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          content: string | null;
+          coupon_id: string;
+          created_at: string;
+          id: number;
+          read: boolean;
+          title: string | null;
+          user_id: string;
+        };
+        Insert: {
+          content?: string | null;
+          coupon_id: string;
+          created_at?: string;
+          id?: number;
+          read?: boolean;
+          title?: string | null;
+          user_id: string;
+        };
+        Update: {
+          content?: string | null;
+          coupon_id?: string;
+          created_at?: string;
+          id?: number;
+          read?: boolean;
+          title?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_coupon_id_fkey";
+            columns: ["coupon_id"];
+            isOneToOne: false;
+            referencedRelation: "coupons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
       organizations: {
         Row: {
           created_at: string;
@@ -132,6 +180,33 @@ export type Database = {
           created_at?: string;
           id?: string;
           name?: string;
+        };
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          auth: string;
+          created_at: string;
+          endpoint: string;
+          id: string;
+          p256dh: string;
+          user_id: string;
+        };
+        Insert: {
+          auth: string;
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          p256dh: string;
+          user_id: string;
+        };
+        Update: {
+          auth?: string;
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          p256dh?: string;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -200,7 +275,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      notify_expiring_coupons: { Args: never; Returns: undefined };
     };
     Enums: {
       [_ in never]: never;

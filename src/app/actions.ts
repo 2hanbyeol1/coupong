@@ -2,50 +2,72 @@
 
 import webpush from "web-push";
 
-webpush.setVapidDetails(
-  "mailto:2hanbyeol1@naver.com",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-);
+import createClient from "@/shared/lib/supabase/server";
 
-let subscription: webpush.PushSubscription | null = null;
+type SerializedSubscription = {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+};
 
-export async function subscribeUser(sub: webpush.PushSubscription) {
-  subscription = sub;
-  // In a production environment, you would want to store the subscription in a database
-  // For example: await db.subscriptions.create({ data: sub })
-  return { success: true };
-}
-
-export async function unsubscribeUser() {
-  subscription = null;
-  // In a production environment, you would want to remove the subscription from the database
-  // For example: await db.subscriptions.delete({ where: { ... } })
-  return { success: true };
-}
-
-export async function sendNotification(
-  title: string,
-  message: string,
-  url?: string,
+export async function subscribeUser(
+  sub: webpush.PushSubscription | SerializedSubscription,
 ) {
-  if (!subscription) {
-    console.error("푸시 알림을 보내기 위한 구독 정보가 없음");
-    throw new Error("구독 정보가 없어서 푸시 알림을 보낼 수 없어요");
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "로그인이 필요해요" };
   }
 
-  try {
-    await webpush.sendNotification(
-      subscription,
-      JSON.stringify({
-        title,
-        body: message,
-        url,
-      }),
-    );
-    return { success: true };
-  } catch (error) {
-    console.error(`푸시 알림을 보내는 중 에러 발생: ${error}`);
-    return { success: false, error: "푸시 알림을 보내는 중 에러가 발생했어요" };
+  const { endpoint, keys } = sub as SerializedSubscription;
+  if (!endpoint || !keys?.p256dh || !keys?.auth) {
+    return { success: false, error: "구독 정보가 올바르지 않아요" };
   }
+
+  // endpoint 가 unique 라 동일 디바이스 재구독 시 user_id 만 갱신됨
+  const { error } = await supabase.from("push_subscriptions").upsert(
+    {
+      user_id: user.id,
+      endpoint,
+      p256dh: keys.p256dh,
+      auth: keys.auth,
+    },
+    { onConflict: "endpoint" },
+  );
+
+  if (error) {
+    console.error("구독 저장 실패", error);
+    return { success: false, error: "구독 저장에 실패했어요" };
+  }
+
+  return { success: true };
+}
+
+export async function unsubscribeUser(endpoint?: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "로그인이 필요해요" };
+  }
+
+  const query = supabase
+    .from("push_subscriptions")
+    .delete()
+    .eq("user_id", user.id);
+
+  const { error } = endpoint
+    ? await query.eq("endpoint", endpoint)
+    : await query;
+
+  if (error) {
+    console.error("구독 삭제 실패", error);
+    return { success: false, error: "구독 해제에 실패했어요" };
+  }
+
+  return { success: true };
 }
