@@ -1,12 +1,7 @@
 "use client";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 import Image from "next/image";
 
 import { COUPON_INFO } from "@/entities/coupon/lib/schema";
@@ -14,9 +9,14 @@ import {
   AddCouponFormValues,
   CouponInfoFormValues,
 } from "@/features/add-coupon/lib/schema";
-import { getFirstCouponInfoErrorMessage } from "@/features/add-coupon/lib/util";
+import {
+  getFirstCouponInfoError,
+  isCouponInfoIncomplete,
+} from "@/features/add-coupon/lib/util";
 import useToast from "@/shared/lib/hook/useToast";
 import { Button, Checkbox, TextInput } from "@/shared/ui";
+
+import CouponListBottomSheet from "./CouponListBottomSheet";
 
 interface CouponInfoInputsProps {
   imagePreviews: string[];
@@ -48,6 +48,7 @@ function CouponInfoInputs({
     setValue,
     getValues,
     trigger,
+    setFocus,
     control,
     formState: { errors },
   } = useFormContext<AddCouponFormValues>();
@@ -56,6 +57,7 @@ function CouponInfoInputs({
   const reactId = useId();
 
   const [applyAll, setApplyAll] = useState(false);
+  const [isListOpen, setIsListOpen] = useState(false);
 
   // 이미지 개수에 맞춰 coupons 배열 길이 동기화
   useEffect(() => {
@@ -74,6 +76,15 @@ function CouponInfoInputs({
 
   // 이전에 입력했던 값들을 자동완성 후보로 수집
   const couponsWatch = useWatch({ control, name: "coupons" });
+
+  const incompleteCoupons = useMemo(
+    () =>
+      imagePreviews.map((_, index) =>
+        isCouponInfoIncomplete(couponsWatch?.[index], errors.coupons?.[index]),
+      ),
+    [imagePreviews, couponsWatch, errors.coupons],
+  );
+
   const autocompleteOptions = useMemo(() => {
     const coupons = couponsWatch ?? [];
     const collect = (field: InfoFieldName) => {
@@ -120,98 +131,55 @@ function CouponInfoInputs({
     });
   };
 
-  const handleFirst = (event?: React.MouseEvent<HTMLButtonElement>) => {
-    event?.preventDefault();
-    onCurrentIndexChange(0);
-  };
-
-  const handlePrev = (event?: React.MouseEvent<HTMLButtonElement>) => {
-    event?.preventDefault();
-    onCurrentIndexChange(Math.max(0, currentIndex - 1));
-  };
-
-  const handleLast = (event?: React.MouseEvent<HTMLButtonElement>) => {
-    event?.preventDefault();
-    onCurrentIndexChange(Math.max(0, imagePreviews.length - 1));
-  };
-
   const handleNext = async (event?: React.MouseEvent<HTMLButtonElement>) => {
     event?.preventDefault();
     const valid = await trigger(`coupons.${currentIndex}`);
     if (!valid) {
-      const message = getFirstCouponInfoErrorMessage(
+      const firstError = getFirstCouponInfoError(
         errors.coupons?.[currentIndex],
       );
-      if (message) {
-        addToast({ message, type: "error" });
+      if (firstError) {
+        addToast({ message: firstError.message, type: "error" });
+        setFocus(`coupons.${currentIndex}.${firstError.field}`);
       }
       return;
     }
     onCurrentIndexChange(Math.min(imagePreviews.length - 1, currentIndex + 1));
   };
 
+  const handleSelectFromList = (index: number) => {
+    onCurrentIndexChange(index);
+    setIsListOpen(false);
+  };
+
   const isLast = currentIndex === imagePreviews.length - 1;
   const couponImage = imagePreviews[currentIndex];
+  const hasMultiple = imagePreviews.length > 1;
 
   return (
     <div className="flex h-full flex-col gap-6">
       <div className="flex h-full flex-col gap-3">
-        {imagePreviews.length > 1 && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={handleFirst}
-                disabled={currentIndex === 0}
-                aria-label="첫 쿠폰"
-                className="flex h-6 w-6 items-center justify-center rounded-full disabled:opacity-30"
-              >
-                <ChevronsLeft size={20} />
-              </button>
-              <button
-                type="button"
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                aria-label="이전 쿠폰"
-                className="flex h-6 w-6 items-center justify-center rounded-full disabled:opacity-30"
-              >
-                <ChevronLeft size={20} />
-              </button>
-            </div>
-            <span className="text-dark text-sm">
-              {currentIndex + 1} / {imagePreviews.length}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={isLast}
-                aria-label="다음 쿠폰"
-                className="flex h-6 w-6 items-center justify-center rounded-full disabled:opacity-30"
-              >
-                <ChevronRight size={20} />
-              </button>
-              <button
-                type="button"
-                onClick={handleLast}
-                disabled={isLast}
-                aria-label="마지막 쿠폰"
-                className="flex h-6 w-6 items-center justify-center rounded-full disabled:opacity-30"
-              >
-                <ChevronsRight size={20} />
-              </button>
-            </div>
-          </div>
-        )}
         <div className="flex h-full flex-col">
-          <h1 className="mb-4 text-2xl leading-snug font-semibold">
-            쿠폰에 대한 설명을
-            <br />
-            입력해주세요
-          </h1>
+          <div className="mb-4 flex items-start justify-between gap-2">
+            <h1 className="text-2xl leading-snug font-semibold">
+              {hasMultiple ? `${currentIndex + 1}번째 쿠폰의` : "쿠폰"} 정보를
+              <br />
+              알려주세요
+            </h1>
+            {hasMultiple && (
+              <button
+                type="button"
+                onClick={() => setIsListOpen(true)}
+                aria-label="쿠폰 목록 보기"
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full"
+              >
+                <LayoutGrid size={20} />
+              </button>
+            )}
+          </div>
           <div className="flex h-full flex-col">
             {couponImage && (
-              <div className="relative mb-4 h-full w-full flex-1">
+              <div className="relative mb-4 flex h-full w-full flex-1">
                 <Image
                   src={couponImage}
                   alt={`쿠폰 이미지 ${currentIndex + 1}`}
@@ -258,28 +226,43 @@ function CouponInfoInputs({
       </div>
 
       <div className="space-y-4">
-        {imagePreviews.length > 1 && (
+        {hasMultiple && (
           <Checkbox checked={applyAll} onChange={setApplyAll}>
             모든 쿠폰을 같은 정보로 등록할게요
           </Checkbox>
         )}
 
-        {isLast ? (
-          <Button type="submit" size="lg" full disabled={isSubmitting}>
+        <div className="flex gap-2">
+          {!isLast && (
+            <Button
+              type="button"
+              onClick={handleNext}
+              color="light"
+              size="lg"
+              className="flex-1"
+            >
+              다음
+            </Button>
+          )}
+          <Button
+            type="submit"
+            size="lg"
+            disabled={isSubmitting}
+            className="flex-[3]"
+          >
             {isSubmitting ? "등록 중..." : submitLabel}
           </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={handleNext}
-            color="light"
-            size="lg"
-            full
-          >
-            다음으로
-          </Button>
-        )}
+        </div>
       </div>
+
+      <CouponListBottomSheet
+        open={isListOpen}
+        imagePreviews={imagePreviews}
+        currentIndex={currentIndex}
+        incompleteCoupons={incompleteCoupons}
+        onSelect={handleSelectFromList}
+        onClose={() => setIsListOpen(false)}
+      />
     </div>
   );
 }

@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useId, useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { Image as ImageIcon, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import Image from "next/image";
 
+import { COUPON_IMAGE_ASPECT_CLASS } from "@/entities/coupon/constants";
 import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 import useToast from "@/shared/lib/hook/useToast";
+import { cn } from "@/shared/lib/util/cn";
 import { Button } from "@/shared/ui";
 
 interface CouponImageUploaderProps {
@@ -98,47 +100,45 @@ function CouponImageUploader({
           onChange={handleFilesPicked}
         />
 
-        {imagePreviews.length === 0 ? (
-          <label
-            htmlFor={inputId}
-            className="border-light bg-light relative flex w-full flex-1 cursor-pointer items-center justify-center overflow-hidden rounded-md border-4"
-          >
-            <ImageIcon className="stroke-dark" size={28} />
-          </label>
-        ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <div className="grid grid-cols-3 gap-2">
-              {imagePreviews.map((url, index) => (
-                <div
-                  key={url}
-                  className="border-light relative aspect-square overflow-hidden rounded-md border-2"
-                >
-                  <Image
-                    src={url}
-                    alt={`쿠폰 이미지 ${index + 1}`}
-                    fill
-                    className="object-contain"
-                  />
-                  <button
-                    type="button"
-                    aria-label="이미지 제거"
-                    onClick={() => handleRemove(index)}
-                    className="absolute top-1 right-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-              <label
-                htmlFor={inputId}
-                className="border-light bg-light flex aspect-square cursor-pointer items-center justify-center rounded-md border-2"
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-3 gap-2">
+            {imagePreviews.map((url, index) => (
+              <div
+                key={url}
+                className={cn(
+                  "border-light relative overflow-hidden rounded-md border-2",
+                  COUPON_IMAGE_ASPECT_CLASS,
+                )}
               >
-                <Plus className="stroke-dark" size={24} />
-              </label>
-            </div>
+                <Image
+                  src={url}
+                  alt={`쿠폰 이미지 ${index + 1}`}
+                  fill
+                  className="object-contain"
+                />
+                <button
+                  type="button"
+                  aria-label="이미지 제거"
+                  onClick={() => handleRemove(index)}
+                  className="absolute top-1 right-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+            <label
+              htmlFor={inputId}
+              className={cn(
+                "border-light bg-light flex cursor-pointer items-center justify-center rounded-md border-2",
+                COUPON_IMAGE_ASPECT_CLASS,
+              )}
+            >
+              <Plus className="stroke-dark" size={24} />
+            </label>
           </div>
-        )}
+        </div>
       </div>
+
       <div className="flex shrink-0 flex-col gap-1 pt-4">
         <Button onClick={handleNextButtonClick} color="primary" size="lg" full>
           다음

@@ -1,3 +1,4 @@
+export { BottomSheet } from "./BottomSheet";
 export { Button } from "./Button";
 export { Checkbox } from "./Checkbox";
 export { Funnel, Step as FunnelStep } from "./Funnel";

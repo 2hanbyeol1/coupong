@@ -14,7 +14,7 @@ import { Funnel, FunnelStep } from "@/shared/ui";
 import { FullView } from "@/shared/ui/FullView";
 
 import { AddCouponFormValues, addCouponSchema } from "../../lib/schema";
-import { getFirstCouponInfoErrorMessage } from "../../lib/util";
+import { getFirstCouponInfoError } from "../../lib/util";
 
 import { CouponImageUploader } from "./Steps/CouponImageUploader";
 import { CouponInfoInputs } from "./Steps/CouponInfoInputs";
@@ -91,10 +91,11 @@ function AddCouponFunnel() {
     const couponErrors = errors.coupons;
     if (!Array.isArray(couponErrors)) return;
 
-    for (const couponError of couponErrors) {
-      const message = getFirstCouponInfoErrorMessage(couponError);
-      if (message) {
-        addToast({ message, type: "error" });
+    for (let index = 0; index < couponErrors.length; index++) {
+      const firstError = getFirstCouponInfoError(couponErrors[index]);
+      if (firstError) {
+        addToast({ message: firstError.message, type: "error" });
+        setCurrentCouponIndex(index);
         return;
       }
     }
