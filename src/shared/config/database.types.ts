@@ -120,51 +120,6 @@ export type Database = {
           },
         ];
       };
-      notifications: {
-        Row: {
-          content: string | null;
-          coupon_id: string;
-          created_at: string;
-          id: number;
-          read: boolean;
-          title: string | null;
-          user_id: string;
-        };
-        Insert: {
-          content?: string | null;
-          coupon_id: string;
-          created_at?: string;
-          id?: number;
-          read?: boolean;
-          title?: string | null;
-          user_id: string;
-        };
-        Update: {
-          content?: string | null;
-          coupon_id?: string;
-          created_at?: string;
-          id?: number;
-          read?: boolean;
-          title?: string | null;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "notifications_coupon_id_fkey";
-            columns: ["coupon_id"];
-            isOneToOne: false;
-            referencedRelation: "coupons";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "notifications_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["user_id"];
-          },
-        ];
-      };
       organizations: {
         Row: {
           created_at: string;
