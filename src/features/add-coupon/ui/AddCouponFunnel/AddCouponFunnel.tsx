@@ -9,7 +9,9 @@ import { addCouponsOption } from "@/entities/coupon/api/query";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import { ROUTES } from "@/shared/config/routes";
 import useFunnel from "@/shared/lib/hook/useFunnel";
+import useModal from "@/shared/lib/hook/useModal";
 import useToast from "@/shared/lib/hook/useToast";
+import { getYYYYMMDD } from "@/shared/lib/util/date";
 import { Funnel, FunnelStep } from "@/shared/ui";
 import { FullView } from "@/shared/ui/FullView";
 
@@ -28,6 +30,7 @@ function AddCouponFunnel() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
+  const { showModal, hideModal } = useModal();
   const { step, setStep } = useFunnel(addCouponStepNames.IMAGE_UPLOAD);
   const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
@@ -79,7 +82,36 @@ function AddCouponFunnel() {
       return;
     }
 
-    addCoupons({ formValues: data, orgId: selectedOrgId });
+    const groupedMap = new Map<
+      string,
+      { place: string; name: string; expire_at: string; count: number }
+    >();
+    for (const c of data.coupons) {
+      const key = `${c.place}|${c.name}|${c.expire_at}`;
+      const existing = groupedMap.get(key);
+      if (existing) existing.count += 1;
+      else groupedMap.set(key, { ...c, count: 1 });
+    }
+    const grouped = Array.from(groupedMap.values());
+
+    showModal({
+      title: "이대로 등록할까요?",
+      content: (
+        <ul className="flex flex-col gap-1">
+          {grouped.map((g, idx) => (
+            <li key={idx}>
+              [{g.place}] {g.name} · {getYYYYMMDD(g.expire_at)}까지
+              {g.count > 1 && ` (${g.count}개)`}
+            </li>
+          ))}
+        </ul>
+      ),
+      confirmButtonText: "등록",
+      onConfirm: () => {
+        addCoupons({ formValues: data, orgId: selectedOrgId });
+        hideModal();
+      },
+    });
   };
 
   const handleInvalid: SubmitErrorHandler<AddCouponFormValues> = (errors) => {
