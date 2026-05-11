@@ -57,8 +57,24 @@ export async function POST(request: Request) {
     "coupon_created",
   );
 
+  const [{ data: uploader }, { data: organization }] = await Promise.all([
+    supabase
+      .from("users")
+      .select("name")
+      .eq("user_id", coupon.uploaded_by)
+      .single(),
+    supabase
+      .from("organizations")
+      .select("name")
+      .eq("id", coupon.organization_id)
+      .single(),
+  ]);
+
+  const uploaderName = uploader?.name ?? "누군가";
+  const organizationName = organization?.name ?? "그룹";
+
   const result = await sendPushToUsers(recipientIds, {
-    title: "새로운 쿠폰이 등록되었어요",
+    title: `${uploaderName}님이 ${organizationName}에 새로운 쿠폰을 등록했어요`,
     body: `[${coupon.place}] ${coupon.name}`,
     url: "/",
   });
