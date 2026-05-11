@@ -9,6 +9,7 @@ interface OrganizationStoreType {
   selectedOrganizationId: OrganizationType["id"] | null;
   isHydrated: boolean;
   setSelectedOrganizationId: (newOrgId: OrganizationType["id"]) => void;
+  resetSelectedOrganization: () => void;
 }
 
 export const useOrganizationStore = create<OrganizationStoreType>()(
@@ -18,6 +19,7 @@ export const useOrganizationStore = create<OrganizationStoreType>()(
       isHydrated: false,
       setSelectedOrganizationId: (newOrgId) =>
         set({ selectedOrganizationId: newOrgId }),
+      resetSelectedOrganization: () => set({ selectedOrganizationId: null }),
     }),
     {
       name: ORGANIZATION_STORE_KEY,
