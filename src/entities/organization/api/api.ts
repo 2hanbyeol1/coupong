@@ -14,10 +14,11 @@ const MEMBER_TABLE = "user_organization";
 // 그룹 정보를 추가
 export async function addOrganization(organization: AddOrganizationFormValues) {
   const supabase = createBrowserClient();
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from(ORGANIZATION_TABLE)
-    .insert(organization)
-    .select();
+    .insert(organization);
+
+  // 트리거(on_organization_created)가 생성한 유저를 user_organization에 자동 추가.
 
   if (error) {
     console.error(`그룹 정보를 업로드하는 중 에러 발생: ${error.message}`);
@@ -26,8 +27,6 @@ export async function addOrganization(organization: AddOrganizationFormValues) {
         "그룹 정보를 등록하는 중 오류가 발생했어요",
     );
   }
-
-  return data;
 }
 
 // organization의 id를 이용하여 그룹 정보를 조회
