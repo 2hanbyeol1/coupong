@@ -147,6 +147,23 @@ export const changeCouponUse = async (couponId: CouponType["id"]) => {
   }
 };
 
+export const updateCoupon = async (
+  couponId: CouponType["id"],
+  changes: Partial<Pick<CouponType, "name" | "place" | "expire_at">>,
+) => {
+  const supabase = createBrowserClient();
+
+  const { error } = await supabase
+    .from(COUPON_TABLE)
+    .update(changes)
+    .eq("id", couponId);
+
+  if (error) {
+    console.error(`쿠폰 수정 중 에러 발생: ${error.message}`);
+    throw new Error("쿠폰 수정 중 오류가 발생했어요");
+  }
+};
+
 export const deleteCoupon = async (couponId: CouponType["id"]) => {
   const supabase = createBrowserClient();
 

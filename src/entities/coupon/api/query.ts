@@ -15,6 +15,7 @@ import {
   getCoupon,
   getCoupons,
   getImageSignedUrl,
+  updateCoupon,
 } from "./api";
 import { COUPON_QUERY_KEY } from "./query-key";
 import { CouponType } from "./type";
@@ -83,6 +84,32 @@ export const changeCouponToUsedOption = (queryClient: QueryClient) => {
         queryKey: COUPON_QUERY_KEY.ALL,
       });
     },
+  });
+};
+
+export const updateCouponOption = (
+  queryClient: QueryClient,
+  {
+    onSuccess,
+    onError,
+  }: { onSuccess?: () => void; onError?: (error: Error) => void } = {},
+) => {
+  return mutationOptions({
+    mutationFn: async ({
+      couponId,
+      changes,
+    }: {
+      couponId: CouponType["id"];
+      changes: Partial<Pick<CouponType, "name" | "place" | "expire_at">>;
+    }) => await updateCoupon(couponId, changes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COUPON_QUERY_KEY.ALL,
+        refetchType: "all",
+      });
+      onSuccess?.();
+    },
+    onError,
   });
 };
 

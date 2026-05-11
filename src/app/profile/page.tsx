@@ -19,7 +19,7 @@ function ProfilePage() {
         <ProfileMenuTitle title="설정" />
         <div className="flex flex-col">
           <ProfileMenu menu="내 그룹" link={ROUTES.PROFILE_ORGANIZATION} />
-          <ProfileMenu menu="알림" link={ROUTES.PROFILE_NOTIFICATION} isTest />
+          <ProfileMenu menu="알림" link={ROUTES.PROFILE_NOTIFICATION} />
         </div>
 
         <LogoutButton className="mt-40" />

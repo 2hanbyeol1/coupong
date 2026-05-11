@@ -66,3 +66,11 @@ export const COUPON_SCHEMA = {
             { message: "쿠폰 이미지를 업로드해주세요" },
           ),
 };
+
+export const couponInfoObjectSchema = z.object({
+  name: COUPON_SCHEMA.name,
+  place: COUPON_SCHEMA.place,
+  expire_at: COUPON_SCHEMA.expire_at,
+});
+
+export type CouponInfoValues = z.infer<typeof couponInfoObjectSchema>;
