@@ -43,11 +43,11 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
   const { mutate: updateCoupon } = useMutation({
     ...updateCouponOption(queryClient, {
       onSuccess: () => {
-        addToast({ message: "쿠폰이 수정되었어요", type: "success" });
+        addToast({ message: "쿠폰이 수정되었어요" });
         hideModal();
       },
       onError: (error) => {
-        addToast({ message: error.message, type: "error" });
+        addToast({ message: error.message });
       },
     }),
   });
@@ -61,7 +61,7 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
       errors.place?.message ??
       errors.name?.message ??
       errors.expire_at?.message;
-    if (first) addToast({ message: String(first), type: "error" });
+    if (first) addToast({ message: String(first) });
   };
 
   return (

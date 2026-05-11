@@ -43,7 +43,7 @@ function NotificationSettingList() {
       if (context?.previous) {
         queryClient.setQueryData(PREFERENCES_QUERY_KEY, context.previous);
       }
-      addToast({ message: "알림 설정 저장에 실패했어요", type: "error" });
+      addToast({ message: "알림 설정 저장에 실패했어요" });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: PREFERENCES_QUERY_KEY });

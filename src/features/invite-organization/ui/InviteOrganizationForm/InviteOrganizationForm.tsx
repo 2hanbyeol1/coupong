@@ -33,7 +33,6 @@ function InviteOrganizationForm({
     onError: (error) => {
       addToast({
         message: error.message,
-        type: "error",
       });
     },
   });
@@ -43,14 +42,12 @@ function InviteOrganizationForm({
     onSuccess: () => {
       addToast({
         message: "초대를 보냈어요!",
-        type: "success",
       });
       hideModal();
     },
     onError: (error) => {
       addToast({
         message: error.message,
-        type: "error",
       });
     },
   });

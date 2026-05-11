@@ -7,12 +7,12 @@ import { signInWithKakaoOption } from "../../api/query";
 
 function LoginButton() {
   const { addToast } = useToast();
+
   const { mutate: signInWithKakao } = useMutation({
     ...signInWithKakaoOption(),
     onError: () => {
       addToast({
         message: "로그인에 실패했어요",
-        type: "error",
       });
     },
   });

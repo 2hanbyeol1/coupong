@@ -34,14 +34,12 @@ function AddOrganizationForm({ formId }: { formId: string }) {
       onSuccess: () => {
         addToast({
           message: "그룹이 추가되었어요",
-          type: "success",
         });
         hideModal();
       },
       onError: (error) => {
         addToast({
           message: error.message,
-          type: "error",
         });
       },
     }),

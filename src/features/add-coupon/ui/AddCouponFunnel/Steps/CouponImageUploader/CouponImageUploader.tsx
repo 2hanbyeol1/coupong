@@ -77,7 +77,6 @@ function CouponImageUploader({
     }
     addToast({
       message: imageFileError.message as string,
-      type: "error",
     });
   };
 

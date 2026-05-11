@@ -25,13 +25,11 @@ function InvitationPage() {
     onSuccess: () => {
       router.push("/");
       toast.addToast({
-        type: "success",
         message: "초대가 수락되었어요",
       });
     },
     onError: () => {
       toast.addToast({
-        type: "error",
         message: "초대 수락에 실패했어요",
       });
     },

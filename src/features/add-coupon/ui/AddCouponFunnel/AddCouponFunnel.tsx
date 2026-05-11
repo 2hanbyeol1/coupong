@@ -60,14 +60,12 @@ function AddCouponFunnel() {
       onSuccess: () => {
         addToast({
           message: "새로운 쿠폰이 추가되었어요",
-          type: "success",
         });
         router.push(ROUTES.HOME);
       },
       onError: () => {
         addToast({
           message: "쿠폰 추가에 실패했어요",
-          type: "error",
         });
       },
     }),
@@ -77,7 +75,6 @@ function AddCouponFunnel() {
     if (!selectedOrgId) {
       addToast({
         message: "그룹을 선택해 주세요",
-        type: "error",
       });
       return;
     }
@@ -116,7 +113,7 @@ function AddCouponFunnel() {
 
   const handleInvalid: SubmitErrorHandler<AddCouponFormValues> = (errors) => {
     if (errors.imageFile?.message) {
-      addToast({ message: errors.imageFile.message as string, type: "error" });
+      addToast({ message: errors.imageFile.message as string });
       return;
     }
 
@@ -126,7 +123,7 @@ function AddCouponFunnel() {
     for (let index = 0; index < couponErrors.length; index++) {
       const firstError = getFirstCouponInfoError(couponErrors[index]);
       if (firstError) {
-        addToast({ message: firstError.message, type: "error" });
+        addToast({ message: firstError.message });
         setCurrentCouponIndex(index);
         return;
       }

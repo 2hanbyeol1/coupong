@@ -139,7 +139,7 @@ function CouponInfoInputs({
         errors.coupons?.[currentIndex],
       );
       if (firstError) {
-        addToast({ message: firstError.message, type: "error" });
+        addToast({ message: firstError.message });
         setFocus(`coupons.${currentIndex}.${firstError.field}`);
       }
       return;

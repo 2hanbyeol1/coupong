@@ -23,7 +23,6 @@ function LogoutButton({ className }: LogoutButtonProps) {
     onError: () => {
       addToast({
         message: "로그아웃 중 오류가 발생했어요",
-        type: "error",
       });
     },
   });

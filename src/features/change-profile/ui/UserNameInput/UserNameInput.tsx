@@ -38,14 +38,12 @@ function UserNameInput({ className }: UserNameInputProps) {
     onSuccess: () => {
       addToast({
         message: "사용자 이름이 수정되었어요",
-        type: "success",
       });
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEY.USER("") });
     },
     onError: (error) => {
       addToast({
         message: error.message,
-        type: "error",
       });
     },
   });

@@ -11,11 +11,7 @@ interface ToastProps {
   toast: ToastType;
 }
 
-function Toast({
-  // !
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  toast: { id, message, type = "success", duration = 3000 },
-}: ToastProps) {
+function Toast({ toast: { id, message, duration = 3000 } }: ToastProps) {
   const { deleteToast } = useToast();
 
   useEffect(() => {
@@ -26,36 +22,30 @@ function Toast({
     return () => clearTimeout(timer);
   }, [id, duration, deleteToast]);
 
-  const handleDeleteToast = () => {
-    deleteToast(id);
-  };
-
   return (
-    <AnimatePresence mode="popLayout">
-      <motion.div
-        layout
-        initial={{ x: 300, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 300, opacity: 0 }}
-        transition={{
-          type: "spring",
-          stiffness: 300,
-          damping: 30,
-          duration: 0.3,
-        }}
-        className="min-w-[300px] rounded-lg bg-white p-4 shadow-lg"
-      >
-        <div className="flex items-center justify-between">
-          <span className="">{message}</span>
-          <motion.button
-            onClick={handleDeleteToast}
-            className="ml-4 cursor-pointer rounded-full p-2 hover:bg-black/10"
-          >
-            <X className="h-4 w-4" />
-          </motion.button>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      layout
+      initial={{ y: -16, opacity: 0, scale: 0.96 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: -8, opacity: 0, scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 320, damping: 28 }}
+      className="pointer-events-auto w-full overflow-hidden rounded-xl border border-white/10 bg-black/80 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.35)] backdrop-blur-lg sm:min-w-[320px]"
+      role="status"
+    >
+      <div className="flex items-center justify-center gap-3 py-3 pr-3 pl-5">
+        <span className="flex-1 text-base leading-relaxed break-keep whitespace-pre-wrap text-slate-50">
+          {message}
+        </span>
+        <button
+          type="button"
+          onClick={() => deleteToast(id)}
+          aria-label="닫기"
+          className="cursor-pointer rounded-full p-1.5 text-slate-300 transition hover:bg-white/10 hover:text-white"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </motion.div>
   );
 }
 
@@ -73,12 +63,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ addToast, deleteToast }}>
       {children}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-1">
-        {toasts.map((toast) => (
-          <AnimatePresence key={toast.id} mode="popLayout">
-            <Toast toast={toast} />
-          </AnimatePresence>
-        ))}
+      <div className="pointer-events-none fixed inset-x-4 top-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:right-4">
+        <AnimatePresence mode="popLayout">
+          {toasts.map((toast) => (
+            <Toast key={toast.id} toast={toast} />
+          ))}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   );
