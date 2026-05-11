@@ -11,6 +11,7 @@ import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 import {
   addCoupons,
   changeCouponUse,
+  deleteCoupon,
   getCoupon,
   getCoupons,
   getImageSignedUrl,
@@ -82,5 +83,26 @@ export const changeCouponToUsedOption = (queryClient: QueryClient) => {
         queryKey: COUPON_QUERY_KEY.ALL,
       });
     },
+  });
+};
+
+export const deleteCouponOption = (
+  queryClient: QueryClient,
+  {
+    onSuccess,
+    onError,
+  }: { onSuccess?: () => void; onError?: (error: Error) => void } = {},
+) => {
+  return mutationOptions({
+    mutationFn: async (couponId: CouponType["id"]) =>
+      await deleteCoupon(couponId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COUPON_QUERY_KEY.LIST_ALL,
+        refetchType: "all",
+      });
+      onSuccess?.();
+    },
+    onError,
   });
 };

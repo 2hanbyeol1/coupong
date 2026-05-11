@@ -26,39 +26,41 @@ function Coupon({ coupon }: CouponProps) {
   };
 
   return (
-    <Link
-      href={ROUTES.COUPON_DETAIL(coupon.id.toString())}
-      className="flex items-center gap-2"
-    >
-      <div className="relative size-20 shrink-0">
-        {isInvalid && (
-          <span className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xs bg-white px-2 py-1 text-xs font-medium whitespace-nowrap text-black">
-            {getInvalidMessage()}
-          </span>
-        )}
-
-        <CouponImage
-          couponName={coupon.name}
-          imagePath={coupon.image_path}
-          isInvalid={isInvalid}
-          sizes="5rem"
-        />
-      </div>
-
-      <div
-        className={cn(
-          "flex flex-grow flex-col gap-1.5 px-3",
-          isInvalid && "opacity-20",
-        )}
+    <div className="relative">
+      <Link
+        href={ROUTES.COUPON_DETAIL(coupon.id.toString())}
+        className="flex items-center gap-2"
       >
-        <div className="text-sm font-medium">
-          [{coupon.place}] {coupon.name}
+        <div className="relative size-20 shrink-0">
+          {isInvalid && (
+            <span className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xs bg-white px-2 py-1 text-xs font-medium whitespace-nowrap text-black">
+              {getInvalidMessage()}
+            </span>
+          )}
+
+          <CouponImage
+            couponName={coupon.name}
+            imagePath={coupon.image_path}
+            isInvalid={isInvalid}
+            sizes="5rem"
+          />
         </div>
-        <div className="text-dark flex items-center justify-between gap-2 text-xs">
-          {getYYYYMMDD(coupon.expire_at)}까지 사용
+
+        <div
+          className={cn(
+            "flex flex-grow flex-col gap-1.5 pr-10 pl-3",
+            isInvalid && "opacity-20",
+          )}
+        >
+          <div className="text-sm font-medium">
+            [{coupon.place}] {coupon.name}
+          </div>
+          <div className="text-dark flex items-center justify-between gap-2 text-xs">
+            {getYYYYMMDD(coupon.expire_at)}까지 사용
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }
 

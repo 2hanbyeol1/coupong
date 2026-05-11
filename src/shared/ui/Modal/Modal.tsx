@@ -25,7 +25,7 @@ function Modal({ modal }: { modal: ModalType | null }) {
             >
               <div className="flex flex-col items-center gap-2 px-1">
                 <div className="text-base font-medium">{modal?.title}</div>
-                <div className="w-full text-sm text-gray-500">
+                <div className="w-full text-center text-sm text-gray-500">
                   {modal.content}
                 </div>
               </div>

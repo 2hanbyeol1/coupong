@@ -146,3 +146,38 @@ export const changeCouponUse = async (couponId: CouponType["id"]) => {
     throw new Error("쿠폰 사용 처리 중 오류가 발생했어요");
   }
 };
+
+export const deleteCoupon = async (couponId: CouponType["id"]) => {
+  const supabase = createBrowserClient();
+
+  const { data: coupon, error: fetchError } = await supabase
+    .from(COUPON_TABLE)
+    .select("image_path")
+    .eq("id", couponId)
+    .single();
+
+  if (fetchError) {
+    console.error(`쿠폰 조회 중 에러 발생: ${fetchError.message}`);
+    throw new Error("쿠폰 정보를 가져오는 중 오류가 발생했어요");
+  }
+
+  const { error: deleteError } = await supabase
+    .from(COUPON_TABLE)
+    .delete()
+    .eq("id", couponId);
+
+  if (deleteError) {
+    console.error(`쿠폰 삭제 중 에러 발생: ${deleteError.message}`);
+    throw new Error("쿠폰 삭제 중 오류가 발생했어요");
+  }
+
+  if (coupon.image_path) {
+    const { error: storageError } = await supabase.storage
+      .from(COUPON_IMAGE_BUCKET)
+      .remove([coupon.image_path]);
+
+    if (storageError) {
+      console.error(`쿠폰 이미지 삭제 중 에러 발생: ${storageError.message}`);
+    }
+  }
+};

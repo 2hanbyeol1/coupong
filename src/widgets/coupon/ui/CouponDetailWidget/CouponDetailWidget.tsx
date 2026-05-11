@@ -8,6 +8,7 @@ import { notFound, useParams } from "next/navigation";
 import { getCouponDetailOption } from "@/entities/coupon/api/query";
 import { CouponImage } from "@/entities/coupon/ui/CouponImage";
 import { Avatar } from "@/entities/user/ui/Avatar";
+import { CouponMenu } from "@/features/manage-coupon/ui/CouponMenu";
 import { UseCouponButton } from "@/features/use-coupon/ui/UseCouponButton";
 import { getCouponStatus } from "@/shared/lib/util/coupon";
 import { getYYYYMMDD } from "@/shared/lib/util/date";
@@ -68,7 +69,10 @@ function CouponDetailWidget() {
               >
                 <div className="flex h-full flex-col gap-1 overflow-hidden">
                   <div className="flex flex-col gap-2">
-                    <div className="text-dark text-sm">{coupon.place}</div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-dark text-sm">{coupon.place}</div>
+                      <CouponMenu coupon={coupon} redirectOnDelete />
+                    </div>
                     <div className="text-lg font-medium">{coupon.name}</div>
                   </div>
                   <div className="flex justify-between gap-2">
@@ -88,8 +92,15 @@ function CouponDetailWidget() {
           </AnimatePresence>
 
           {isInvalid ? (
-            <div className="text-dark text-center text-sm">
-              {getInvalidMessage()}
+            <div className="flex flex-col">
+              <CouponMenu
+                coupon={coupon}
+                className="self-end"
+                redirectOnDelete
+              />
+              <div className="text-dark text-center text-sm">
+                {getInvalidMessage()}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
