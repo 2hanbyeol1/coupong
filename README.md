@@ -52,6 +52,47 @@ pnpm dev
 
 <br/>
 
+## Supabase
+
+### Extensions
+
+| 이름     | 역할                                                  |
+| :------- | :---------------------------------------------------- |
+| `pg_net` | DB에서 외부로 HTTP 요청을 보낼 수 있게 해주는 확장    |
+| `pg_cron`| DB 내부에서 동작하는 크론 스케줄러                    |
+
+### Functions
+
+| 이름                          | 스키마   | 역할                                                                                                                    |
+| :---------------------------- | :------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `handle_new_user`             | `public` | 신규 가입자가 생기면 `public.users`에 대응 행 생성. 이름은 `raw_user_meta_data.name` → `email` → `'사용자'` 순으로 결정 |
+| `add_creator_to_organization` | `public` | 그룹 생성자를 `user_organization`에 자동 추가하여 멤버로 등록                                                           |
+| `notify_expiring_coupons`     | `public` | Vault에 저장된 `webhook_url`/`webhook_secret`을 꺼내 `pg_net`으로 만료 임박 쿠폰 알림 웹훅을 호출                        |
+
+### Triggers
+
+| 이름                      | 대상 테이블            | 시점         | 호출 함수                     | 역할                                   |
+| :------------------------ | :--------------------- | :----------- | :---------------------------- | :------------------------------------- |
+| `on_auth_user_created`    | `auth.users`           | AFTER INSERT | `handle_new_user`             | 첫 가입 시 `public.users` 자동 생성    |
+| `on_organization_created` | `public.organizations` | AFTER INSERT | `add_creator_to_organization` | 그룹 생성 시 생성자를 멤버로 자동 추가 |
+
+### Cron Jobs
+
+| 이름                       | 스케줄      | 실행 내용                                | 설명                                                     |
+| :------------------------- | :---------- | :--------------------------------------- | :------------------------------------------------------- |
+| `notify-expiring-coupons`  | `0 0 * * *` | `select public.notify_expiring_coupons()` | 매일 UTC 00:00 (KST 09:00)에 만료 임박 쿠폰 알림 트리거 |
+
+### Vault Secrets
+
+`notify_expiring_coupons`가 동작하려면 Supabase Dashboard → Project Settings → Vault에 아래 secret이 등록되어 있어야 한다.
+
+| 이름             | 값                                                            |
+| :--------------- | :------------------------------------------------------------ |
+| `webhook_url`    | `https://<your-domain>/api/push/expiring-soon` 형태의 웹훅 URL |
+| `webhook_secret` | 임의의 긴 랜덤 문자열. Vercel 환경변수 `WEBHOOK_SECRET`와 동일해야 함 |
+
+<br/>
+
 ## 커밋 prefix
 
 |          | 설명          |
