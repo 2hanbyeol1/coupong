@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   if (!code) return redirectToLoginWithError(request, "missing_code");
 
   const supabase = await createClient();
-  const { data, error: exchangeCodeError } =
+  const { error: exchangeCodeError } =
     await supabase.auth.exchangeCodeForSession(code);
   if (exchangeCodeError) {
     console.error(`exchangeCodeForSession 실패: ${exchangeCodeError.message}`);
@@ -36,22 +36,7 @@ export async function GET(request: NextRequest) {
     return redirectToLoginWithError(request, reason);
   }
 
-  const { data: existingUser } = await supabase
-    .from("users")
-    .select("id")
-    .eq("user_id", data.user.id)
-    .single();
-  if (existingUser)
-    return NextResponse.redirect(new URL(ROUTES.HOME, request.nextUrl.origin));
-
-  const { error: insertError } = await supabase.from("users").insert({
-    user_id: data.user.id,
-    name: data.user.user_metadata?.name || data.user.email || "사용자",
-  });
-  if (insertError) {
-    console.error(`사용자 정보 생성 실패: ${insertError.message}`);
-    return redirectToLoginWithError(request, "user_insert_failed");
-  }
+  // 첫 가입 시 트리거(on_auth_user_created)가 public.users에 행을 자동 생성.
 
   return NextResponse.redirect(new URL(ROUTES.HOME, request.nextUrl.origin));
 }
