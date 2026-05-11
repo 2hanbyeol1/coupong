@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import ModalContext, { ModalType } from "@/shared/lib/context/modal";
@@ -38,6 +38,7 @@ function Modal({ modal }: { modal: ModalType | null }) {
                   size="sm"
                   onClick={modal.onConfirm}
                   form={modal.formId}
+                  disabled={modal.confirmButtonDisabled}
                 >
                   {modal.confirmButtonText ?? "확인"}
                 </Button>
@@ -53,16 +54,25 @@ function Modal({ modal }: { modal: ModalType | null }) {
 export function ModalProvider({ children }: { children: React.ReactNode }) {
   const [modal, setModal] = useState<ModalType | null>(null);
 
-  const showModal = (modal: ModalType) => {
+  const showModal = useCallback((modal: ModalType) => {
     setModal(modal);
-  };
+  }, []);
 
-  const hideModal = () => {
+  const hideModal = useCallback(() => {
     setModal(null);
-  };
+  }, []);
+
+  const updateModal = useCallback((partial: Partial<ModalType>) => {
+    setModal((prev) => (prev ? { ...prev, ...partial } : prev));
+  }, []);
+
+  const value = useMemo(
+    () => ({ showModal, hideModal, updateModal }),
+    [showModal, hideModal, updateModal],
+  );
 
   return (
-    <ModalContext.Provider value={{ showModal, hideModal }}>
+    <ModalContext.Provider value={value}>
       {children}
       <Modal modal={modal} />
     </ModalContext.Provider>

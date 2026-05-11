@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,9 +28,9 @@ function AddOrganizationForm({ formId }: { formId: string }) {
     resolver: zodResolver(addOrganizationSchema),
   });
   const { addToast } = useToast();
-  const { hideModal } = useModal();
+  const { hideModal, updateModal } = useModal();
 
-  const { mutate: addOrganization } = useMutation({
+  const { mutate: addOrganization, isPending } = useMutation({
     ...addOrganizationOption(queryClient, {
       onSuccess: () => {
         addToast({
@@ -45,7 +46,12 @@ function AddOrganizationForm({ formId }: { formId: string }) {
     }),
   });
 
+  useEffect(() => {
+    updateModal({ confirmButtonDisabled: isPending });
+  }, [isPending, updateModal]);
+
   const onSubmit = (data: AddOrganizationFormValues) => {
+    if (isPending) return;
     addOrganization({ organization: data });
   };
 

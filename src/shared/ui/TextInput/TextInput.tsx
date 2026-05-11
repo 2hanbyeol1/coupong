@@ -11,7 +11,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     return (
       <div>
         <div className="flex flex-col gap-1">
-          <label htmlFor={id} className="text-dark text-sm">
+          <label htmlFor={id} className="text-dark text-start text-sm">
             {placeholder}
             {required && <span className="text-error"> *</span>}
           </label>
@@ -23,7 +23,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             {...props}
           />
         </div>
-        <div className="text-error mt-1">{errorMessage}</div>
+        <div className="text-error mt-1 text-start">{errorMessage}</div>
       </div>
     );
   },

@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,7 +28,7 @@ export interface EditCouponFormProps {
 
 function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
   const queryClient = useQueryClient();
-  const { hideModal } = useModal();
+  const { hideModal, updateModal } = useModal();
   const { addToast } = useToast();
 
   const { register, handleSubmit } = useForm<CouponInfoValues>({
@@ -40,7 +41,7 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
     },
   });
 
-  const { mutate: updateCoupon } = useMutation({
+  const { mutate: updateCoupon, isPending } = useMutation({
     ...updateCouponOption(queryClient, {
       onSuccess: () => {
         addToast({ message: "쿠폰이 수정되었어요" });
@@ -51,6 +52,10 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
       },
     }),
   });
+
+  useEffect(() => {
+    updateModal({ confirmButtonDisabled: isPending });
+  }, [isPending, updateModal]);
 
   const onSubmit = (data: CouponInfoValues) => {
     updateCoupon({ couponId: coupon.id, changes: data });

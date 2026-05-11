@@ -15,7 +15,8 @@ interface LogoutButtonProps {
 function LogoutButton({ className }: LogoutButtonProps) {
   const { addToast } = useToast();
   const router = useRouter();
-  const { mutate: signOut } = useMutation({
+
+  const { mutate: signOut, isPending: isSigningOut } = useMutation({
     ...signOutOption(),
     onSuccess: () => {
       router.push(ROUTES.LOGIN);
@@ -35,6 +36,7 @@ function LogoutButton({ className }: LogoutButtonProps) {
         className,
       )}
       onClick={() => signOut()}
+      disabled={isSigningOut}
     >
       로그아웃
     </button>

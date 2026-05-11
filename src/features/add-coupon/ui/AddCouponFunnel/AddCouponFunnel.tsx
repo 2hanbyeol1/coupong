@@ -30,7 +30,7 @@ function AddCouponFunnel() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { showModal, hideModal } = useModal();
+  const { showModal, hideModal, updateModal } = useModal();
   const { step, setStep } = useFunnel(addCouponStepNames.IMAGE_UPLOAD);
   const { selectedOrganizationId: selectedOrgId } = useOrganizationStore();
 
@@ -61,15 +61,21 @@ function AddCouponFunnel() {
         addToast({
           message: "새로운 쿠폰이 추가되었어요",
         });
+        hideModal();
         router.push(ROUTES.HOME);
       },
       onError: () => {
         addToast({
           message: "쿠폰 추가에 실패했어요",
         });
+        hideModal();
       },
     }),
   });
+
+  useEffect(() => {
+    updateModal({ confirmButtonDisabled: isAddCouponsPending });
+  }, [isAddCouponsPending, updateModal]);
 
   const handleSubmit = async (data: AddCouponFormValues) => {
     if (!selectedOrgId) {
@@ -106,7 +112,6 @@ function AddCouponFunnel() {
       confirmButtonText: "등록",
       onConfirm: () => {
         addCoupons({ formValues: data, orgId: selectedOrgId });
-        hideModal();
       },
     });
   };

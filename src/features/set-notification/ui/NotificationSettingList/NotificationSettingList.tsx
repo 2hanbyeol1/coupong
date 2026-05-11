@@ -25,7 +25,7 @@ function NotificationSettingList() {
     queryFn: getNotificationPreferences,
   });
 
-  const { mutate: savePreferences } = useMutation({
+  const { mutate: savePreferences, isPending } = useMutation({
     mutationFn: (next: Partial<NotificationPreferences>) =>
       updateNotificationPreferences(next),
     onMutate: async (next) => {
@@ -56,17 +56,19 @@ function NotificationSettingList() {
         title="쿠폰 등록 알림"
         description="내 그룹에 새 쿠폰이 등록되면 알림을 받아요"
         isChecked={preferences.coupon_created}
-        onChange={() =>
-          savePreferences({ coupon_created: !preferences.coupon_created })
-        }
+        onChange={() => {
+          if (isPending) return;
+          savePreferences({ coupon_created: !preferences.coupon_created });
+        }}
       />
       <NotificationSetting
         title="쿠폰 마감 임박 알림"
         description="등록된 쿠폰의 마감일이 1일 남았을 때 알림을 받아요"
         isChecked={preferences.expiring_soon}
-        onChange={() =>
-          savePreferences({ expiring_soon: !preferences.expiring_soon })
-        }
+        onChange={() => {
+          if (isPending) return;
+          savePreferences({ expiring_soon: !preferences.expiring_soon });
+        }}
       />
     </>
   );

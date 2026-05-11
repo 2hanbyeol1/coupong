@@ -33,7 +33,7 @@ function UserNameInput({ className }: UserNameInputProps) {
   });
 
   const { data: user, isPending, isError } = useQuery(getUserOption(""));
-  const { mutate: updateUserProfile } = useMutation({
+  const { mutate: updateUserProfile, isPending: isUpdating } = useMutation({
     ...updateUserProfileOption(),
     onSuccess: () => {
       addToast({
@@ -65,11 +65,13 @@ function UserNameInput({ className }: UserNameInputProps) {
         )}
         maxLength={8}
         autoComplete="off"
+        disabled={isUpdating}
         {...register("name", {
           onBlur: (e) => {
             const newName = e.target.value;
             if (!isValid) return;
             if (newName === user.name) return;
+            if (isUpdating) return;
             updateUserProfile({ name: newName });
           },
         })}

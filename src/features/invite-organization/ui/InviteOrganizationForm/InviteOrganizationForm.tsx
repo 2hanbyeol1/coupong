@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -26,18 +27,19 @@ function InviteOrganizationForm({
   organization,
 }: InviteOrganizationFormProps) {
   const { addToast } = useToast();
-  const { hideModal } = useModal();
+  const { hideModal, updateModal } = useModal();
 
-  const { mutateAsync: addInvitation } = useMutation({
-    ...addInvitationOption(),
-    onError: (error) => {
-      addToast({
-        message: error.message,
-      });
-    },
-  });
+  const { mutateAsync: addInvitation, isPending: isAddingInvitation } =
+    useMutation({
+      ...addInvitationOption(),
+      onError: (error) => {
+        addToast({
+          message: error.message,
+        });
+      },
+    });
 
-  const { mutateAsync: sendEmail } = useMutation({
+  const { mutateAsync: sendEmail, isPending: isSendingEmail } = useMutation({
     ...sendEmailOption(),
     onSuccess: () => {
       addToast({
@@ -51,6 +53,12 @@ function InviteOrganizationForm({
       });
     },
   });
+
+  const isPending = isAddingInvitation || isSendingEmail;
+
+  useEffect(() => {
+    updateModal({ confirmButtonDisabled: isPending });
+  }, [isPending, updateModal]);
 
   const {
     register,

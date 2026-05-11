@@ -24,29 +24,32 @@ function UserImageInput({ className }: UserImageInputProps) {
 
   const { data: user, isPending, isError } = useQuery(getUserOption(""));
 
-  const { mutate: uploadUserImage } = useMutation({
+  const { mutate: uploadUserImage, isPending: isUploading } = useMutation({
     ...uploadUserImageOption(),
     onSuccess: (data) => {
       updateUserProfile({ image_path: data });
     },
   });
 
-  const { mutate: updateUserProfile } = useMutation({
-    ...updateUserProfileOption(),
-    onSuccess: () => {
-      addToast({
-        message: "사용자 프로필 이미지가 수정되었어요",
-      });
-      queryClient.invalidateQueries({
-        queryKey: USER_QUERY_KEY.USER(""),
-      });
-    },
-    onError: () => {
-      addToast({
-        message: "사용자 프로필 이미지 수정에 실패했어요",
-      });
-    },
-  });
+  const { mutate: updateUserProfile, isPending: isUpdatingProfile } =
+    useMutation({
+      ...updateUserProfileOption(),
+      onSuccess: () => {
+        addToast({
+          message: "사용자 프로필 이미지가 수정되었어요",
+        });
+        queryClient.invalidateQueries({
+          queryKey: USER_QUERY_KEY.USER(""),
+        });
+      },
+      onError: () => {
+        addToast({
+          message: "사용자 프로필 이미지 수정에 실패했어요",
+        });
+      },
+    });
+
+  const isUploadingImage = isUploading || isUpdatingProfile;
 
   if (isPending) return <Skeleton className="h-20 w-20 rounded-full" />;
   if (isError) return <div>에러</div>;
@@ -62,7 +65,9 @@ function UserImageInput({ className }: UserImageInputProps) {
       previewImageClassName="object-cover"
       aspect="square"
       rounded="full"
+      disabled={isUploadingImage}
       onImageChange={({ imageFile }) => {
+        if (isUploadingImage) return;
         uploadUserImage({ userId: user.user_id, newUserImage: imageFile });
       }}
     />

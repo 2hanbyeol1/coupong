@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -26,15 +27,23 @@ function CouponMenu({
   const queryClient = useQueryClient();
   const router = useRouter();
   const { data: me } = useQuery(getMyInfoOption());
-  const { showModal, hideModal } = useModal();
+  const { showModal, hideModal, updateModal } = useModal();
 
-  const { mutate: deleteCoupon } = useMutation({
+  const { mutate: deleteCoupon, isPending: isDeletingCoupon } = useMutation({
     ...deleteCouponOption(queryClient, {
       onSuccess: () => {
+        hideModal();
         if (redirectOnDelete) router.replace(ROUTES.HOME);
+      },
+      onError: () => {
+        hideModal();
       },
     }),
   });
+
+  useEffect(() => {
+    updateModal({ confirmButtonDisabled: isDeletingCoupon });
+  }, [isDeletingCoupon, updateModal]);
 
   if (me?.user_id !== coupon.uploaded_by) return null;
 
@@ -54,7 +63,6 @@ function CouponMenu({
       confirmButtonText: "삭제",
       onConfirm: () => {
         deleteCoupon(coupon.id);
-        hideModal();
       },
     });
   };
