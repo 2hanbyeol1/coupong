@@ -43,3 +43,6 @@ next-env.d.ts
 # ide
 .cursor
 certificates
+
+# claude code
+.claude/settings.local.json
