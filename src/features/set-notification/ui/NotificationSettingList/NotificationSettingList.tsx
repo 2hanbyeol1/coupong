@@ -51,7 +51,7 @@ function NotificationSettingList() {
   });
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
       <NotificationSetting
         title="쿠폰 등록 알림"
         description="내 그룹에 새 쿠폰이 등록되면 알림을 받아요"
@@ -70,7 +70,7 @@ function NotificationSettingList() {
           savePreferences({ expiring_soon: !preferences.expiring_soon });
         }}
       />
-    </>
+    </div>
   );
 }
 
