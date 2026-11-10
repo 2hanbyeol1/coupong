@@ -12,9 +12,11 @@ import { CouponImage } from "../CouponImage";
 
 interface CouponProps {
   coupon: CouponType;
+  /** 검색 결과에서 진입한 경우, 상세에서 검색 결과 안에서만 스와이프하도록 전달 */
+  keyword?: string;
 }
 
-function Coupon({ coupon }: CouponProps) {
+function Coupon({ coupon, keyword }: CouponProps) {
   const isExpired = getExpired(coupon.expire_at);
   const isUsed = !!coupon.used_by;
   const isInvalid = isExpired || isUsed;
@@ -28,7 +30,7 @@ function Coupon({ coupon }: CouponProps) {
   return (
     <div className="relative">
       <Link
-        href={ROUTES.COUPON_DETAIL(coupon.id.toString())}
+        href={ROUTES.COUPON_DETAIL(coupon.id.toString(), keyword)}
         className="flex items-center gap-2"
       >
         <div className="relative size-20 shrink-0">

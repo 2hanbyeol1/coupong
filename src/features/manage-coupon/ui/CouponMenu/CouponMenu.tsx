@@ -1,13 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import { deleteCouponOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
 import { getMyInfoOption } from "@/entities/user/api/query";
 import { EditCouponForm } from "@/features/manage-coupon/ui/EditCouponForm";
-import { ROUTES } from "@/shared/config/routes";
 import useModal from "@/shared/lib/hook/useModal";
 import { MoreMenu } from "@/shared/ui";
 
@@ -16,16 +14,11 @@ const EDIT_COUPON_FORM_ID = "edit-coupon";
 export interface CouponMenuProps {
   coupon: CouponType;
   className?: string;
-  redirectOnDelete?: boolean;
+  onDeleted?: () => void;
 }
 
-function CouponMenu({
-  coupon,
-  className,
-  redirectOnDelete = false,
-}: CouponMenuProps) {
+function CouponMenu({ coupon, className, onDeleted }: CouponMenuProps) {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const { data: me } = useQuery(getMyInfoOption());
   const { showModal, hideModal, updateModal } = useModal();
 
@@ -33,7 +26,7 @@ function CouponMenu({
     ...deleteCouponOption(queryClient, {
       onSuccess: () => {
         hideModal();
-        if (redirectOnDelete) router.replace(ROUTES.HOME);
+        onDeleted?.();
       },
       onError: () => {
         hideModal();

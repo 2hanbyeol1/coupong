@@ -6,7 +6,10 @@ export const ROUTES = {
   HOME: "/", // 홈
   LOGIN: "/login", // 로그인
   ADD_COUPON: "/coupon/add", // 쿠폰 등록
-  COUPON_DETAIL: (id: string) => `/coupon/${id}`, // 쿠폰 상세
+  COUPON_DETAIL: (id: string, keyword?: string) =>
+    keyword
+      ? `/coupon/${id}?keyword=${encodeURIComponent(keyword)}`
+      : `/coupon/${id}`, // 쿠폰 상세 (keyword: 검색 결과 안에서만 스와이프)
   SEARCH: "/search", // 검색
   PROFILE: "/profile", // 프로필
   PROFILE_ORGANIZATION: "/profile/organization", // 내 그룹 관리

@@ -3,6 +3,7 @@ import { Suspense, useMemo } from "react";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
+import { filterCouponsByKeyword } from "@/entities/coupon/lib/filter";
 import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
 import { OrganizationType } from "@/entities/organization/api/type";
@@ -57,14 +58,7 @@ function SuspensedCouponList({
   });
 
   const filteredCoupons = useMemo(
-    () =>
-      keyword && coupons
-        ? coupons.filter(
-            (coupon) =>
-              coupon.place.toUpperCase().includes(keyword) ||
-              coupon.name.toUpperCase().includes(keyword),
-          )
-        : (coupons ?? []),
+    () => filterCouponsByKeyword(coupons ?? [], keyword),
     [coupons, keyword],
   );
 
@@ -105,7 +99,7 @@ function SuspensedCouponList({
       isFetchingNextPage={isFetchingNextPage}
     >
       {filteredCoupons.map((coupon) => (
-        <Coupon key={coupon.id} coupon={coupon} />
+        <Coupon key={coupon.id} coupon={coupon} keyword={keyword} />
       ))}
     </InfiniteScroll>
   );

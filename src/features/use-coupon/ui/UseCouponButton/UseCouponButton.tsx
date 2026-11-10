@@ -10,9 +10,14 @@ import { Button } from "@/shared/ui";
 export interface UseCouponButtonProps {
   className?: string;
   couponId: CouponType["id"];
+  onUsed?: () => void;
 }
 
-function UseCouponButton({ className, couponId }: UseCouponButtonProps) {
+function UseCouponButton({
+  className,
+  couponId,
+  onUsed,
+}: UseCouponButtonProps) {
   const queryClient = useQueryClient();
   const { showModal, hideModal, updateModal } = useModal();
 
@@ -30,6 +35,7 @@ function UseCouponButton({ className, couponId }: UseCouponButtonProps) {
       content: "한번 사용 버튼을 누르면 되돌릴 수 없어요.",
       onConfirm: () => {
         changeCouponToUsed(couponId, {
+          onSuccess: () => onUsed?.(),
           onSettled: () => hideModal(),
         });
       },

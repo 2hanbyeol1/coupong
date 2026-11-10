@@ -5,21 +5,19 @@ interface CouponDetailWidgetSkeletonProps {
   className?: string;
 }
 
-function CouponDetailWidgetSkeleton({
+export function CouponDetailPanelSkeleton({
   className,
 }: CouponDetailWidgetSkeletonProps) {
   return (
-    <>
-      <Skeleton className="h-full w-full" wrapper />
-      <Skeleton
-        className={cn(
-          "flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7",
-          className,
-        )}
-        wrapper
-      >
-        <div className="flex flex-col gap-6">
-          {/* <div className="flex flex-col gap-1">
+    <Skeleton
+      className={cn(
+        "flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7",
+        className,
+      )}
+      wrapper
+    >
+      <div className="flex flex-col gap-6">
+        {/* <div className="flex flex-col gap-1">
           <div className="flex flex-col gap-2">
             <Skeleton className="w-8" textSize="sm" />
             <Skeleton className="w-52" textSize="lg" />
@@ -30,12 +28,22 @@ function CouponDetailWidgetSkeleton({
           </div>
         </div> */}
 
-          <div className="grid grid-cols-2 gap-2">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
         </div>
-      </Skeleton>
+      </div>
+    </Skeleton>
+  );
+}
+
+function CouponDetailWidgetSkeleton({
+  className,
+}: CouponDetailWidgetSkeletonProps) {
+  return (
+    <>
+      <Skeleton className="h-full w-full" wrapper />
+      <CouponDetailPanelSkeleton className={className} />
     </>
   );
 }
