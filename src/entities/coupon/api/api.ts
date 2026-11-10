@@ -8,6 +8,8 @@ import { CouponType, InsertCouponType } from "./type";
 
 const COUPON_TABLE = "coupons";
 const COUPON_IMAGE_BUCKET = "coupon-image";
+// 서명 URL이 바뀌면 같은 이미지도 다시 받아야 해서 길게 유지
+export const SIGNED_URL_EXPIRES_IN = 60 * 60; // 1 hour (seconds)
 
 export const getCoupons = async ({
   organizationId,
@@ -123,7 +125,7 @@ export const getImageSignedUrl = async (path: string) => {
 
   const { data, error } = await supabase.storage
     .from(COUPON_IMAGE_BUCKET)
-    .createSignedUrl(path, 300); // expires in 5 minutes
+    .createSignedUrl(path, SIGNED_URL_EXPIRES_IN);
 
   if (error) {
     console.error(`쿠폰 이미지 URL 조회 중 에러 발생: ${error.message}`);

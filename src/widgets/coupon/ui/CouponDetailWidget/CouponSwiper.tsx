@@ -137,6 +137,8 @@ function CouponSwiper({
                   couponName={coupon.name}
                   imageClassName={imageClassName}
                   sizes="100vw"
+                  // 다음 쿠폰은 화면 밖이라 lazy면 넘기는 순간에야 받기 시작하므로 미리 받아둠
+                  loading={position === 1 ? "eager" : undefined}
                 />
               </div>
             ),

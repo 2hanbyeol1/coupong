@@ -13,6 +13,7 @@ export interface CouponImageProps {
   isInvalid?: boolean;
   imageClassName?: string;
   sizes: string;
+  loading?: "eager" | "lazy";
 }
 
 function CouponImage({
@@ -21,6 +22,7 @@ function CouponImage({
   isInvalid,
   imageClassName,
   sizes,
+  loading,
 }: CouponImageProps) {
   const {
     data: signedUrl,
@@ -43,6 +45,7 @@ function CouponImage({
         )}
         alt={couponName}
         sizes={sizes}
+        loading={loading}
       />
     </div>
   );

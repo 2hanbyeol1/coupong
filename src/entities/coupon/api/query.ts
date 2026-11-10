@@ -15,6 +15,7 @@ import {
   getCoupon,
   getCoupons,
   getImageSignedUrl,
+  SIGNED_URL_EXPIRES_IN,
   updateCoupon,
 } from "./api";
 import { COUPON_QUERY_KEY } from "./query-key";
@@ -46,9 +47,18 @@ export const getCouponImageOption = ({
     queryKey: COUPON_QUERY_KEY.COUPON_IMAGE(imagePath),
     queryFn: async () => await getImageSignedUrl(imagePath),
     enabled: !!imagePath,
-    staleTime: 300000, // 5 minutes
-    gcTime: 300000, // 5 minutes
+    // 서명 URL이 만료되기 5분 전에 새로 발급
+    staleTime: SIGNED_URL_EXPIRES_IN * 1000 - 5 * 60 * 1000, // 55 minutes
+    gcTime: SIGNED_URL_EXPIRES_IN * 1000 - 5 * 60 * 1000, // 55 minutes
   });
+
+// 쿠폰 정보가 바뀌어도 이미지는 그대로이므로 서명 URL은 다시 발급하지 않음
+// (다시 발급하면 URL이 바뀌어 같은 이미지를 새로 다운로드하게 됨)
+const isNotCouponImageQuery = ({
+  queryKey,
+}: {
+  queryKey: readonly unknown[];
+}) => queryKey[1] !== COUPON_QUERY_KEY.COUPON_IMAGE_ALL[1];
 
 export const addCouponsOption = (
   queryClient: QueryClient,
@@ -68,6 +78,7 @@ export const addCouponsOption = (
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: COUPON_QUERY_KEY.ALL,
+        predicate: isNotCouponImageQuery,
       });
       onSuccess?.();
     },
@@ -82,6 +93,7 @@ export const changeCouponToUsedOption = (queryClient: QueryClient) => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: COUPON_QUERY_KEY.ALL,
+        predicate: isNotCouponImageQuery,
       });
     },
   });
@@ -105,6 +117,7 @@ export const updateCouponOption = (
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: COUPON_QUERY_KEY.ALL,
+        predicate: isNotCouponImageQuery,
         refetchType: "all",
       });
       onSuccess?.();
