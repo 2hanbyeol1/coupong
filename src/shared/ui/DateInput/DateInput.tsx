@@ -1,6 +1,5 @@
 "use client";
-import { forwardRef, useEffect, useId, useState } from "react";
-import { createPortal } from "react-dom";
+import { forwardRef, useId, useState } from "react";
 import { CalendarDays, Keyboard } from "lucide-react";
 
 import { cn } from "@/shared/lib/util/cn";
@@ -40,13 +39,6 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     const id = useId();
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [sheetMode, setSheetMode] = useState<SheetMode>("calendar");
-    const [isMounted, setIsMounted] = useState(false);
-
-    // 화면 이동 애니메이션(transform) 안에 있어도 화면 전체를 덮도록 시트는 body에 렌더링
-    useEffect(() => {
-      setIsMounted(true);
-    }, []);
-
     const valueDigits = toDateDigits(value);
     const displayValue = valueDigits ? formatDateDigits(valueDigits) : "";
 
@@ -90,34 +82,30 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
         </div>
         <div className="text-error mt-1 text-start">{errorMessage}</div>
 
-        {isMounted &&
-          createPortal(
-            <BottomSheet open={isSheetOpen} onClose={closeSheet} title={label}>
-              {sheetMode === "calendar" ? (
-                <div className="flex flex-col gap-3">
-                  <Calendar value={value} min={min} onSelect={handleSelect} />
-                  <SheetModeButton onClick={() => setSheetMode("text")}>
-                    <Keyboard size={16} aria-hidden />
-                    직접 입력
-                  </SheetModeButton>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  <DirectDateInput
-                    label={label}
-                    initialValue={value}
-                    min={min}
-                    onConfirm={handleSelect}
-                  />
-                  <SheetModeButton onClick={() => setSheetMode("calendar")}>
-                    <CalendarDays size={16} aria-hidden />
-                    달력에서 고르기
-                  </SheetModeButton>
-                </div>
-              )}
-            </BottomSheet>,
-            document.body,
+        <BottomSheet open={isSheetOpen} onClose={closeSheet} title={label}>
+          {sheetMode === "calendar" ? (
+            <div className="flex flex-col gap-3">
+              <Calendar value={value} min={min} onSelect={handleSelect} />
+              <SheetModeButton onClick={() => setSheetMode("text")}>
+                <Keyboard size={16} aria-hidden />
+                직접 입력
+              </SheetModeButton>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <DirectDateInput
+                label={label}
+                initialValue={value}
+                min={min}
+                onConfirm={handleSelect}
+              />
+              <SheetModeButton onClick={() => setSheetMode("calendar")}>
+                <CalendarDays size={16} aria-hidden />
+                달력에서 고르기
+              </SheetModeButton>
+            </div>
           )}
+        </BottomSheet>
       </div>
     );
   },

@@ -139,8 +139,7 @@ function DirectDateInput({
   const fieldClass = cn(FIELD_CLASS, error && "ring-error focus:ring-error");
 
   return (
-    // 시트 내용 영역이 스크롤 영역이라 칸 바깥으로 그려지는 포커스 테두리가 잘리지 않도록 여백
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-3 p-1">
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-3">
       <div className="flex flex-col gap-1">
         <div
           role="group"

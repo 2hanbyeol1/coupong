@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 
 import { useOrganizationStore } from "@/entities/organization/model/store";
@@ -17,12 +16,6 @@ interface SelectOrganizationFieldProps {
 function SelectOrganizationField({ className }: SelectOrganizationFieldProps) {
   const { selectedOrganizationId, isHydrated } = useOrganizationStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-
-  // 폼 안에 놓여도 목록의 버튼이 폼을 제출하지 않도록 시트는 body에 렌더링
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const hasSelected = !!selectedOrganizationId;
   const closeSheet = () => setIsOpen(false);
@@ -48,13 +41,9 @@ function SelectOrganizationField({ className }: SelectOrganizationFieldProps) {
         </button>
       </div>
 
-      {isMounted &&
-        createPortal(
-          <BottomSheet open={isOpen} onClose={closeSheet} title="그룹 선택">
-            <MyOrganizationList onSelect={closeSheet} />
-          </BottomSheet>,
-          document.body,
-        )}
+      <BottomSheet open={isOpen} onClose={closeSheet} title="그룹 선택">
+        <MyOrganizationList onSelect={closeSheet} />
+      </BottomSheet>
     </>
   );
 }
