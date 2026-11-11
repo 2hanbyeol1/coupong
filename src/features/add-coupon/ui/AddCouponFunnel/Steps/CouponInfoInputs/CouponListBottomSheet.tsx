@@ -25,7 +25,8 @@ function CouponListBottomSheet({
 }: CouponListBottomSheetProps) {
   return (
     <BottomSheet open={open} onClose={onClose} title="쿠폰 목록">
-      <div className="grid grid-cols-3 gap-2 pb-2">
+      {/* 사진 업로드 단계의 목록과 같은 그리드: 모바일 3열, 넓은 화면에선 칸 크기를 유지한 채 열 수가 늘어남 */}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2 pb-2">
         {imagePreviews.map((url, index) => {
           const isIncomplete = incompleteCoupons[index];
           return (
