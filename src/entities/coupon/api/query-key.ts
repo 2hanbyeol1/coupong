@@ -7,6 +7,7 @@ export const COUPON_QUERY_KEY = {
   LIST_ALL: ["coupon", "list"],
   LIST: (orgId: OrganizationType["id"]) => ["coupon", "list", orgId],
   DETAIL: (couponId: CouponType["id"]) => ["coupon", couponId],
+  SUGGESTIONS: (params: object) => ["coupon", "suggestions", params],
   COUPON_IMAGE_ALL: ["coupon", "image"],
   COUPON_IMAGE: (imagePath: CouponType["image_path"]) => [
     "coupon",

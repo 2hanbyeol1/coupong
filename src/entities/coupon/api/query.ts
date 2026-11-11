@@ -15,6 +15,8 @@ import {
   getCoupon,
   getCoupons,
   getImageSignedUrl,
+  searchCouponSuggestions,
+  SearchCouponSuggestionsParams,
   SIGNED_URL_EXPIRES_IN,
   updateCoupon,
 } from "./api";
@@ -36,6 +38,38 @@ export const getCouponDetailOption = (couponId: CouponType["id"]) =>
   queryOptions({
     queryKey: COUPON_QUERY_KEY.DETAIL(couponId),
     queryFn: async () => await getCoupon(couponId),
+  });
+
+export const searchCouponSuggestionsOption = (
+  {
+    organizationId,
+    ...params
+  }: Omit<SearchCouponSuggestionsParams, "organizationId"> & {
+    organizationId: OrganizationType["id"] | null;
+  },
+  { enabled = true }: { enabled?: boolean } = {},
+) =>
+  queryOptions({
+    queryKey: COUPON_QUERY_KEY.SUGGESTIONS({ organizationId, ...params }),
+    queryFn: async () =>
+      await searchCouponSuggestions({
+        organizationId: organizationId!,
+        ...params,
+      }),
+    enabled: enabled && !!organizationId,
+    staleTime: 60 * 1000,
+    // 새 검색 결과를 받는 동안 이전 결과를 유지해 목록이 깜빡이지 않게
+    // (다른 항목·다른 사용처의 결과가 보이지 않도록 그룹·항목·사용처가 같을 때만)
+    placeholderData: (previousData, previousQuery) => {
+      const previousParams = previousQuery?.queryKey[2] as
+        | Partial<SearchCouponSuggestionsParams>
+        | undefined;
+      const isSameSearch =
+        previousParams?.organizationId === organizationId &&
+        previousParams?.field === params.field &&
+        (previousParams?.place ?? "") === (params.place ?? "");
+      return isSameSearch ? previousData : undefined;
+    },
   });
 
 export const getCouponImageOption = ({

@@ -252,6 +252,22 @@ export type Database = {
     };
     Functions: {
       notify_expiring_coupons: { Args: never; Returns: undefined };
+      search_coupon_suggestions: {
+        Args: {
+          p_field: string;
+          p_limit?: number;
+          p_organization_id: string;
+          p_place?: string;
+          p_place_only?: boolean;
+          p_query?: string;
+          p_session_values?: string[];
+        };
+        Returns: {
+          last_used_at: string;
+          use_count: number;
+          value: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

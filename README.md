@@ -67,6 +67,7 @@ pnpm dev
 | :---------------------------- | :------- | :---------------------------------------------------------------------------------------------------------------------- |
 | `handle_new_user`             | `public` | 신규 가입자가 생기면 `public.users`에 대응 행 생성. 이름은 `raw_user_meta_data.name` → `email` → `'사용자'` 순으로 결정 |
 | `add_creator_to_organization` | `public` | 그룹 생성자를 `user_organization`에 자동 추가하여 멤버로 등록                                                           |
+| `search_coupon_suggestions`   | `public` | 쿠폰 등록 시 사용처·쿠폰 이름 추천 검색. 띄어쓰기·대소문자를 무시해 중복 제거하고 많이 쓴 순으로 반환 (`supabase/sql/search_coupon_suggestions.sql`) |
 | `notify_expiring_coupons`     | `public` | Vault에 저장된 `webhook_url`/`webhook_secret`을 꺼내 `pg_net`으로 만료 임박 쿠폰 알림 웹훅을 호출                        |
 
 ### Triggers

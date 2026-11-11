@@ -71,6 +71,55 @@ export const getCoupon = async (couponId: CouponType["id"]) => {
   return data;
 };
 
+// 그룹 전체 쿠폰의 (사용처, 이름) 조합별 사용 횟수 (입력 추천용)
+// 많이 쓴 순 → 최근에 쓴 순으로 정렬되어 옴
+export interface SearchCouponSuggestionsParams {
+  organizationId: OrganizationType["id"];
+  /** 검색할 항목 */
+  field: "place" | "name";
+  /** 검색어. 비어 있으면 많이 쓴 순 상위 값을 반환 */
+  query?: string;
+  /** 쿠폰 이름 검색 시 이 사용처에서 쓴 이름을 먼저 */
+  place?: string;
+  /** true면 place에서 쓴 적 있는 이름(과 sessionValues)만 */
+  placeOnly?: boolean;
+  /** 아직 저장 전인, 이번 등록에서 입력한 값 (후보에 포함되고 먼저 나옴) */
+  sessionValues?: string[];
+  limit?: number;
+}
+
+/**
+ * 그룹 쿠폰에서 사용처·쿠폰 이름 추천 검색
+ * 중복 제거(띄어쓰기·대소문자 무시)·검색·정렬은 서버(search_coupon_suggestions)에서 처리
+ */
+export const searchCouponSuggestions = async ({
+  organizationId,
+  field,
+  query = "",
+  place = "",
+  sessionValues = [],
+  limit,
+  placeOnly = false,
+}: SearchCouponSuggestionsParams) => {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase.rpc("search_coupon_suggestions", {
+    p_organization_id: organizationId,
+    p_field: field,
+    p_query: query,
+    p_place: place,
+    p_session_values: sessionValues,
+    p_limit: limit,
+    p_place_only: placeOnly,
+  });
+
+  if (error) {
+    console.error("쿠폰 추천 검색 에러:", error);
+    throw new Error("쿠폰 추천 목록을 가져오는 중 오류가 발생했어요");
+  }
+  return data.map(({ value }) => value);
+};
+
 // ! 하나라도 실패하는 경우, rollback 처리 필요
 export const addCoupons = async (
   formValues: AddCouponFormValues,
