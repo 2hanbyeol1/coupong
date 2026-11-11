@@ -48,6 +48,9 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [currentCouponIndex, setCurrentCouponIndex] = useState(0);
+  // 사진 삭제 확인 모달에서 '이번 등록에서는 다시 묻지 않기'를 고르면 false
+  const [confirmBeforeImageRemove, setConfirmBeforeImageRemove] =
+    useState(true);
 
   const methods = useForm<AddCouponFormValues>({
     mode: "onChange",
@@ -56,8 +59,10 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
   });
 
   const hasImagesRef = useRef(false);
+  const imagePreviewsRef = useRef<string[]>([]);
   useEffect(() => {
     hasImagesRef.current = imagePreviews.length > 0;
+    imagePreviewsRef.current = imagePreviews;
   }, [imagePreviews]);
 
   useEffect(() => {
@@ -95,15 +100,24 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
     setStep(addCouponStepNames.IMAGE_UPLOAD);
   };
 
-  // 더 이상 사용하지 않는 미리보기 URL 해제
+  // 페이지를 떠날 때 남은 미리보기 URL 해제
   useEffect(() => {
     return () => {
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      imagePreviewsRef.current.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [imagePreviews]);
+  }, []);
 
-  const handleImagesChange = (files: File[]) => {
-    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
+  // 미리보기 URL은 사진마다 한 번만 만들어 유지 (목록 key로 쓰여, 바뀌면 사진이 다시 그려지며 깜빡임)
+  const handleImagesAdd = (files: File[]) => {
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...urls]);
+    setCurrentCouponIndex(0);
+  };
+
+  const handleImageRemove = (index: number) => {
+    const url = imagePreviews[index];
+    if (url) URL.revokeObjectURL(url);
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     setCurrentCouponIndex(0);
   };
 
@@ -200,7 +214,12 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
               <CouponImageUploader
                 onNext={goToCouponInfoStep}
                 imagePreviews={imagePreviews}
-                onImagesChange={handleImagesChange}
+                onImagesAdd={handleImagesAdd}
+                onImageRemove={handleImageRemove}
+                confirmBeforeRemove={confirmBeforeImageRemove}
+                onDisableRemoveConfirm={() =>
+                  setConfirmBeforeImageRemove(false)
+                }
                 organizationField={organizationField}
               />
             </FullView>
