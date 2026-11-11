@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useId, useMemo, useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, PanInfo, Variants } from "framer-motion";
 import { LayoutGrid } from "lucide-react";
@@ -23,7 +23,7 @@ import useSlideDirection from "@/shared/lib/hook/useSlideDirection";
 import useToast from "@/shared/lib/hook/useToast";
 import { cn } from "@/shared/lib/util/cn";
 import { getTodayDateInputValue } from "@/shared/lib/util/date";
-import { Button, Checkbox, TextInput } from "@/shared/ui";
+import { Button, Checkbox, DateInput, TextInput } from "@/shared/ui";
 
 import AutocompleteList from "./AutocompleteList";
 import CouponListBottomSheet from "./CouponListBottomSheet";
@@ -398,6 +398,30 @@ function CouponInfoInputs({
           <div className="flex flex-col gap-3">
             {INPUT_CONFIG.map(({ name, type, placeholder, ...props }) => {
               const fieldName = name as InfoFieldName;
+              if (fieldName === "expire_at") {
+                return (
+                  <Controller
+                    key={fieldName}
+                    control={control}
+                    name={`coupons.${currentIndex}.expire_at`}
+                    render={({ field }) => (
+                      <DateInput
+                        ref={field.ref}
+                        name={field.name}
+                        label={COUPON_INFO.expire_at.label}
+                        required={COUPON_INFO.expire_at.required}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        onBlur={() => {
+                          field.onBlur();
+                          handleFieldBlur("expire_at");
+                        }}
+                        min={today}
+                      />
+                    )}
+                  />
+                );
+              }
               const isAutocompleteField =
                 AUTOCOMPLETE_FIELDS.includes(fieldName);
               // 입력칸이 비어 있으면 목록을 띄우지 않음
@@ -418,7 +442,6 @@ function CouponInfoInputs({
                     <TextInput
                       type={type}
                       placeholder={placeholder}
-                      min={fieldName === "expire_at" ? today : undefined}
                       autoComplete={isAutocompleteField ? "off" : undefined}
                       aria-controls={showAutocomplete ? listId : undefined}
                       onKeyDown={

@@ -50,6 +50,8 @@ export const COUPON_SCHEMA = {
   expire_at: z
     .string()
     .min(1, "쿠폰의 유효 기간을 입력해주세요")
+    // 날짜 입력칸은 완성된 날짜일 때만 YYYY-MM-DD 값을 넘김
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "유효 기간을 끝까지 정확히 입력해주세요")
     .refine((dateStr) => !getExpired(dateStr), {
       message: "유효 기간이 지난 쿠폰은 등록할 수 없어요",
     }),

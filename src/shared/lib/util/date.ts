@@ -40,11 +40,31 @@ export const getYYYYMMDD = (date: string) => {
 };
 
 /**
+ * 날짜를 date input 값 형식(YYYY-MM-DD, 로컬 시간 기준)으로 반환
+ */
+export const toDateInputValue = (date: Date) => {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+};
+
+/**
  * 오늘 날짜를 date input 값 형식(YYYY-MM-DD, 로컬 시간 기준)으로 반환
  */
-export const getTodayDateInputValue = () => {
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${today.getFullYear()}-${month}-${day}`;
+export const getTodayDateInputValue = () => toDateInputValue(new Date());
+
+/**
+ * YYYY-MM-DD 값을 로컬 시간 기준 Date로 변환. 형식이 틀리거나 없는 날짜(2월 30일 등)면 null
+ */
+export const parseDateInputValue = (value: string): Date | null => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return null;
+
+  const [, year, month, day] = match.map(Number);
+  const date = new Date(year, month - 1, day);
+  const isValid =
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day;
+  return isValid ? date : null;
 };

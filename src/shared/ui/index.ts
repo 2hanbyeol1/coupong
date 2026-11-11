@@ -1,6 +1,8 @@
 export { BottomSheet } from "./BottomSheet";
 export { Button } from "./Button";
+export { Calendar } from "./Calendar";
 export { Checkbox } from "./Checkbox";
+export { DateInput } from "./DateInput";
 export { Funnel, Step as FunnelStep } from "./Funnel";
 export { ImageInput } from "./ImageInput";
 export { Logo } from "./Logo";

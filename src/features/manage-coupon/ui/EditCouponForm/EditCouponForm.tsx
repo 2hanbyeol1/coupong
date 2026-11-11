@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { SubmitErrorHandler, useForm } from "react-hook-form";
+import { Controller, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -13,12 +13,12 @@ import {
 } from "@/entities/coupon/lib/schema";
 import useModal from "@/shared/lib/hook/useModal";
 import useToast from "@/shared/lib/hook/useToast";
-import { TextInput } from "@/shared/ui";
+import { getTodayDateInputValue } from "@/shared/lib/util/date";
+import { DateInput, TextInput } from "@/shared/ui";
 
-const INPUT_CONFIG = [
+const TEXT_INPUT_CONFIG = [
   { ...COUPON_INFO.place },
   { ...COUPON_INFO.name },
-  { ...COUPON_INFO.expire_at },
 ] as const;
 
 export interface EditCouponFormProps {
@@ -31,7 +31,7 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
   const { hideModal, updateModal } = useModal();
   const { addToast } = useToast();
 
-  const { register, handleSubmit } = useForm<CouponInfoValues>({
+  const { register, control, handleSubmit } = useForm<CouponInfoValues>({
     mode: "onChange",
     resolver: zodResolver(couponInfoObjectSchema),
     defaultValues: {
@@ -72,13 +72,29 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit, onInvalid)}>
       <div className="flex flex-col gap-3 text-left">
-        {INPUT_CONFIG.map(({ name, ...props }) => (
+        {TEXT_INPUT_CONFIG.map(({ name, ...props }) => (
           <TextInput
             key={name}
             {...props}
             {...register(name as keyof CouponInfoValues)}
           />
         ))}
+        <Controller
+          control={control}
+          name="expire_at"
+          render={({ field }) => (
+            <DateInput
+              ref={field.ref}
+              name={field.name}
+              label={COUPON_INFO.expire_at.label}
+              required={COUPON_INFO.expire_at.required}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              min={getTodayDateInputValue()}
+            />
+          )}
+        />
       </div>
     </form>
   );
