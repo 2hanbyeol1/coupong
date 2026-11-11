@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FormProvider, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +26,12 @@ const addCouponStepNames = {
   COUPON_INFO: "coupon-info",
 };
 
-function AddCouponFunnel() {
+interface AddCouponFunnelProps {
+  /** 등록할 그룹을 고르는 영역 (첫 단계에 표시) */
+  organizationField?: ReactNode;
+}
+
+function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -149,6 +154,7 @@ function AddCouponFunnel() {
                 onNext={() => setStep(addCouponStepNames.COUPON_INFO)}
                 imagePreviews={imagePreviews}
                 onImagesChange={handleImagesChange}
+                organizationField={organizationField}
               />
             </FullView>
           </FunnelStep>

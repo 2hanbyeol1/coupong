@@ -15,7 +15,8 @@ function Funnel({ currentStep, children }: FunnelProps) {
   );
 
   return (
-    <AnimatePresence mode="popLayout">
+    // 첫 진입 시에는 슬라이드하지 않음 (서버 렌더링 시 본문이 화면 밖에 있지 않도록)
+    <AnimatePresence mode="popLayout" initial={false}>
       <motion.div
         key={currentStep}
         className="h-full w-full"
