@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { FormProvider, SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +26,13 @@ const addCouponStepNames = {
   COUPON_INFO: "coupon-info",
 };
 
+// 정보 입력 단계를 history에 쌓아, 뒤로가기 시 페이지를 나가지 않고 사진 선택 단계로 돌아가게 함
+const STEP_SEARCH_PARAM = "step";
+
+const isCouponInfoStepUrl = () =>
+  new URLSearchParams(window.location.search).get(STEP_SEARCH_PARAM) ===
+  addCouponStepNames.COUPON_INFO;
+
 interface AddCouponFunnelProps {
   /** 등록할 그룹을 고르는 영역 (첫 단계에 표시) */
   organizationField?: ReactNode;
@@ -47,6 +54,37 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
     resolver: zodResolver(addCouponSchema),
     defaultValues: { coupons: [] },
   });
+
+  const hasImagesRef = useRef(false);
+  useEffect(() => {
+    hasImagesRef.current = imagePreviews.length > 0;
+  }, [imagePreviews]);
+
+  useEffect(() => {
+    // 새로고침하면 선택한 사진이 사라지므로 단계 표시를 지우고 첫 단계부터 시작
+    if (isCouponInfoStepUrl()) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+
+    const handlePopState = () => {
+      setStep(
+        isCouponInfoStepUrl() && hasImagesRef.current
+          ? addCouponStepNames.COUPON_INFO
+          : addCouponStepNames.IMAGE_UPLOAD,
+      );
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [setStep]);
+
+  const goToCouponInfoStep = () => {
+    window.history.pushState(
+      null,
+      "",
+      `?${STEP_SEARCH_PARAM}=${addCouponStepNames.COUPON_INFO}`,
+    );
+    setStep(addCouponStepNames.COUPON_INFO);
+  };
 
   // 더 이상 사용하지 않는 미리보기 URL 해제
   useEffect(() => {
@@ -151,7 +189,7 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
           <FunnelStep name={addCouponStepNames.IMAGE_UPLOAD}>
             <FullView className="relative" withHeader={true}>
               <CouponImageUploader
-                onNext={() => setStep(addCouponStepNames.COUPON_INFO)}
+                onNext={goToCouponInfoStep}
                 imagePreviews={imagePreviews}
                 onImagesChange={handleImagesChange}
                 organizationField={organizationField}
@@ -163,7 +201,7 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
           <FunnelStep name={addCouponStepNames.COUPON_INFO}>
             {imagePreviews.length > 0 && (
               <FullView className="relative" withHeader={true}>
-                <div className="flex h-full w-full flex-col justify-between gap-16 p-4">
+                <div className="flex h-full w-full flex-col overflow-hidden p-4">
                   <CouponInfoInputs
                     imagePreviews={imagePreviews}
                     currentIndex={currentCouponIndex}

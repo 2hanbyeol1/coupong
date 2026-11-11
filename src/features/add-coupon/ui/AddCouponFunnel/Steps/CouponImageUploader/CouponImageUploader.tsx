@@ -37,7 +37,8 @@ function CouponImageUploader({
   onImagesChange,
   organizationField,
 }: CouponImageUploaderProps) {
-  const { setValue, getValues } = useFormContext<AddCouponFormValues>();
+  const { setValue, getValues, clearErrors } =
+    useFormContext<AddCouponFormValues>();
   const { addToast } = useToast();
   const { selectedOrganizationId, isHydrated } = useOrganizationStore();
   const inputId = useId();
@@ -89,6 +90,16 @@ function CouponImageUploader({
   };
 
   const handleRemove = (index: number) => {
+    // 입력해 둔 쿠폰 정보가 다른 사진에 붙지 않도록 같은 위치의 정보도 함께 삭제
+    const coupons = getValues("coupons") ?? [];
+    if (index < coupons.length) {
+      setValue(
+        "coupons",
+        coupons.filter((_, i) => i !== index),
+        { shouldDirty: true },
+      );
+      clearErrors("coupons");
+    }
     syncFiles(getCurrentFiles().filter((_, i) => i !== index));
   };
 

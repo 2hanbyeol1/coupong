@@ -38,3 +38,13 @@ export const getYYYYMMDD = (date: string) => {
     day: "2-digit",
   });
 };
+
+/**
+ * 오늘 날짜를 date input 값 형식(YYYY-MM-DD, 로컬 시간 기준)으로 반환
+ */
+export const getTodayDateInputValue = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+};
