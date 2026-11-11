@@ -85,7 +85,7 @@ function CouponDetailPanel({
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            <Button color="light" onClick={toggleCouponInfo}>
+            <Button color="light" size="lg" onClick={toggleCouponInfo}>
               {isCouponInfoVisible ? "닫기" : "쿠폰 정보"}
             </Button>
             <UseCouponButton couponId={coupon.id} onUsed={onUsed} />

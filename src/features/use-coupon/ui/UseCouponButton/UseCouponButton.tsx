@@ -43,7 +43,7 @@ function UseCouponButton({
   };
 
   return (
-    <Button className={className} onClick={handleShowModal}>
+    <Button className={className} size="lg" onClick={handleShowModal}>
       사용 완료
     </Button>
   );

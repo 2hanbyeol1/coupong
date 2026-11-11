@@ -71,6 +71,8 @@ function InvitationPage() {
             })
           }
           disabled={isPending}
+          size="lg"
+          full
         >
           초대 수락
         </Button>
