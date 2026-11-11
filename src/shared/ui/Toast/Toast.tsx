@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import ToastContext, { ToastType } from "@/shared/lib/context/toast";
 import useToast from "@/shared/lib/hook/useToast";
+import useVisualViewportOffsetTop from "@/shared/lib/hook/useVisualViewportOffsetTop";
 
 interface ToastProps {
   toast: ToastType;
@@ -51,6 +52,7 @@ function Toast({ toast: { id, message, duration = 3000 } }: ToastProps) {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastType[]>([]);
+  const viewportOffsetTop = useVisualViewportOffsetTop();
 
   const addToast = useCallback((toast: Omit<ToastType, "id">) => {
     setToasts((prev) => [...prev, { ...toast, id: uuidv4() }]);
@@ -63,7 +65,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ addToast, deleteToast }}>
       {children}
-      <div className="pointer-events-none fixed inset-x-4 top-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:right-4">
+      {/* 키보드가 올라와 화면이 밀려도 보이는 영역 상단에 표시 */}
+      <div
+        className="pointer-events-none fixed inset-x-4 top-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:right-4"
+        style={{ transform: `translateY(${viewportOffsetTop}px)` }}
+      >
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => (
             <Toast key={toast.id} toast={toast} />
