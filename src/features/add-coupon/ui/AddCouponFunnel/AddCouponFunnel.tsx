@@ -86,6 +86,15 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
     setStep(addCouponStepNames.COUPON_INFO);
   };
 
+  const goToImageUploadStep = () => {
+    // 정보 입력 단계는 history에 쌓여 있으므로 뒤로가기와 같게 동작 (popstate에서 단계 변경)
+    if (isCouponInfoStepUrl()) {
+      window.history.back();
+      return;
+    }
+    setStep(addCouponStepNames.IMAGE_UPLOAD);
+  };
+
   // 더 이상 사용하지 않는 미리보기 URL 해제
   useEffect(() => {
     return () => {
@@ -208,6 +217,7 @@ function AddCouponFunnel({ organizationField }: AddCouponFunnelProps) {
                     onCurrentIndexChange={setCurrentCouponIndex}
                     isSubmitting={isAddCouponsPending}
                     submitLabel={submitLabel}
+                    onBackToImages={goToImageUploadStep}
                   />
                 </div>
               </FullView>

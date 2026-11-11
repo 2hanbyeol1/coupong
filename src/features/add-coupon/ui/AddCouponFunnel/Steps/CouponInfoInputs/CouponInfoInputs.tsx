@@ -35,6 +35,8 @@ interface CouponInfoInputsProps {
   onCurrentIndexChange: (index: number) => void;
   isSubmitting: boolean;
   submitLabel: string;
+  /** 첫 번째 쿠폰에서 '이전'을 누르면 사진 선택 단계로 돌아감 */
+  onBackToImages: () => void;
 }
 
 const INPUT_CONFIG = [
@@ -73,6 +75,7 @@ function CouponInfoInputs({
   onCurrentIndexChange,
   isSubmitting,
   submitLabel,
+  onBackToImages,
 }: CouponInfoInputsProps) {
   const {
     register,
@@ -297,6 +300,9 @@ function CouponInfoInputs({
     onCurrentIndexChange(Math.max(0, currentIndex - 1));
   };
 
+  // 첫 번째 쿠폰이면 사진 선택 단계로, 아니면 이전 쿠폰으로
+  const handlePrevButtonClick = isFirst ? onBackToImages : handlePrev;
+
   const handleSwipeEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.x < -SWIPE_THRESHOLD && !isLast) handleNext();
     else if (info.offset.x > SWIPE_THRESHOLD && !isFirst) handlePrev();
@@ -514,17 +520,15 @@ function CouponInfoInputs({
         )}
 
         <div className="flex gap-2">
-          {hasMultiple && !isFirst && (
-            <Button
-              type="button"
-              onClick={handlePrev}
-              color="light"
-              size="lg"
-              className="flex-1"
-            >
-              이전
-            </Button>
-          )}
+          <Button
+            type="button"
+            onClick={handlePrevButtonClick}
+            color="light"
+            size="lg"
+            className="flex-1"
+          >
+            이전
+          </Button>
           {isLast ? (
             <Button
               key="submit"
