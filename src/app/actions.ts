@@ -2,6 +2,11 @@
 
 import webpush from "web-push";
 
+import {
+  DEFAULT_EXPIRY_REMINDER_DAYS,
+  ExpiryReminderDay,
+  isExpiryReminderDay,
+} from "@/shared/config/notification";
 import createClient from "@/shared/lib/supabase/server";
 
 type SerializedSubscription = {
@@ -75,11 +80,14 @@ export async function unsubscribeUser(endpoint?: string) {
 export type NotificationPreferences = {
   coupon_created: boolean;
   expiring_soon: boolean;
+  /** 마감 며칠 전에 알림을 받을지 (7·3·1 중 하나 이상) */
+  expiring_soon_days: ExpiryReminderDay[];
 };
 
 const DEFAULT_PREFERENCES: NotificationPreferences = {
   coupon_created: true,
   expiring_soon: true,
+  expiring_soon_days: DEFAULT_EXPIRY_REMINDER_DAYS,
 };
 
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
@@ -92,7 +100,7 @@ export async function getNotificationPreferences(): Promise<NotificationPreferen
 
   const { data, error } = await supabase
     .from("user_notification_preferences")
-    .select("coupon_created, expiring_soon")
+    .select("coupon_created, expiring_soon, expiring_soon_days")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -100,8 +108,12 @@ export async function getNotificationPreferences(): Promise<NotificationPreferen
     console.error("알림 설정 조회 실패", error);
     return DEFAULT_PREFERENCES;
   }
+  if (!data) return DEFAULT_PREFERENCES;
 
-  return data ?? DEFAULT_PREFERENCES;
+  return {
+    ...data,
+    expiring_soon_days: data.expiring_soon_days.filter(isExpiryReminderDay),
+  };
 }
 
 export async function updateNotificationPreferences(
@@ -114,6 +126,16 @@ export async function updateNotificationPreferences(
 
   if (!user) {
     return { success: false, error: "로그인이 필요해요" };
+  }
+
+  if (prefs.expiring_soon_days) {
+    const days = [...new Set(prefs.expiring_soon_days)].filter(
+      isExpiryReminderDay,
+    );
+    if (days.length === 0) {
+      return { success: false, error: "알림 받을 날을 하나 이상 골라주세요" };
+    }
+    prefs = { ...prefs, expiring_soon_days: days };
   }
 
   const { error } = await supabase.from("user_notification_preferences").upsert(

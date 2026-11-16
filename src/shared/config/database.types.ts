@@ -14,6 +14,35 @@ export type Database = {
   };
   public: {
     Tables: {
+      coupon_expiry_notifications: {
+        Row: {
+          coupon_id: string;
+          days_before: number;
+          expire_at: string;
+          sent_at: string;
+        };
+        Insert: {
+          coupon_id: string;
+          days_before: number;
+          expire_at: string;
+          sent_at?: string;
+        };
+        Update: {
+          coupon_id?: string;
+          days_before?: number;
+          expire_at?: string;
+          sent_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "coupon_expiry_notifications_coupon_id_fkey";
+            columns: ["coupon_id"];
+            isOneToOne: false;
+            referencedRelation: "coupons";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       coupons: {
         Row: {
           created_at: string;
@@ -169,18 +198,21 @@ export type Database = {
         Row: {
           coupon_created: boolean;
           expiring_soon: boolean;
+          expiring_soon_days: number[];
           updated_at: string;
           user_id: string;
         };
         Insert: {
           coupon_created?: boolean;
           expiring_soon?: boolean;
+          expiring_soon_days?: number[];
           updated_at?: string;
           user_id: string;
         };
         Update: {
           coupon_created?: boolean;
           expiring_soon?: boolean;
+          expiring_soon_days?: number[];
           updated_at?: string;
           user_id?: string;
         };
