@@ -121,17 +121,64 @@ export const searchCouponSuggestions = async ({
 };
 
 // ! 하나라도 실패하는 경우, rollback 처리 필요
+/** 쿠폰 사진 하나의 업로드 상태 */
+export type CouponUploadStatus = "pending" | "uploading" | "done" | "error";
+
+/** 사진 일부를 올리지 못해 등록을 멈췄을 때 (먼저 올라간 사진은 정리됨) */
+export class CouponImageUploadError extends Error {
+  constructor(public failedCount: number) {
+    super(`${failedCount}개 쿠폰 사진을 올리지 못했어요`);
+    this.name = "CouponImageUploadError";
+  }
+}
+
+/** 등록이 실패했을 때 먼저 올라간 사진을 지움 (실패해도 등록 실패 안내는 그대로) */
+const removeCouponImages = async (paths: string[]) => {
+  if (paths.length === 0) return;
+  const supabase = createBrowserClient();
+  const { error } = await supabase.storage
+    .from(COUPON_IMAGE_BUCKET)
+    .remove(paths);
+  if (error) {
+    console.error(
+      `올라간 쿠폰 이미지를 정리하는 중 에러 발생: ${error.message}`,
+    );
+  }
+};
+
 export const addCoupons = async (
   formValues: AddCouponFormValues,
   orgId: OrganizationType["id"],
+  /** 사진별 업로드 상태가 바뀔 때마다 호출 */
+  onUploadStatusChange?: (index: number, status: CouponUploadStatus) => void,
 ) => {
   const user = await getAuthUser();
   const supabase = createBrowserClient();
 
   const files = Array.from(formValues.imageFile as FileList);
-  const imagePaths = await Promise.all(
-    files.map((file) => uploadCouponImage(file, orgId)),
+  const results = await Promise.allSettled(
+    files.map(async (file, index) => {
+      onUploadStatusChange?.(index, "uploading");
+      try {
+        const path = await uploadCouponImage(file, orgId);
+        onUploadStatusChange?.(index, "done");
+        return path;
+      } catch (error) {
+        onUploadStatusChange?.(index, "error");
+        throw error;
+      }
+    }),
   );
+
+  const imagePaths = results.flatMap((result) =>
+    result.status === "fulfilled" ? [result.value] : [],
+  );
+  const failedCount = results.length - imagePaths.length;
+  // 하나라도 실패하면 먼저 올라간 사진을 지워, 다시 시도할 때 사진이 중복으로 쌓이지 않게 함
+  if (failedCount > 0) {
+    await removeCouponImages(imagePaths);
+    throw new CouponImageUploadError(failedCount);
+  }
 
   const rows = formValues.coupons.map((coupon, index) => ({
     name: coupon.name,
@@ -146,6 +193,7 @@ export const addCoupons = async (
 
   if (error) {
     console.error(`쿠폰 정보를 업로드하는 중 에러 발생: ${error.message}`);
+    await removeCouponImages(imagePaths);
     throw new Error("쿠폰 정보를 등록하는 중 오류가 발생했어요");
   }
 };

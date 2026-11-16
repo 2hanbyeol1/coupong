@@ -11,6 +11,7 @@ import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 import {
   addCoupons,
   changeCouponUse,
+  CouponUploadStatus,
   deleteCoupon,
   getCoupon,
   getCoupons,
@@ -105,10 +106,15 @@ export const addCouponsOption = (
     mutationFn: async ({
       formValues,
       orgId,
+      onUploadStatusChange,
     }: {
       formValues: AddCouponFormValues;
       orgId: OrganizationType["id"];
-    }) => await addCoupons(formValues, orgId),
+      onUploadStatusChange?: (
+        index: number,
+        status: CouponUploadStatus,
+      ) => void;
+    }) => await addCoupons(formValues, orgId, onUploadStatusChange),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: COUPON_QUERY_KEY.ALL,
