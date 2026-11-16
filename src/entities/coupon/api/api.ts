@@ -69,6 +69,9 @@ export const getCoupons = async ({
   const { data, count, error } = await selectCoupons(filter)
     .order("expire_at", { ascending: isAvailable })
     .order("created_at", { ascending: false })
+    // 여러 장을 한 번에 등록하면 만료일·등록 시각이 같아 순서가 정해지지 않음
+    // → 페이지마다 순서가 달라져 같은 쿠폰이 중복되거나 빠지므로 id로 순서를 고정
+    .order("id")
     .range((page - 1) * limit, page * limit - 1);
 
   if (error) {
