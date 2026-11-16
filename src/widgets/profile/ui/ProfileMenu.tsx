@@ -1,6 +1,8 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
+import { Chip } from "@/shared/ui";
+
 interface ProfileMenuProps {
   menu: string;
   link: string;
@@ -15,11 +17,7 @@ function ProfileMenu({ menu, link, isTest }: ProfileMenuProps) {
     >
       <div className="flex items-center gap-3">
         <span className="text-lg font-medium">{menu}</span>
-        {isTest && (
-          <span className="bg-dark rounded-md px-2 py-1 text-xs text-white">
-            Beta
-          </span>
-        )}
+        {isTest && <Chip color="neutral">Beta</Chip>}
       </div>
       <ChevronRight className="stroke-dark" size={20} />
     </Link>

@@ -9,7 +9,7 @@ import {
 } from "@/features/add-coupon/lib/schema";
 import { COUPON_INFO_FIELD_ORDER } from "@/features/add-coupon/lib/util";
 import { cn } from "@/shared/lib/util/cn";
-import { DateInput, SuggestionChips, ToggleChip } from "@/shared/ui";
+import { Chip, DateInput, SuggestionChips, ToggleChip } from "@/shared/ui";
 
 import { focusNextField } from "./fieldNavigation";
 
@@ -101,9 +101,9 @@ function BatchCouponInputs({
             )}
           >
             <Image src={url} alt="" fill className="object-contain" />
-            <span className="absolute top-1 left-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-black/50 px-1 text-xs text-white">
+            <Chip color="overlay" className="absolute top-1 left-1">
               {index + 1}
-            </span>
+            </Chip>
           </button>
         ))}
       </div>

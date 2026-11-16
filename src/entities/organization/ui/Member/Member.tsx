@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
+import { Crown } from "lucide-react";
 
 import { Avatar } from "@/entities/user/ui/Avatar";
+import { Chip } from "@/shared/ui";
 
 import { OrganizationRole } from "../../api/type";
 
@@ -18,13 +20,22 @@ function Member({ userId, name, role, isMe, action }: MemberProps) {
     <div className="flex items-center justify-between gap-3 py-2">
       <div className="flex min-w-0 items-center gap-3">
         <Avatar userId={userId} size={28} />
-        <span className="truncate font-medium">{name}</span>
-        {isMe && <span className="text-dark shrink-0 text-sm">나</span>}
-        {role === "admin" && (
-          <span className="bg-primary/5 text-primary shrink-0 rounded-sm px-1.5 py-0.5 text-xs font-medium">
-            관리자
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex min-w-0 items-center gap-1">
+            <span className="truncate font-medium">{name}</span>
+            {/* 관리자는 이름 바로 옆에 왕관 */}
+            {role === "admin" && (
+              <>
+                <Crown
+                  aria-hidden
+                  className="size-4 shrink-0 fill-amber-400 stroke-amber-500"
+                />
+                <span className="sr-only">관리자</span>
+              </>
+            )}
           </span>
-        )}
+          {isMe && <Chip color="neutral">나</Chip>}
+        </div>
       </div>
       {action}
     </div>

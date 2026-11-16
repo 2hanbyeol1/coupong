@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { COUPON_IMAGE_ASPECT_CLASS } from "@/entities/coupon/constants";
 import { cn } from "@/shared/lib/util/cn";
-import { BottomSheet } from "@/shared/ui";
+import { BottomSheet, Chip } from "@/shared/ui";
 
 interface CouponListBottomSheetProps {
   open: boolean;
@@ -50,16 +50,12 @@ function CouponListBottomSheet({
                 fill
                 className="object-contain"
               />
-              <span
-                className={cn(
-                  "absolute top-1 left-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs",
-                  index === currentIndex
-                    ? "bg-primary text-white"
-                    : "bg-black/50 text-white",
-                )}
+              <Chip
+                color={index === currentIndex ? "primary" : "overlay"}
+                className="absolute top-1 left-1"
               >
                 {index + 1}
-              </span>
+              </Chip>
               {isIncomplete && (
                 <span
                   aria-hidden="true"

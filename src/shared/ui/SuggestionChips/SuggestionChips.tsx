@@ -1,6 +1,10 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { cn } from "@/shared/lib/util/cn";
+
+import { chipVariants } from "../Chip";
+
 interface SuggestionChipsProps {
   /** false면 높이를 접으며 사라짐 */
   show: boolean;
@@ -27,7 +31,11 @@ function SuggestionChips({ show, items, onSelect }: SuggestionChipsProps) {
                 type="button"
                 onClick={() => onSelect(item)}
                 title={item}
-                className="bg-light text-dark max-w-full cursor-pointer truncate rounded-full px-3 py-1 text-sm"
+                className={cn(
+                  chipVariants({ size: "md" }),
+                  // 긴 값은 줄 너비를 넘지 않게 말줄임
+                  "block max-w-full cursor-pointer truncate leading-7",
+                )}
               >
                 {item}
               </button>
