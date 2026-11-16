@@ -68,3 +68,12 @@ export const parseDateInputValue = (value: string): Date | null => {
     date.getDate() === day;
   return isValid ? date : null;
 };
+
+/**
+ * YYYY-MM-DD 값을 "2027년 8월 18일"처럼 앞의 0 없이 표시. 날짜가 아니면 그대로 반환
+ */
+export const formatKoreanDate = (value: string) => {
+  const date = parseDateInputValue(value);
+  if (!date) return value;
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};

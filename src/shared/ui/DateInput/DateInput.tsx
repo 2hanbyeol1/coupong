@@ -21,6 +21,8 @@ interface DateInputProps {
   /** 고를 수 있는 가장 이른 날짜 (YYYY-MM-DD) */
   min?: string;
   errorMessage?: string;
+  /** 라벨을 화면에서 숨김 (스크린 리더에는 읽힘) */
+  hideLabel?: boolean;
 }
 
 /** calendar: 달력에서 고르기, text: 숫자로 직접 입력 */
@@ -33,7 +35,17 @@ type SheetMode = "calendar" | "text";
  */
 const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
   (
-    { label, required, name, value = "", onChange, onBlur, min, errorMessage },
+    {
+      label,
+      required,
+      name,
+      value = "",
+      onChange,
+      onBlur,
+      min,
+      errorMessage,
+      hideLabel,
+    },
     ref,
   ) => {
     const id = useId();
@@ -61,7 +73,13 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     return (
       <div>
         <div className="flex flex-col gap-1">
-          <label htmlFor={id} className="text-dark text-start text-sm">
+          <label
+            htmlFor={id}
+            className={cn(
+              "text-dark text-start text-sm",
+              hideLabel && "sr-only",
+            )}
+          >
             {label}
             {required && <span className="text-error"> *</span>}
           </label>
@@ -72,6 +90,8 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
             type="button"
             onClick={openSheet}
             aria-haspopup="dialog"
+            // 입력칸에서 Enter로 넘어왔을 때 비어 있으면 바로 달력을 열 수 있도록 표시
+            data-empty={!displayValue}
             className="ring-light focus:ring-primary flex w-full cursor-pointer items-center justify-between rounded-md py-2 pr-3 pl-4 text-start ring-1 focus:ring-2"
           >
             <span className={cn(displayValue ? "text-black" : "text-black/30")}>
