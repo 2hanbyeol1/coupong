@@ -23,7 +23,7 @@ export const chipVariants = cva(
   {
     variants: {
       color: {
-        muted: "bg-black/5 text-black/40",
+        muted: "bg-dark/10 text-dark",
         neutral: "bg-black/8 text-black/70",
         primary: "bg-primary text-white",
         danger: "bg-error/8 text-error",

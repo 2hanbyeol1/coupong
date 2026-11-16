@@ -3,7 +3,7 @@
 @theme {
   --font-pretendard: var(--font-pretendard);
   --color-primary: #389970;
-  --color-dark: #898989;
+  --color-dark: #6b6b6b;
   --color-light: #f0f0f0;
   --color-error: #d61616;
   --breakpoint-mobile: 480px;

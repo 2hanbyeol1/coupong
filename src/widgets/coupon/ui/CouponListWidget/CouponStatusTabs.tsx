@@ -67,16 +67,13 @@ function StatusTab({ filter, isSelected, onSelect }: StatusTabProps) {
       onClick={onSelect}
       className={cn(
         "relative flex cursor-pointer items-center gap-1 pt-1 pb-2.5 text-[15px] transition-colors duration-200",
-        isSelected ? "font-semibold text-black" : "font-medium text-black/35",
+        isSelected ? "font-semibold text-black" : "text-dark font-medium",
       )}
     >
       {COUPON_LIST_STATUS_LABEL[filter.status]}
       {count !== undefined && (
         <span
-          className={cn(
-            "font-medium tabular-nums",
-            isSelected && "text-black/40",
-          )}
+          className={cn("font-medium tabular-nums", isSelected && "text-dark")}
         >
           {count}
         </span>

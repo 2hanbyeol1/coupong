@@ -608,7 +608,7 @@ function CouponInfoInputs({
                 }}
                 className={cn(
                   "relative h-9 cursor-pointer rounded-lg text-sm transition-colors duration-200",
-                  isSelected ? "font-semibold text-black" : "text-black/60",
+                  isSelected ? "font-semibold text-black" : "text-dark",
                 )}
               >
                 {/* 선택 표시(흰 배경)가 고른 쪽으로 미끄러져 이동 */}
@@ -900,7 +900,7 @@ function CompactCouponImage({
       </div>
       <div className="flex flex-col gap-0.5">
         <span className="text-[15px] font-semibold">{label}</span>
-        <span className="text-sm text-black/60">
+        <span className="text-dark text-sm">
           입력하는 동안 사진은 작게 보여요
         </span>
       </div>

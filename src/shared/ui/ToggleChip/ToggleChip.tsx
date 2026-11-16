@@ -33,7 +33,7 @@ function ToggleChip({
         "flex h-7 shrink-0 cursor-pointer items-center rounded-full border px-2.5 text-xs transition-[color,background-color,border-color,transform] duration-200 active:scale-95",
         pressed
           ? "border-primary bg-primary/10 text-primary font-semibold"
-          : "border-light text-black/60",
+          : "border-light text-dark",
         className,
       )}
       {...props}

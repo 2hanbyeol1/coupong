@@ -63,17 +63,23 @@ function Coupon({ coupon, keyword }: CouponProps) {
           />
         </div>
 
-        <div className={cn("min-w-0 flex-1 pr-4", isInvalid && "opacity-40")}>
-          <div className="truncate text-xs font-medium text-black/45">
+        {/* 지난 쿠폰은 흐리게(opacity) 하면 글자가 읽히지 않아, 이름만 회색으로 낮춤 */}
+        <div className="min-w-0 flex-1 pr-4">
+          <div className="text-dark truncate text-xs font-medium">
             {coupon.place}
           </div>
-          <div className="truncate text-[15px] font-semibold">
+          <div
+            className={cn(
+              "truncate text-[15px] font-semibold",
+              isInvalid && "text-dark",
+            )}
+          >
             {coupon.name}
           </div>
           {/* 사용 가능: 남은 날만 (정확한 날짜는 상세에서) / 지난 쿠폰: 남은 날이 없으므로 날짜 */}
           <div className="mt-1 flex items-center">
             {isInvalid ? (
-              <span className="text-xs text-black/40">
+              <span className="text-dark text-xs">
                 {formatShortDate(coupon.expire_at)}까지
               </span>
             ) : (

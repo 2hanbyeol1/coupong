@@ -75,7 +75,7 @@ function CouponSummary({ coupon }: { coupon: CouponInfoFormValues }) {
       <span className="truncate text-[15px] font-medium">
         [{coupon.place}] {coupon.name}
       </span>
-      <span className="text-sm text-black/60">
+      <span className="text-dark text-sm">
         {formatKoreanDate(coupon.expire_at)}까지
       </span>
     </div>
@@ -185,7 +185,7 @@ function RegisterConfirmSheet({
         {phase === "submitting" && (
           <div className="flex flex-col gap-2" aria-live="polite">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-black/60">사진 올리는 중</span>
+              <span className="text-dark">사진 올리는 중</span>
               <span className="font-semibold">
                 {doneCount} / {total}
               </span>
@@ -207,7 +207,7 @@ function RegisterConfirmSheet({
         )}
 
         {phase === "error" && (
-          <p className="text-sm break-keep text-black/60">
+          <p className="text-dark text-sm break-keep">
             올라간 사진은 정리했어요. 입력한 정보는 그대로 두었으니 다시 시도해
             주세요.
           </p>

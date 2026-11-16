@@ -61,9 +61,7 @@ function SharedValueChoice({
             >
               {option.label}
             </span>
-            <span className="shrink-0 text-sm text-black/50">
-              {option.count}개
-            </span>
+            <span className="text-dark shrink-0 text-sm">{option.count}개</span>
           </label>
         );
       })}
