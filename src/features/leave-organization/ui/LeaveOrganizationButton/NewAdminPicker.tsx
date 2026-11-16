@@ -37,7 +37,7 @@ function NewAdminPicker({ candidates, onChange }: NewAdminPickerProps) {
           <label
             key={member.id}
             className={cn(
-              "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 transition-colors has-focus-visible:ring-2 has-focus-visible:ring-black/20",
+              "has-focus-visible:ring-ink/20 flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 transition-colors has-focus-visible:ring-2",
               isSelected && "bg-primary/8",
             )}
           >
@@ -52,7 +52,7 @@ function NewAdminPicker({ candidates, onChange }: NewAdminPickerProps) {
             <Avatar userId={member.user_id} size={28} />
             <span
               className={cn(
-                "min-w-0 flex-1 truncate font-medium text-black",
+                "text-ink min-w-0 flex-1 truncate font-medium",
                 isSelected && "text-primary font-semibold",
               )}
             >
@@ -62,11 +62,11 @@ function NewAdminPicker({ candidates, onChange }: NewAdminPickerProps) {
               aria-hidden
               className={cn(
                 "flex size-5 shrink-0 items-center justify-center rounded-full",
-                isSelected ? "bg-primary" : "bg-light",
+                isSelected ? "bg-primary-fill" : "bg-light",
               )}
             >
               {isSelected && (
-                <Check className="stroke-light stroke-4" size={12} />
+                <Check className="stroke-white stroke-4" size={12} />
               )}
             </span>
           </label>

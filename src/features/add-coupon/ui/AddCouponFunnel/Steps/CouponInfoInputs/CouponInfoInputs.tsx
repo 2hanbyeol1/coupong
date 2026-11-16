@@ -608,10 +608,10 @@ function CouponInfoInputs({
                 }}
                 className={cn(
                   "relative h-9 cursor-pointer rounded-lg text-sm transition-colors duration-200",
-                  isSelected ? "font-semibold text-black" : "text-dark",
+                  isSelected ? "text-ink font-semibold" : "text-dark",
                 )}
               >
-                {/* 선택 표시(흰 배경)가 고른 쪽으로 미끄러져 이동 */}
+                {/* 선택 표시(밝은 배경)가 고른 쪽으로 미끄러져 이동 */}
                 {isSelected && (
                   <motion.span
                     layoutId={`${reactId}-input-mode`}
@@ -621,7 +621,7 @@ function CouponInfoInputs({
                         ? { duration: 0 }
                         : INPUT_MODE_INDICATOR_SPRING
                     }
-                    className="absolute inset-0 rounded-lg bg-white shadow-sm"
+                    className="bg-elevated absolute inset-0 rounded-lg shadow-sm"
                   />
                 )}
                 <span className="relative">{label}</span>
@@ -892,7 +892,7 @@ function CompactCouponImage({
     <div className="bg-light/60 flex shrink-0 items-center gap-3 rounded-xl p-2">
       <div
         className={cn(
-          "relative h-16 shrink-0 overflow-hidden rounded-md bg-white",
+          "bg-surface relative h-16 shrink-0 overflow-hidden rounded-md",
           COUPON_IMAGE_ASPECT_CLASS,
         )}
       >

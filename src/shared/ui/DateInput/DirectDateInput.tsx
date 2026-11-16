@@ -28,7 +28,7 @@ interface DirectDateInputProps {
 type Field = "year" | "month" | "day";
 
 const FIELD_CLASS =
-  "ring-light focus:ring-primary w-0 rounded-md py-3 text-center text-lg text-black ring-1 placeholder:text-black/30 focus:ring-2";
+  "ring-light focus:ring-primary w-0 rounded-md py-3 text-center text-ink placeholder:text-ink/30 text-lg ring-1 focus:ring-2";
 
 /**
  * [YYYY]년 [MM]월 [DD]일 세 칸으로 날짜를 직접 입력

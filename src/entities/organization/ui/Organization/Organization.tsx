@@ -34,8 +34,8 @@ function Organization({ organization, onSelect, actions }: OrganizationProps) {
         onClick={() => handleSelectOrganization(organization.id)}
       >
         {isSelectedOrganization ? (
-          <div className="bg-primary flex h-5 w-5 items-center justify-center rounded-full">
-            <Check className="stroke-light stroke-4" size={12} />
+          <div className="bg-primary-fill flex h-5 w-5 items-center justify-center rounded-full">
+            <Check className="stroke-white stroke-4" size={12} />
           </div>
         ) : (
           <div className="bg-light flex h-5 w-5 items-center justify-center rounded-full"></div>

@@ -11,7 +11,7 @@ export function CouponDetailPanelSkeleton({
   return (
     <Skeleton
       className={cn(
-        "flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7",
+        "bg-surface flex w-full flex-col gap-5 px-4 pt-3 pb-7",
         className,
       )}
       wrapper

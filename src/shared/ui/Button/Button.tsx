@@ -17,8 +17,8 @@ const buttonVariants = cva(
   {
     variants: {
       color: {
-        primary: "bg-primary text-white",
-        light: "bg-light text-black",
+        primary: "bg-primary-fill text-white",
+        light: "bg-light text-ink",
       },
       size: {
         sm: "h-8 gap-1 rounded-md px-3 text-sm",

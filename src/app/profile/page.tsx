@@ -1,4 +1,5 @@
 import { LogoutButton } from "@/entities/auth/ui";
+import { ThemeSetting } from "@/features/set-theme/ui/ThemeSetting";
 import { ROUTES } from "@/shared/config/routes";
 import { FullView } from "@/shared/ui/FullView";
 import { Header } from "@/widgets/header";
@@ -18,6 +19,7 @@ function ProfilePage() {
         <div className="flex flex-col">
           <ProfileMenu menu="내 그룹" link={ROUTES.PROFILE_ORGANIZATION} />
           <ProfileMenu menu="알림" link={ROUTES.PROFILE_NOTIFICATION} />
+          <ThemeSetting />
         </div>
 
         <LogoutButton className="mt-40" />

@@ -1,11 +1,22 @@
 @import "tailwindcss";
 
+/* <html class="dark">일 때 dark: 변형 적용 (시스템 설정 또는 앱에서 고른 테마) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-pretendard: var(--font-pretendard);
   --color-primary: #389970;
+  /* 흰 글자·아이콘을 얹는 초록 면 (다크 모드에서도 그대로, primary는 다크에서 밝아짐) */
+  --color-primary-fill: #389970;
   --color-dark: #6b6b6b;
   --color-light: #f0f0f0;
   --color-error: #d61616;
+  /* 화면 배경 */
+  --color-surface: #ffffff;
+  /* 모달·바텀시트·메뉴처럼 화면 위에 뜨는 면 */
+  --color-elevated: #ffffff;
+  /* 기본 글자색, 옅은 구분선·배경은 ink/5처럼 투명도로 */
+  --color-ink: #000000;
   --breakpoint-mobile: 480px;
   --breakpoint-tablet: 768px;
   --breakpoint-laptop: 1281px;
@@ -22,8 +33,22 @@
   }
 }
 
+/* 다크 모드: 같은 이름의 색을 어둡게 바꿔 끼움 (작은 글자 대비 4.5:1 이상) */
+.dark {
+  color-scheme: dark;
+  --color-surface: #141414;
+  --color-elevated: #1f1f1f;
+  --color-ink: #ffffff;
+  /* 어두운 배경에서 초록 글자·아이콘이 묻히지 않게 밝게 (대비 약 7:1) */
+  --color-primary: #4cb386;
+  --color-dark: #9a9a9a;
+  --color-light: #2a2a2a;
+  --color-error: #f05252;
+}
+
 body {
   font-synthesis: none;
+  @apply bg-surface text-ink;
 }
 
 input {

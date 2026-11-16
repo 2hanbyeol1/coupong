@@ -50,7 +50,7 @@ function AddCouponButton() {
           {/* 클라이언트 이동으로 페이지 전체 새로고침(흰 화면) 없이 진입 */}
           <Link
             href={ROUTES.ADD_COUPON}
-            className="bg-primary flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_-6px_rgb(56_153_112/0.6)] transition-transform active:scale-95"
+            className="bg-primary-fill flex items-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_-6px_rgb(56_153_112/0.6)] transition-transform active:scale-95"
           >
             <Plus aria-hidden className="size-4.5 stroke-[2.5]" />
             쿠폰 추가하기

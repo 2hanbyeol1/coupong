@@ -113,7 +113,7 @@ function MenuPopup({
           exit={{ opacity: 0, scale: 0.95, y: offsetY }}
           transition={{ duration: 0.12 }}
           style={style}
-          className="z-[100] min-w-32 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5"
+          className="bg-elevated ring-ink/5 z-[100] min-w-32 overflow-hidden rounded-lg shadow-lg ring-1"
         >
           {items.map((item, idx) => (
             <button
@@ -124,7 +124,7 @@ function MenuPopup({
               className={cn(
                 "block w-full cursor-pointer px-4 py-2.5 text-left text-sm",
                 item.variant === "danger"
-                  ? "text-red-500 hover:bg-red-50"
+                  ? "text-error hover:bg-error/8"
                   : "hover:bg-light/40",
               )}
             >

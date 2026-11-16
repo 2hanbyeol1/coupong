@@ -88,7 +88,7 @@ function ValueSwapOverlay({
               transition={{ ...SWAP_TRANSITION, delay }}
               className={cn(
                 "absolute inset-0 flex items-center truncate",
-                from.isPlaceholder ? "text-black/30" : "text-black",
+                from.isPlaceholder ? "text-ink/30" : "text-ink",
               )}
             >
               {from.text}
@@ -100,7 +100,7 @@ function ValueSwapOverlay({
               onAnimationComplete={isLast ? onDone : undefined}
               className={cn(
                 "absolute inset-0 flex items-center truncate",
-                to.isPlaceholder ? "text-black/30" : "text-black",
+                to.isPlaceholder ? "text-ink/30" : "text-ink",
               )}
             >
               {to.text}

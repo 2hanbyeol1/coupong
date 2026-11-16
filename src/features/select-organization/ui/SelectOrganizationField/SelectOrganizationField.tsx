@@ -24,9 +24,9 @@ function SelectOrganizationField({ className }: SelectOrganizationFieldProps) {
     <>
       <div className={cn("flex items-center gap-1.5 text-base", className)}>
         {isHydrated && !hasSelected ? (
-          <span className="text-black/70">등록할 그룹을 선택해주세요</span>
+          <span className="text-ink/70">등록할 그룹을 선택해주세요</span>
         ) : (
-          <span className="flex min-w-0 items-center gap-1 text-black/70">
+          <span className="text-ink/70 flex min-w-0 items-center gap-1">
             <SelectedOrganization className="text-primary truncate font-semibold" />
             <span className="shrink-0">그룹에 등록돼요</span>
           </span>

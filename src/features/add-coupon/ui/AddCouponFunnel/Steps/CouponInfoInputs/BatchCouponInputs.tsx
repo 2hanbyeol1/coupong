@@ -36,7 +36,7 @@ interface BatchCouponInputsProps {
 }
 
 const ROW_INPUT_CLASS =
-  "ring-light focus:ring-primary w-full min-w-0 rounded-md px-4 py-2 text-black ring-1 focus:ring-2";
+  "ring-light focus:ring-primary w-full min-w-0 rounded-md px-4 text-ink py-2 ring-1 focus:ring-2";
 
 /**
  * 여러 쿠폰을 한 화면에서 입력

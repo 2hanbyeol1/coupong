@@ -24,8 +24,8 @@ export const chipVariants = cva(
     variants: {
       color: {
         muted: "bg-dark/10 text-dark",
-        neutral: "bg-black/8 text-black/70",
-        primary: "bg-primary text-white",
+        neutral: "bg-ink/8 text-ink/70",
+        primary: "bg-primary-fill text-white",
         danger: "bg-error/8 text-error",
         overlay: "bg-black/50 text-white",
         white: "bg-white text-black",

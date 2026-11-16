@@ -32,7 +32,7 @@ function Toast({
       animate={{ y: 0, opacity: 1, scale: 1 }}
       exit={{ y: -8, opacity: 0, scale: 0.96 }}
       transition={{ type: "spring", stiffness: 320, damping: 28 }}
-      className="pointer-events-auto w-full overflow-hidden rounded-xl border border-white/10 bg-black/80 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.35)] backdrop-blur-lg sm:min-w-[320px]"
+      className="pointer-events-auto w-full overflow-hidden rounded-xl border border-white/10 bg-black/80 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.35)] backdrop-blur-lg sm:min-w-[320px] dark:border-white/15 dark:bg-[#2a2a2a]/95"
       role="status"
     >
       <div className="flex items-center justify-center gap-3 py-3 pr-3 pl-5">

@@ -42,7 +42,7 @@ function CouponDetailPanel({
   };
 
   return (
-    <div className="flex w-full flex-col gap-5 bg-white px-4 pt-3 pb-7">
+    <div className="bg-surface flex w-full flex-col gap-5 px-4 pt-3 pb-7">
       <div className="flex flex-col">
         <AnimatePresence>
           {isCouponInfoVisible && (

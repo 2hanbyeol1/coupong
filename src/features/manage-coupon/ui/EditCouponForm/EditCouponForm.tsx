@@ -147,7 +147,7 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
 
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <div className="flex flex-col gap-3 text-left text-black">
+      <div className="text-ink flex flex-col gap-3 text-left">
         {TEXT_INPUT_CONFIG.map(({ name, ...props }) => {
           const fieldName = name as CouponAutocompleteField;
           // 입력칸이 비어 있으면 목록을 띄우지 않음

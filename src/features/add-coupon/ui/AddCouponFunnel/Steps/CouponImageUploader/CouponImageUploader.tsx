@@ -281,7 +281,7 @@ function CouponImageUploader({
               <ImagePlus className="stroke-dark" size={30} />
             </span>
             <span className="text-lg font-semibold">사진 선택하기</span>
-            <span className="text-sm leading-normal text-black/70">
+            <span className="text-ink/70 text-sm leading-normal">
               기프티콘 캡처를 여러 장
               <br />한 번에 고를 수 있어요
             </span>

@@ -29,6 +29,9 @@ function SearchInput({
         "shadow-[inset_0_1px_1px_rgb(255_255_255/0.9),inset_0_-10px_16px_-10px_rgb(255_255_255/0.8),0_4px_12px_-6px_rgb(0_0_0/0.1)]",
         "transition-[box-shadow,background-color] duration-200",
         "focus-within:from-white/45 focus-within:to-white/20",
+        // 다크 모드: 흰빛을 줄여 어두운 유리처럼
+        "dark:border-white/15 dark:from-white/12 dark:to-white/4 dark:ring-white/5 dark:focus-within:from-white/18 dark:focus-within:to-white/8",
+        "dark:shadow-[inset_0_1px_1px_rgb(255_255_255/0.12),0_4px_12px_-6px_rgb(0_0_0/0.6)]",
         className,
       )}
     >
@@ -49,11 +52,11 @@ function SearchInput({
 
       <Search
         aria-hidden
-        className="group-focus-within:stroke-primary pointer-events-none absolute left-4 size-4 stroke-neutral-500 stroke-[2.5] transition-colors duration-200"
+        className="group-focus-within:stroke-primary stroke-dark pointer-events-none absolute left-4 size-4 stroke-[2.5] transition-colors duration-200"
       />
       <input
         type="search"
-        className="w-full appearance-none bg-transparent py-2.5 pr-11 pl-11 placeholder:text-neutral-500 [&::-webkit-search-cancel-button]:hidden"
+        className="placeholder:text-dark w-full appearance-none bg-transparent py-2.5 pr-11 pl-11 [&::-webkit-search-cancel-button]:hidden"
         {...props}
       />
       {props.value && (
@@ -64,7 +67,7 @@ function SearchInput({
           className="group/clear absolute right-1.5 flex size-8 cursor-pointer items-center justify-center"
           onClick={onXButtonClick}
         >
-          <span className="flex size-5.5 items-center justify-center rounded-full bg-black/15 transition-colors group-hover/clear:bg-black/25">
+          <span className="bg-dark/50 group-hover/clear:bg-dark/70 flex size-5.5 items-center justify-center rounded-full transition-colors">
             <X className="size-3 stroke-white stroke-3" />
           </span>
         </button>

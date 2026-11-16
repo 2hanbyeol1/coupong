@@ -20,7 +20,7 @@ function Modal({ modal }: { modal: ModalType }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/15 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/15 backdrop-blur-md dark:bg-black/50"
     >
       <motion.div
         role="dialog"
@@ -30,11 +30,11 @@ function Modal({ modal }: { modal: ModalType }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 60 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-7 rounded-xl bg-white px-6 py-8 shadow-lg"
+        className="bg-elevated flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-7 rounded-xl px-6 py-8 shadow-lg"
       >
         <div className="flex flex-col items-center gap-2 px-1">
           <div className="text-lg font-semibold">{modal.title}</div>
-          <div className="w-full text-center text-base text-gray-500">
+          <div className="text-dark w-full text-center text-base">
             {modal.content}
           </div>
         </div>

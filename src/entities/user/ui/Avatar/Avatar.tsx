@@ -12,7 +12,7 @@ const avatarVariants = cva(
   {
     variants: {
       color: {
-        primary: "bg-primary text-white",
+        primary: "bg-primary-fill text-white",
         secondary: "bg-light text-primary",
         none: "",
       },

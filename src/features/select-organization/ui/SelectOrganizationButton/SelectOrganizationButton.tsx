@@ -32,7 +32,7 @@ function SelectOrganizationButton() {
         />
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 flex w-full flex-col gap-4 rounded-b-2xl bg-white px-6 py-8 shadow-2xl">
+        <div className="bg-elevated absolute top-full left-0 flex w-full flex-col gap-4 rounded-b-2xl px-6 py-8 shadow-2xl">
           <div className="text-lg font-medium">그룹을 선택해 주세요</div>
           <MyOrganizationList className="pb-2" onSelect={handleButtonClick} />
         </div>

@@ -172,12 +172,12 @@ function Calendar({ value = "", min, onSelect }: CalendarProps) {
                     className={cn(
                       "flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-base transition-colors",
                       isSelected
-                        ? "bg-primary font-semibold text-white"
+                        ? "bg-primary-fill font-semibold text-white"
                         : isToday
                           ? "text-primary font-semibold"
                           : "hover:bg-light",
                       isDisabled &&
-                        "cursor-default text-black/20 hover:bg-transparent",
+                        "text-ink/20 cursor-default hover:bg-transparent",
                     )}
                   >
                     {day}
@@ -269,9 +269,9 @@ function OptionGrid({
           className={cn(
             "flex h-14 cursor-pointer items-center justify-center rounded-full text-base transition-colors",
             isSelected
-              ? "bg-primary font-semibold text-white"
+              ? "bg-primary-fill font-semibold text-white"
               : "hover:bg-light",
-            isDisabled && "cursor-default text-black/20 hover:bg-transparent",
+            isDisabled && "text-ink/20 cursor-default hover:bg-transparent",
           )}
         >
           {label}

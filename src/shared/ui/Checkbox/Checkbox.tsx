@@ -48,7 +48,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           className={cn(
             "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2 transition-colors",
             "peer-focus-visible:ring-primary peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2",
-            checked ? "border-primary bg-primary" : "border-light bg-white",
+            checked
+              ? "border-primary-fill bg-primary-fill"
+              : "border-light bg-surface",
           )}
         >
           <Check

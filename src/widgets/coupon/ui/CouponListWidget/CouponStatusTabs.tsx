@@ -30,7 +30,7 @@ function CouponStatusTabs({
     <div
       role="tablist"
       className={cn(
-        "mb-2 flex gap-5 border-b border-black/5 bg-white px-4",
+        "border-ink/5 bg-surface mb-2 flex gap-5 border-b px-4",
         sticky && "sticky top-12 z-40",
       )}
     >
@@ -67,7 +67,7 @@ function StatusTab({ filter, isSelected, onSelect }: StatusTabProps) {
       onClick={onSelect}
       className={cn(
         "relative flex cursor-pointer items-center gap-1 pt-1 pb-2.5 text-[15px] transition-colors duration-200",
-        isSelected ? "font-semibold text-black" : "text-dark font-medium",
+        isSelected ? "text-ink font-semibold" : "text-dark font-medium",
       )}
     >
       {COUPON_LIST_STATUS_LABEL[filter.status]}
@@ -82,7 +82,7 @@ function StatusTab({ filter, isSelected, onSelect }: StatusTabProps) {
       {isSelected && (
         <motion.span
           layoutId="coupon-status-tab"
-          className="absolute inset-x-0 -bottom-px h-0.5 bg-black"
+          className="bg-ink absolute inset-x-0 -bottom-px h-0.5"
           transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
         />
       )}

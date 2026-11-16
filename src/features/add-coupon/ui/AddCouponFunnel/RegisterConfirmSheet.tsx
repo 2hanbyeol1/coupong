@@ -85,7 +85,7 @@ function CouponSummary({ coupon }: { coupon: CouponInfoFormValues }) {
 function UploadStatusIcon({ status }: { status: CouponUploadStatus }) {
   if (status === "done")
     return (
-      <span className="bg-primary flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white">
+      <span className="bg-primary-fill flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white">
         <Check size={14} strokeWidth={3} aria-label="완료" />
       </span>
     );
@@ -231,7 +231,7 @@ function RegisterConfirmSheet({
                       "shrink-0 rounded-full px-2.5 py-0.5 text-sm font-semibold",
                       count > 1
                         ? "bg-primary/10 text-primary"
-                        : "bg-light text-black/70",
+                        : "bg-light text-ink/70",
                     )}
                   >
                     {count}개

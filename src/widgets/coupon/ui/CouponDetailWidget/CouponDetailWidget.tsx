@@ -209,7 +209,7 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
           aria-label={
             isExpanded ? "쿠폰 사진 작게 보기" : "쿠폰 사진 크게 보기"
           }
-          className="absolute right-4 bottom-2 z-10 rounded-full bg-white p-2 shadow-lg"
+          className="bg-elevated absolute right-4 bottom-2 z-10 rounded-full p-2 shadow-lg"
           onClick={toggleExpanded}
         >
           {isExpanded ? (

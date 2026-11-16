@@ -94,7 +94,7 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
             data-empty={!displayValue}
             className="ring-light focus:ring-primary flex w-full cursor-pointer items-center justify-between rounded-md py-2 pr-3 pl-4 text-start ring-1 focus:ring-2"
           >
-            <span className={cn(displayValue ? "text-black" : "text-black/30")}>
+            <span className={cn(displayValue ? "text-ink" : "text-ink/30")}>
               {displayValue || "YYYY년 MM월 DD일"}
             </span>
             <CalendarDays className="text-dark" size={20} aria-hidden />

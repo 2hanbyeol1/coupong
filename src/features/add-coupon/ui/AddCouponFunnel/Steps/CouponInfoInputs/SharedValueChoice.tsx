@@ -55,7 +55,7 @@ function SharedValueChoice({
             />
             <span
               className={cn(
-                "min-w-0 flex-1 truncate text-black",
+                "text-ink min-w-0 flex-1 truncate",
                 isSelected && "font-semibold",
               )}
             >

@@ -19,7 +19,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             id={id}
             ref={ref}
             type="text"
-            className="ring-light focus:ring-primary rounded-md px-4 py-2 text-black ring-1 focus:ring-2"
+            className="ring-light focus:ring-primary text-ink rounded-md px-4 py-2 ring-1 focus:ring-2"
             {...props}
           />
         </div>

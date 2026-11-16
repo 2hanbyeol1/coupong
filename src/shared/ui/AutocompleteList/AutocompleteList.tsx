@@ -43,7 +43,7 @@ function AutocompleteList({
       id={id}
       role="listbox"
       aria-busy={isLoading}
-      className="ring-light absolute inset-x-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-md bg-white py-1 shadow-lg ring-1"
+      className="ring-light bg-elevated absolute inset-x-0 top-full z-20 mt-1 max-h-48 overflow-y-auto rounded-md py-1 shadow-lg ring-1"
     >
       {/* 이전 결과가 없을 때만 로딩 문구를 보여주고, 있으면 결과를 흐리게 유지 */}
       {!hasItems && isLoading && (

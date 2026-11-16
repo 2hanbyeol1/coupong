@@ -43,7 +43,7 @@ function Coupon({ coupon, keyword }: CouponProps) {
         href={ROUTES.COUPON_DETAIL(coupon.id.toString(), keyword)}
         className="flex items-center gap-3.5 py-1"
       >
-        <div className="relative size-16 shrink-0 overflow-hidden rounded-lg ring-1 ring-black/5">
+        <div className="ring-ink/5 relative size-16 shrink-0 overflow-hidden rounded-lg ring-1">
           {isInvalid && (
             <Chip
               color="white"

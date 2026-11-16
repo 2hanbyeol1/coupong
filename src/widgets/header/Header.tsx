@@ -42,7 +42,7 @@ function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 flex h-12 min-h-12 w-full items-center justify-between bg-white px-4 py-1">
+    <header className="bg-surface sticky top-0 z-50 flex h-12 min-h-12 w-full items-center justify-between px-4 py-1">
       <div className={cn("flex items-center gap-2", withBackButton && "-ml-2")}>
         {withBackButton && (
           <button

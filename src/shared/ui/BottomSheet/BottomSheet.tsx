@@ -101,7 +101,7 @@ function BottomSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/40"
+            className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60"
             onClick={requestClose}
           />
           <motion.div
@@ -121,7 +121,7 @@ function BottomSheet({
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={handleDragEnd}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] w-full flex-col rounded-t-3xl bg-white shadow-[0_-8px_32px_rgba(0,0,0,0.12)]",
+              "bg-elevated fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] w-full flex-col rounded-t-3xl shadow-[0_-8px_32px_rgba(0,0,0,0.12)]",
               className,
             )}
           >
@@ -137,7 +137,7 @@ function BottomSheet({
                 aria-label="닫기"
                 className="mx-auto flex h-6 w-16 cursor-pointer items-center justify-center"
               >
-                <span className="h-1 w-10 rounded-full bg-black/15" />
+                <span className="bg-ink/15 h-1 w-10 rounded-full" />
               </button>
               {title &&
                 (typeof title === "string" ? (
