@@ -15,6 +15,7 @@ import {
 
 import { getCouponDetailOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
+import { getCouponListStatus } from "@/entities/coupon/lib/status";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
 
@@ -66,10 +67,14 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [excludedIds, setExcludedIds] = useState<CouponType["id"][]>([]);
   const [pendingSlide, setPendingSlide] = useState<PendingSlide | null>(null);
+  // 처음 들어온 쿠폰이 속한 탭(사용 가능 / 지난 쿠폰) 안에서만 넘겨 봄
+  // (사용 처리로 쿠폰 상태가 바뀌어도 탭은 그대로 유지)
+  const [listStatus] = useState(() => getCouponListStatus(initialCoupon));
 
   const { current, prev, next } = useCouponSequence({
     organizationId: initialCoupon.organization_id,
     currentId,
+    status: listStatus,
     keyword,
     excludedIds,
   });

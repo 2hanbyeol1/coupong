@@ -11,9 +11,11 @@ import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 import {
   addCoupons,
   changeCouponUse,
+  CouponListFilter,
   CouponUploadStatus,
   deleteCoupon,
   getCoupon,
+  getCouponCount,
   getCoupons,
   getImageSignedUrl,
   searchCouponSuggestions,
@@ -24,24 +26,38 @@ import {
 import { COUPON_QUERY_KEY } from "./query-key";
 import { CouponType } from "./type";
 
-/** keyword가 있으면 사용처·이름에 키워드가 포함된 쿠폰만 (서버에서 검색) */
-export const getInfiniteCouponsOption = (
-  orgId: OrganizationType["id"],
-  keyword?: string,
-) =>
+/** 목록 탭(status)의 쿠폰. keyword가 있으면 사용처·이름에 키워드가 포함된 쿠폰만 (서버에서 검색) */
+export const getInfiniteCouponsOption = ({
+  organizationId,
+  status,
+  keyword,
+}: CouponListFilter) =>
   infiniteQueryOptions({
-    queryKey: COUPON_QUERY_KEY.LIST(orgId, keyword),
+    queryKey: COUPON_QUERY_KEY.LIST(organizationId, status, keyword),
     queryFn: async ({ pageParam }) =>
       await getCoupons({
-        organizationId: orgId,
+        organizationId,
+        status,
+        keyword,
         page: pageParam,
         limit: 10,
-        keyword,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, pageParam) =>
       lastPage.hasNext ? pageParam + 1 : undefined,
     select: (data) => data.pages.flatMap((page) => page.data),
+  });
+
+/** 목록 탭(status)에 있는 쿠폰 개수 */
+export const getCouponCountOption = ({
+  organizationId,
+  status,
+  keyword,
+}: CouponListFilter) =>
+  queryOptions({
+    queryKey: COUPON_QUERY_KEY.COUNT(organizationId, status, keyword),
+    queryFn: async () =>
+      await getCouponCount({ organizationId, status, keyword }),
   });
 
 export const getCouponDetailOption = (couponId: CouponType["id"]) =>

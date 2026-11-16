@@ -3,6 +3,9 @@ import { OrganizationType } from "@/entities/organization/api/type";
 import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 import { NOT_FOUND_ERROR_CODE } from "@/shared/lib/constants/error-code";
 import createBrowserClient from "@/shared/lib/supabase/client";
+import { getTodayDateInputValue } from "@/shared/lib/util/date";
+
+import { CouponListStatus } from "../lib/status";
 
 import { CouponType, InsertCouponType } from "./type";
 
@@ -19,24 +22,31 @@ const escapeRegExp = (value: string) =>
 const quoteFilterValue = (value: string) =>
   `"${value.replace(/["\\]/g, "\\$&")}"`;
 
-export const getCoupons = async ({
-  organizationId,
-  page,
-  limit,
-  keyword,
-}: {
+export interface CouponListFilter {
   organizationId: OrganizationType["id"];
-  page: number;
-  limit: number;
+  status: CouponListStatus;
   /** 사용처(place)나 이름(name)에 포함된 쿠폰만 (대소문자 무시) */
   keyword?: string;
-}) => {
+}
+
+/** 목록 탭·검색어 조건에 맞는 쿠폰 조회 (head: 개수만) */
+const selectCoupons = (
+  { organizationId, status, keyword }: CouponListFilter,
+  { head = false }: { head?: boolean } = {},
+) => {
   const supabase = createBrowserClient();
 
   let query = supabase
     .from(COUPON_TABLE)
-    .select("*", { count: "exact" })
+    .select("*", { count: "exact", head })
     .eq("organization_id", organizationId);
+
+  // 오늘이 유효기간인 쿠폰은 아직 쓸 수 있음 (getExpired와 같은 기준, 기기 날짜 기준)
+  const today = getTodayDateInputValue();
+  query =
+    status === "available"
+      ? query.is("used_by", null).gte("expire_at", today)
+      : query.or(`used_by.not.is.null,expire_at.lt.${today}`);
 
   if (keyword) {
     // ilike는 PostgREST가 값의 *를 %로 바꿔 버려 *를 글자 그대로 찾을 수 없으므로,
@@ -45,9 +55,19 @@ export const getCoupons = async ({
     query = query.or(`place.imatch.${pattern},name.imatch.${pattern}`);
   }
 
-  const { data, count, error } = await query
-    .order("used_by", { nullsFirst: true })
-    .order("expire_at", { ascending: false })
+  return query;
+};
+
+export const getCoupons = async ({
+  page,
+  limit,
+  ...filter
+}: CouponListFilter & { page: number; limit: number }) => {
+  // 사용 가능: 빨리 써야 하는 쿠폰부터 / 지난 쿠폰: 최근에 만료된 쿠폰부터
+  const isAvailable = filter.status === "available";
+
+  const { data, count, error } = await selectCoupons(filter)
+    .order("expire_at", { ascending: isAvailable })
     .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit - 1);
 
@@ -56,6 +76,16 @@ export const getCoupons = async ({
     throw new Error("쿠폰 목록을 가져오는 중 오류가 발생했어요");
   }
   return { data, hasNext: (count ?? 0) > page * limit };
+};
+
+export const getCouponCount = async (filter: CouponListFilter) => {
+  const { count, error } = await selectCoupons(filter, { head: true });
+
+  if (error) {
+    console.error("쿠폰 개수 조회 에러:", error);
+    throw new Error("쿠폰 개수를 가져오는 중 오류가 발생했어요");
+  }
+  return count ?? 0;
 };
 
 export const getCoupon = async (couponId: CouponType["id"]) => {

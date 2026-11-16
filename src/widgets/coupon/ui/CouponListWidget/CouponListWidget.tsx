@@ -2,10 +2,11 @@
 import { Suspense } from "react";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
+import { CouponListFilter } from "@/entities/coupon/api/api";
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
+import { CouponListStatus } from "@/entities/coupon/lib/status";
 import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
-import { OrganizationType } from "@/entities/organization/api/type";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import { CouponContextMenu } from "@/features/manage-coupon/ui/CouponMenu";
 import { InfiniteScroll } from "@/shared/ui/InfiniteScroll";
@@ -13,17 +14,20 @@ import { InfoMessage } from "@/shared/ui/InfoMessage";
 import Iterator from "@/shared/ui/Iterator/Iterator";
 
 import CouponListWidgetSkeleton from "./CouponListWidgetSkeleton";
+import CouponStatusTabs from "./CouponStatusTabs";
+import useCouponListStatusParam from "./useCouponListStatusParam";
 
 interface CouponListWidgetProps {
   /** 사용처·이름에 이 키워드가 포함된 쿠폰만 (서버에서 검색) */
   keyword?: string;
-}
-interface SuspensedCouponListProps extends CouponListWidgetProps {
-  selectedOrganizationId: OrganizationType["id"];
+  /** 스크롤해도 탭을 헤더 아래에 고정 (긴 목록에서도 바로 탭을 바꿀 수 있게) */
+  stickyTabs?: boolean;
 }
 
-function CouponListWidget({ keyword }: CouponListWidgetProps) {
+/** 사용 가능 / 지난 쿠폰 탭과 쿠폰 목록 */
+function CouponListWidget({ keyword, stickyTabs }: CouponListWidgetProps) {
   const { selectedOrganizationId, isHydrated } = useOrganizationStore();
+  const [status, setStatus] = useCouponListStatusParam();
 
   if (!isHydrated) return <CouponListWidgetSkeleton />;
 
@@ -35,29 +39,52 @@ function CouponListWidget({ keyword }: CouponListWidgetProps) {
       />
     );
 
+  const filter = { organizationId: selectedOrganizationId, keyword };
+
+  // 고정된 탭으로 목록 중간에서 탭을 바꿔도 새 목록을 처음부터 보도록 맨 위로
+  const handleStatusChange = (nextStatus: CouponListStatus) => {
+    setStatus(nextStatus);
+    if (stickyTabs) window.scrollTo({ top: 0 });
+  };
+
   return (
-    <Suspense fallback={<CouponListWidgetSkeleton />}>
-      <SuspensedCouponList
-        keyword={keyword}
-        selectedOrganizationId={selectedOrganizationId}
+    <>
+      <CouponStatusTabs
+        filter={filter}
+        value={status}
+        onChange={handleStatusChange}
+        sticky={stickyTabs}
       />
-    </Suspense>
+      <Suspense fallback={<CouponListWidgetSkeleton />}>
+        <SuspensedCouponList filter={{ ...filter, status }} />
+      </Suspense>
+    </>
   );
 }
 
-function SuspensedCouponList({
-  keyword,
-  selectedOrganizationId,
-}: SuspensedCouponListProps) {
+const EMPTY_MESSAGE: Record<
+  CouponListStatus,
+  { title: string; description: string }
+> = {
+  available: {
+    title: "사용할 수 있는 쿠폰이 없어요",
+    description: "화면 하단의 버튼을 눌러 등록해보세요",
+  },
+  past: {
+    title: "지난 쿠폰이 없어요",
+    description: "사용했거나 기간이 지난 쿠폰이 여기에 모여요",
+  },
+};
+
+function SuspensedCouponList({ filter }: { filter: CouponListFilter }) {
+  const { keyword } = filter;
   const {
     data: coupons,
     isError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useSuspenseInfiniteQuery({
-    ...getInfiniteCouponsOption(selectedOrganizationId, keyword),
-  });
+  } = useSuspenseInfiniteQuery(getInfiniteCouponsOption(filter));
 
   if (isError)
     return (
@@ -76,12 +103,7 @@ function SuspensedCouponList({
     );
 
   if (coupons.length === 0)
-    return (
-      <InfoMessage
-        title="등록된 쿠폰이 없어요"
-        description="화면 하단의 버튼을 눌러 등록해보세요"
-      />
-    );
+    return <InfoMessage {...EMPTY_MESSAGE[filter.status]} />;
 
   return (
     <InfiniteScroll

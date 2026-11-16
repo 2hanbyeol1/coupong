@@ -2,8 +2,8 @@
 import { useDeferredValue, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { ROUTES } from "@/shared/config/routes";
 import useDebouncedValue from "@/shared/lib/hook/useDebouncedValue";
+import { replaceSearchParams } from "@/shared/lib/util/url";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 import { SearchInput } from "@/shared/ui/SearchInput";
 import { CouponListWidget } from "@/widgets/coupon/ui/CouponListWidget";
@@ -23,12 +23,9 @@ function SearchPage() {
   const debouncedKeyword = useDebouncedValue(keyword.trim(), SEARCH_DEBOUNCE);
   const searchKeyword = useDeferredValue(debouncedKeyword);
 
-  // 검색어를 URL에 저장 (검색어마다 기록이 쌓이지 않게 현재 기록을 교체)
+  // 검색어를 URL에 저장 (검색어마다 기록이 쌓이지 않게 현재 기록을 교체, 탭 등 다른 값은 유지)
   useEffect(() => {
-    const url = ROUTES.SEARCH(debouncedKeyword);
-    if (url !== window.location.pathname + window.location.search) {
-      window.history.replaceState(null, "", url);
-    }
+    replaceSearchParams({ keyword: debouncedKeyword });
   }, [debouncedKeyword]);
 
   return (
