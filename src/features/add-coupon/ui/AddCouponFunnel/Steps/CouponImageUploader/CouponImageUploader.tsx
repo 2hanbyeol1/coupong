@@ -45,6 +45,17 @@ const tileMotion = {
   transition: { duration: 0.2, ease: "easeOut" },
 } as const;
 
+/**
+ * 고른 사진을 메모리로 복사
+ * File은 업로드할 때 원본을 다시 읽어서, 그사이 원본에 접근할 수 없게 되면
+ * (Android 인앱 브라우저 등) 요청이 보내지지도 못하고 실패함
+ */
+const copyFileToMemory = async (file: File) =>
+  new File([await file.arrayBuffer()], file.name, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
+
 function fileListFromFiles(files: File[]): FileList {
   const dt = new DataTransfer();
   files.forEach((file) => dt.items.add(file));
@@ -88,7 +99,9 @@ function CouponImageUploader({
     return current ? Array.from(current) : [];
   };
 
-  const handleFilesPicked = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilesPicked = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const picked = Array.from(event.target.files ?? []);
     // 같은 파일을 다시 선택할 수 있도록 input 값 초기화
     if (inputRef.current) inputRef.current.value = "";
@@ -97,9 +110,27 @@ function CouponImageUploader({
     const sizeAllowed = picked.filter(
       (file) => file.size <= MAX_COUPON_IMAGE_SIZE_BYTES,
     );
+    const remainingBeforeCopy = Math.max(
+      0,
+      MAX_COUPON_IMAGE_COUNT - getCurrentFiles().length,
+    );
+    const copyResults = await Promise.allSettled(
+      sizeAllowed.slice(0, remainingBeforeCopy).map(copyFileToMemory),
+    );
+    const copied = copyResults.flatMap((result) =>
+      result.status === "fulfilled" ? [result.value] : [],
+    );
+    const unreadableCount = copyResults.length - copied.length;
+    if (unreadableCount > 0) {
+      addToast({
+        message: `사진 ${unreadableCount}장을 불러오지 못했어요\n다시 골라 주세요`,
+      });
+    }
+
+    // 복사하는 동안 사진이 바뀌었을 수 있어 개수를 다시 셈
     const current = getCurrentFiles();
     const remaining = Math.max(0, MAX_COUPON_IMAGE_COUNT - current.length);
-    const accepted = sizeAllowed.slice(0, remaining);
+    const accepted = copied.slice(0, remaining);
 
     const oversizedCount = picked.length - sizeAllowed.length;
     if (oversizedCount > 0) {
@@ -107,7 +138,9 @@ function CouponImageUploader({
         message: `${MAX_COUPON_IMAGE_SIZE_MB}MB가 넘는 사진 ${oversizedCount}장은 제외했어요`,
       });
     }
-    if (accepted.length < sizeAllowed.length) {
+    const overLimit =
+      sizeAllowed.length > remainingBeforeCopy || copied.length > remaining;
+    if (overLimit) {
       addToast({
         message: `사진은 최대 ${MAX_COUPON_IMAGE_COUNT}장까지 올릴 수 있어요`,
       });
