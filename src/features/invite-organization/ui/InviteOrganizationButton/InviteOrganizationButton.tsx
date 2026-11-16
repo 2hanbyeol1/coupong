@@ -3,6 +3,7 @@ import { UserPlus } from "lucide-react";
 
 import { OrganizationType } from "@/entities/organization/api/type";
 import useModal from "@/shared/lib/hook/useModal";
+import { Button } from "@/shared/ui";
 
 import { InviteOrganizationForm } from "../InviteOrganizationForm";
 
@@ -30,9 +31,14 @@ function InviteOrganizationButton({
   };
 
   return (
-    <button className="cursor-pointer" onClick={openInviteOrganizationModal}>
-      <UserPlus className="stroke-primary fill-primary" size={20} />
-    </button>
+    <Button
+      size="sm"
+      className="shrink-0"
+      onClick={openInviteOrganizationModal}
+    >
+      <UserPlus className="fill-white stroke-white" size={16} />
+      초대
+    </Button>
   );
 }
 

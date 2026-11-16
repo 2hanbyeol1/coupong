@@ -1,7 +1,6 @@
 import { Check, Users } from "lucide-react";
 import Link from "next/link";
 
-import { InviteOrganizationButton } from "@/features/invite-organization/ui/InviteOrganizationButton";
 import { ROUTES } from "@/shared/config/routes";
 import { cn } from "@/shared/lib/util/cn";
 
@@ -57,7 +56,6 @@ function Organization({ organization, onSelect }: OrganizationProps) {
           >
             <Users className="fill-dark stroke-dark" size={20} />
           </Link>
-          <InviteOrganizationButton organization={organization} />
         </div>
       )}
     </div>
