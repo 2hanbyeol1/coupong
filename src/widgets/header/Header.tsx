@@ -35,7 +35,7 @@ function Header({
   };
 
   const handleSearch = () => {
-    router.push(ROUTES.SEARCH);
+    router.push(ROUTES.SEARCH());
   };
 
   return (

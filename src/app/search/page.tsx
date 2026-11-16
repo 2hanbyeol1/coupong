@@ -1,6 +1,8 @@
 "use client";
-import { useDeferredValue, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
+import { ROUTES } from "@/shared/config/routes";
 import useDebouncedValue from "@/shared/lib/hook/useDebouncedValue";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 import { SearchInput } from "@/shared/ui/SearchInput";
@@ -12,10 +14,22 @@ const SEARCH_DEBOUNCE = 300; // ms
 
 function SearchPage() {
   const tags = ["스타벅스", "GS25", "푸라닭"];
-  const [keyword, setKeyword] = useState("");
+  // 쿠폰 상세에 들어갔다 뒤로 돌아왔을 때 URL에 남겨 둔 검색어로 다시 시작
+  const searchParams = useSearchParams();
+  const [keyword, setKeyword] = useState(
+    () => searchParams.get("keyword") ?? "",
+  );
   // 입력할 때마다 서버에 요청하지 않고, 새 결과를 받는 동안 이전 결과를 보여줌
   const debouncedKeyword = useDebouncedValue(keyword.trim(), SEARCH_DEBOUNCE);
   const searchKeyword = useDeferredValue(debouncedKeyword);
+
+  // 검색어를 URL에 저장 (검색어마다 기록이 쌓이지 않게 현재 기록을 교체)
+  useEffect(() => {
+    const url = ROUTES.SEARCH(debouncedKeyword);
+    if (url !== window.location.pathname + window.location.search) {
+      window.history.replaceState(null, "", url);
+    }
+  }, [debouncedKeyword]);
 
   return (
     <div className="relative">
