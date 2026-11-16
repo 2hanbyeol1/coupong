@@ -4,6 +4,7 @@ import createBrowserClient from "@/shared/lib/supabase/client";
 import { InsertInvitationType, InvitationType } from "./type";
 
 const INVITATION_TABLE = "invitations";
+const INVITATION_ERROR_CODE = "P0001";
 
 export async function getMyInvitations() {
   const user = await getAuthUser();
@@ -54,7 +55,7 @@ export const addInvitation = async (
       .select()
       .eq("invite_email", inviteEmail)
       .eq("organization_id", organizationId)
-      .eq("accepted", false)
+      .is("accepted", null)
       .limit(1);
   if (getDuplicateInvitationError)
     throw new Error("초대 정보 조회에 실패했어요");
@@ -77,15 +78,21 @@ export const addInvitation = async (
   return token;
 };
 
-export const approveInvitation = async (invitationId: InvitationType["id"]) => {
+// 초대를 수락하고 그룹에 가입 (초대받은 이메일로 로그인한 경우만 가능)
+export const acceptInvitation = async (token: InvitationType["token"]) => {
   const supabase = createBrowserClient();
-  const { error } = await supabase
-    .from(INVITATION_TABLE)
-    .update({ accepted: true })
-    .eq("id", invitationId);
+  const { data, error } = await supabase.rpc("accept_invitation", {
+    p_token: token,
+  });
 
   if (error) {
-    console.error(`초대 정보를 수락하는 중 에러 발생: ${error.message}`);
-    throw new Error("초대 정보 수락에 실패했어요");
+    console.error(`초대를 수락하는 중 에러 발생: ${error.message}`);
+    // P0001: 만료·이미 수락 등 사용자에게 보여줄 사유
+    throw new Error(
+      error.code === INVITATION_ERROR_CODE
+        ? error.message
+        : "초대 수락에 실패했어요",
+    );
   }
+  return data;
 };

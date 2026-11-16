@@ -1,5 +1,4 @@
 import { getAuthUser } from "@/entities/auth/api/api";
-import { OrganizationType } from "@/entities/organization/api/type";
 import createBrowserClient from "@/shared/lib/supabase/client";
 import { getSupabasePublicImageUrl } from "@/shared/lib/util/image";
 
@@ -106,18 +105,3 @@ export function getUserImageUrl(imagePath: UserType["image_path"]) {
   if (!imagePath) return null;
   return getSupabasePublicImageUrl(USER_IMAGE_BUCKET, imagePath).data.publicUrl;
 }
-
-export const addToOrganization = async (
-  organizationId: OrganizationType["id"],
-) => {
-  const user = await getAuthUser();
-  const supabase = createBrowserClient();
-  const { error } = await supabase
-    .from(USER_GROUP_TABLE)
-    .insert({ user_id: user.id, organization_id: organizationId });
-
-  if (error) {
-    console.error(`사용자를 조직에 추가하는 중 에러 발생: ${error.message}`);
-    throw new Error("사용자를 조직에 추가하는데 실패했어요");
-  }
-};

@@ -1,9 +1,13 @@
 "use client";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { notFound, useParams, useRouter } from "next/navigation";
 
 import {
-  approveInvitationOption,
+  acceptInvitationOption,
   getInvitationByTokenOption,
 } from "@/entities/invitation/api/query";
 import useToast from "@/shared/lib/hook/useToast";
@@ -15,22 +19,23 @@ function InvitationPage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { data: invitation } = useSuspenseQuery({
     ...getInvitationByTokenOption(token),
   });
 
-  const { mutate: approveInvitation, isPending } = useMutation({
-    ...approveInvitationOption(),
+  const { mutate: acceptInvitation, isPending } = useMutation({
+    ...acceptInvitationOption(queryClient),
     onSuccess: () => {
       router.push("/");
       toast.addToast({
         message: "초대가 수락되었어요",
       });
     },
-    onError: () => {
+    onError: (error) => {
       toast.addToast({
-        message: "초대 수락에 실패했어요",
+        message: error.message,
       });
     },
   });
@@ -64,12 +69,7 @@ function InvitationPage() {
         </div>
 
         <Button
-          onClick={() =>
-            approveInvitation({
-              invitationId: invitation.id,
-              organizationId: invitation.organizations.id,
-            })
-          }
+          onClick={() => acceptInvitation(token)}
           disabled={isPending}
           size="lg"
           full

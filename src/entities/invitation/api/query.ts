@@ -1,11 +1,15 @@
-import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import {
+  mutationOptions,
+  QueryClient,
+  queryOptions,
+} from "@tanstack/react-query";
 
 import { checkIsUserBelongsToOrganization } from "@/entities/organization/api/api";
-import { addToOrganization } from "@/entities/user/api/api";
+import { USER_QUERY_KEY } from "@/entities/user/api/query-key";
 
 import {
+  acceptInvitation,
   addInvitation,
-  approveInvitation,
   getInvitationByToken,
   getMyInvitations,
 } from "./api";
@@ -46,16 +50,11 @@ export const addInvitationOption = () =>
     }) => await addInvitation(inviteEmail, organizationId),
   });
 
-export const approveInvitationOption = () =>
+export const acceptInvitationOption = (queryClient: QueryClient) =>
   mutationOptions({
-    mutationFn: async ({
-      invitationId,
-      organizationId,
-    }: {
-      invitationId: InvitationType["id"];
-      organizationId: InvitationType["organization_id"];
-    }) =>
-      await approveInvitation(invitationId).then(() => {
-        addToOrganization(organizationId);
-      }),
+    mutationFn: async (token: InvitationType["token"]) =>
+      await acceptInvitation(token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEY.GROUP_LIST });
+    },
   });

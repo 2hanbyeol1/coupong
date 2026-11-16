@@ -254,6 +254,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_invitation: { Args: { p_token: string }; Returns: string };
       is_organization_admin: {
         Args: { p_organization_id: string };
         Returns: boolean;
