@@ -2,15 +2,13 @@ import Skeleton from "@/shared/ui/Skeleton";
 
 function CouponSkeleton() {
   return (
-    <Skeleton className="flex items-center gap-2" wrapper>
-      <Skeleton className="aspect-square w-20 shrink-0" />
+    <Skeleton className="flex items-center gap-3.5 py-1" wrapper>
+      <Skeleton className="size-16 shrink-0 rounded-lg" />
 
-      <div className="flex flex-grow flex-col gap-1.5 px-3">
-        <Skeleton className="w-20" textSize="sm" />
-        <Skeleton
-          className="text-dark flex w-40 items-center justify-between gap-2"
-          textSize="xs"
-        />
+      <div className="flex flex-grow flex-col">
+        <Skeleton className="w-16" textSize="xs" />
+        <Skeleton className="w-40" textSize="base" />
+        <Skeleton className="mt-1 w-24" textSize="xs" />
       </div>
     </Skeleton>
   );

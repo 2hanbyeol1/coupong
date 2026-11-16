@@ -5,10 +5,19 @@ import Link from "next/link";
 
 import { ROUTES } from "@/shared/config/routes";
 import { cn } from "@/shared/lib/util/cn";
-import { getExpired, getYYYYMMDD } from "@/shared/lib/util/date";
+import {
+  formatDaysLeft,
+  formatShortDate,
+  getDaysLeft,
+  getExpired,
+} from "@/shared/lib/util/date";
+import { Chip } from "@/shared/ui";
 
 import { CouponType } from "../../api/type";
 import { CouponImage } from "../CouponImage";
+
+/** 남은 날이 이 이하면 빨갛게 강조 */
+const URGENT_DAYS_LEFT = 7;
 
 interface CouponProps {
   coupon: CouponType;
@@ -20,6 +29,7 @@ function Coupon({ coupon, keyword }: CouponProps) {
   const isExpired = getExpired(coupon.expire_at);
   const isUsed = !!coupon.used_by;
   const isInvalid = isExpired || isUsed;
+  const daysLeft = getDaysLeft(coupon.expire_at);
 
   const getInvalidMessage = () => {
     if (isUsed) return "사용 완료";
@@ -31,34 +41,49 @@ function Coupon({ coupon, keyword }: CouponProps) {
     <div className="relative">
       <Link
         href={ROUTES.COUPON_DETAIL(coupon.id.toString(), keyword)}
-        className="flex items-center gap-2"
+        className="flex items-center gap-3.5 py-1"
       >
-        <div className="relative size-20 shrink-0">
+        <div className="relative size-16 shrink-0 overflow-hidden rounded-lg ring-1 ring-black/5">
           {isInvalid && (
-            <span className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xs bg-white px-2 py-1 text-xs font-medium whitespace-nowrap text-black">
+            <Chip
+              color="white"
+              className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+            >
               {getInvalidMessage()}
-            </span>
+            </Chip>
           )}
 
+          {/* 쿠폰 사진은 위쪽에 상품 사진이 있어 위를 기준으로 자름 */}
           <CouponImage
             couponName={coupon.name}
             imagePath={coupon.image_path}
             isInvalid={isInvalid}
-            sizes="5rem"
+            imageClassName="object-top"
+            sizes="4rem"
           />
         </div>
 
-        <div
-          className={cn(
-            "flex flex-grow flex-col gap-1.5 pr-10 pl-3",
-            isInvalid && "opacity-20",
-          )}
-        >
-          <div className="text-sm font-medium">
-            [{coupon.place}] {coupon.name}
+        <div className={cn("min-w-0 flex-1 pr-4", isInvalid && "opacity-40")}>
+          <div className="truncate text-xs font-medium text-black/45">
+            {coupon.place}
           </div>
-          <div className="text-dark flex items-center justify-between gap-2 text-xs">
-            {getYYYYMMDD(coupon.expire_at)}까지 사용
+          <div className="truncate text-[15px] font-semibold">
+            {coupon.name}
+          </div>
+          {/* 사용 가능: 남은 날만 (정확한 날짜는 상세에서) / 지난 쿠폰: 남은 날이 없으므로 날짜 */}
+          <div className="mt-1 flex items-center">
+            {isInvalid ? (
+              <span className="text-xs text-black/40">
+                {formatShortDate(coupon.expire_at)}까지
+              </span>
+            ) : (
+              <Chip
+                color={daysLeft <= URGENT_DAYS_LEFT ? "danger" : "muted"}
+                className="font-semibold"
+              >
+                {formatDaysLeft(daysLeft)}
+              </Chip>
+            )}
           </div>
         </div>
       </Link>
