@@ -8,6 +8,10 @@ export interface ModalType {
   /** 버튼 바로 위에 표시할 체크박스 문구 (예: 다시 묻지 않기). 없으면 체크박스를 표시하지 않음 */
   checkboxLabel?: string;
   confirmButtonText?: string;
+  /** 왼쪽(보조) 버튼 문구, 기본은 '취소' */
+  cancelButtonText?: string;
+  /** 왼쪽 버튼을 눌렀을 때, 없으면 모달만 닫음 */
+  onCancel?: () => void;
   confirmButtonDisabled?: boolean;
   formId?: string;
 }
