@@ -9,7 +9,7 @@ export const COUPON_INFO = {
     name: "name",
     type: "text",
     placeholder: "쿠폰 이름",
-    maxLength: 20,
+    maxLength: 30,
     minLength: 1,
   },
   place: {
