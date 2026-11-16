@@ -6,14 +6,14 @@ import { ROUTES } from "@/shared/config/routes";
 import useDebouncedValue from "@/shared/lib/hook/useDebouncedValue";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 import { SearchInput } from "@/shared/ui/SearchInput";
-import { Tag } from "@/shared/ui/Tag";
 import { CouponListWidget } from "@/widgets/coupon/ui/CouponListWidget";
 import { Header } from "@/widgets/header";
+
+import PopularPlaceTags from "./PopularPlaceTags";
 
 const SEARCH_DEBOUNCE = 300; // ms
 
 function SearchPage() {
-  const tags = ["스타벅스", "GS25", "푸라닭"];
   // 쿠폰 상세에 들어갔다 뒤로 돌아왔을 때 URL에 남겨 둔 검색어로 다시 시작
   const searchParams = useSearchParams();
   const [keyword, setKeyword] = useState(
@@ -53,19 +53,7 @@ function SearchPage() {
           onXButtonClick={() => setKeyword("")}
         />
       </div>
-      <div className="mb-5 px-4">
-        <div className="flex gap-x-1.5 gap-y-2">
-          {tags.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => setKeyword(tag)}
-              className="cursor-pointer"
-            >
-              <Tag name={tag} />
-            </button>
-          ))}
-        </div>
-      </div>
+      <PopularPlaceTags onSelect={setKeyword} />
 
       {searchKeyword.length === 0 ? (
         <InfoMessage
