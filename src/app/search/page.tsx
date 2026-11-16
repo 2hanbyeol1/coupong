@@ -19,6 +19,9 @@ function SearchPage() {
   const [keyword, setKeyword] = useState(
     () => searchParams.get("keyword") ?? "",
   );
+  // 새로 검색하러 들어왔을 때만 바로 입력할 수 있게 포커스
+  // (상세에서 돌아왔을 때는 키보드가 결과를 가리지 않도록 포커스하지 않음)
+  const [shouldAutoFocus] = useState(() => !searchParams.get("keyword"));
   // 입력할 때마다 서버에 요청하지 않고, 새 결과를 받는 동안 이전 결과를 보여줌
   const debouncedKeyword = useDebouncedValue(keyword.trim(), SEARCH_DEBOUNCE);
   const searchKeyword = useDeferredValue(debouncedKeyword);
@@ -45,6 +48,7 @@ function SearchPage() {
           className="pointer-events-auto"
           placeholder="찾고 싶은 쿠폰의 키워드를 입력해 보세요"
           name="keyword"
+          autoFocus={shouldAutoFocus}
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           onXButtonClick={() => setKeyword("")}
