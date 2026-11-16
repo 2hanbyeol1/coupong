@@ -9,10 +9,9 @@ import {
 } from "@/features/add-coupon/lib/schema";
 import { COUPON_INFO_FIELD_ORDER } from "@/features/add-coupon/lib/util";
 import { cn } from "@/shared/lib/util/cn";
-import { DateInput, ToggleChip } from "@/shared/ui";
+import { DateInput, SuggestionChips, ToggleChip } from "@/shared/ui";
 
 import { focusNextField } from "./fieldNavigation";
-import SuggestionChips from "./SuggestionChips";
 
 export type InfoFieldName = keyof CouponInfoFormValues;
 

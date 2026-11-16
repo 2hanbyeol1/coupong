@@ -17,6 +17,9 @@ import Image from "next/image";
 import { searchCouponSuggestionsOption } from "@/entities/coupon/api/query";
 import { COUPON_IMAGE_ASPECT_CLASS } from "@/entities/coupon/constants";
 import { COUPON_INFO } from "@/entities/coupon/lib/schema";
+import useCouponAutocomplete, {
+  CouponAutocompleteField,
+} from "@/entities/coupon/model/useCouponAutocomplete";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import {
   AddCouponFormValues,
@@ -26,7 +29,6 @@ import {
   COUPON_INFO_FIELD_ORDER,
   isCouponInfoIncomplete,
 } from "@/features/add-coupon/lib/util";
-import useDebouncedValue from "@/shared/lib/hook/useDebouncedValue";
 import useIsKeyboardOpen from "@/shared/lib/hook/useIsKeyboardOpen";
 import useModal from "@/shared/lib/hook/useModal";
 import useToast from "@/shared/lib/hook/useToast";
@@ -36,9 +38,14 @@ import {
   getTodayDateInputValue,
   parseDateInputValue,
 } from "@/shared/lib/util/date";
-import { Button, DateInput, TextInput } from "@/shared/ui";
+import {
+  AutocompleteList,
+  Button,
+  DateInput,
+  SuggestionChips,
+  TextInput,
+} from "@/shared/ui";
 
-import AutocompleteList from "./AutocompleteList";
 import BatchCouponInputs, {
   FIELD_LABELS,
   InfoFieldName,
@@ -48,7 +55,6 @@ import CouponListBottomSheet from "./CouponListBottomSheet";
 import { focusNextField } from "./fieldNavigation";
 import { CouponInputMode, DEFAULT_SHARED_FIELDS } from "./inputMode";
 import SharedValueChoice, { SharedValueOption } from "./SharedValueChoice";
-import SuggestionChips from "./SuggestionChips";
 import ValueSwapOverlay, { SwapText } from "./ValueSwapOverlay";
 
 interface CouponInfoInputsProps {
@@ -116,13 +122,11 @@ const INPUT_MODE_INDICATOR_SPRING = {
   damping: 38,
 } as const;
 
-type AutocompleteFieldName = "place" | "name";
+type AutocompleteFieldName = CouponAutocompleteField;
 
 const AUTOCOMPLETE_FIELDS: InfoFieldName[] = ["place", "name"];
 const MAX_PLACE_SUGGESTIONS = 5;
 const MAX_NAME_SUGGESTIONS = 10;
-const MAX_AUTOCOMPLETE_ITEMS = 5;
-const AUTOCOMPLETE_DEBOUNCE_MS = 250;
 /** 다음 쿠폰으로 넘어가는 슬라이드가 끝난 뒤 첫 칸에 포커스 */
 const FOCUS_AFTER_SLIDE_MS = 200;
 
@@ -281,37 +285,18 @@ function CouponInfoInputs({
   const autocompleteQuery = autocompleteField
     ? (couponsWatch?.[currentIndex]?.[autocompleteField] ?? "").trim()
     : "";
-  const autocompleteParams = useMemo(
-    () => ({
-      field: autocompleteField,
-      query: autocompleteQuery,
-      // 쿠폰 이름은 지금 입력한 사용처에서 쓰였던 이름을 먼저
-      place: autocompleteField === "name" ? currentPlace : "",
-    }),
-    [autocompleteField, autocompleteQuery, currentPlace],
-  );
-  const debouncedParams = useDebouncedValue(
-    autocompleteParams,
-    AUTOCOMPLETE_DEBOUNCE_MS,
-  );
-  const isDebouncing = debouncedParams !== autocompleteParams;
-  const { data: autocompleteResult = [], isFetching: isAutocompleteFetching } =
-    useQuery(
-      searchCouponSuggestionsOption(
-        {
-          organizationId: selectedOrganizationId,
-          field: debouncedParams.field ?? "place",
-          query: debouncedParams.query,
-          place: debouncedParams.place,
-          sessionValues: debouncedParams.field
-            ? sessionValues[debouncedParams.field]
-            : [],
-          limit: MAX_AUTOCOMPLETE_ITEMS,
-        },
-        { enabled: !!debouncedParams.field && debouncedParams.query !== "" },
-      ),
-    );
-  const isAutocompleteLoading = isDebouncing || isAutocompleteFetching;
+  const {
+    items: autocompleteResult,
+    field: autocompleteResultField,
+    isLoading: isAutocompleteLoading,
+  } = useCouponAutocomplete({
+    organizationId: selectedOrganizationId,
+    field: autocompleteField,
+    query: autocompleteQuery,
+    // 쿠폰 이름은 지금 입력한 사용처에서 쓰였던 이름을 먼저
+    place: currentPlace,
+    sessionValues,
+  });
 
   const handleSuggestionClick = (
     field: AutocompleteFieldName,
@@ -757,7 +742,7 @@ function CouponInfoInputs({
                   autocompleteField === fieldName && autocompleteQuery !== "";
                 // 다른 칸에서 검색한 결과는 보여주지 않음
                 const autocompleteItems =
-                  isAutocompleteOpen && debouncedParams.field === fieldName
+                  isAutocompleteOpen && autocompleteResultField === fieldName
                     ? autocompleteResult
                     : [];
                 const showAutocomplete =

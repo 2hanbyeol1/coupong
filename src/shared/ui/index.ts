@@ -1,3 +1,4 @@
+export { AutocompleteList } from "./AutocompleteList";
 export { BottomSheet } from "./BottomSheet";
 export { Button } from "./Button";
 export { Calendar } from "./Calendar";
@@ -7,6 +8,7 @@ export { Funnel, Step as FunnelStep } from "./Funnel";
 export { ImageInput } from "./ImageInput";
 export { Logo } from "./Logo";
 export { MoreMenu } from "./MoreMenu";
+export { SuggestionChips } from "./SuggestionChips";
 export { TextInput } from "./TextInput";
 export { Toast } from "./Toast";
 export { ToggleChip } from "./ToggleChip";
