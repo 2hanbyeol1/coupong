@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { sendEmailOption } from "@/entities/email/query";
 import { addInvitationOption } from "@/entities/invitation/api/query";
@@ -27,11 +27,12 @@ function InviteOrganizationForm({
   organization,
 }: InviteOrganizationFormProps) {
   const { addToast } = useToast();
+  const queryClient = useQueryClient();
   const { hideModal, updateModal } = useModal();
 
   const { mutateAsync: addInvitation, isPending: isAddingInvitation } =
     useMutation({
-      ...addInvitationOption(),
+      ...addInvitationOption(queryClient),
       onError: (error) => {
         addToast({
           message: error.message,

@@ -15,6 +15,8 @@ import { InfoMessage } from "@/shared/ui/InfoMessage";
 import Iterator from "@/shared/ui/Iterator/Iterator";
 import Skeleton from "@/shared/ui/Skeleton";
 
+import PendingInvitationList from "./PendingInvitationList";
+
 interface OrganizationMemberWidgetProps {
   organizationId: OrganizationType["id"];
 }
@@ -62,33 +64,41 @@ function OrganizationMemberWidget({
   const isAdmin = myMembership.role === "admin";
 
   return (
-    <div className="flex flex-col gap-5 px-6 py-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="flex min-w-0 items-center gap-2 text-xl font-medium">
-          <span className="truncate">{organization.name}</span>
-          <span className="text-dark shrink-0">{members.length}</span>
-        </h1>
-        <InviteOrganizationButton organization={organization} />
-      </div>
+    <div className="flex flex-col gap-8 px-6 py-6">
+      <section className="flex flex-col gap-5">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="flex min-w-0 items-center gap-2 text-xl font-medium">
+            <span className="truncate">{organization.name}</span>
+            <span className="text-dark shrink-0">{members.length}</span>
+          </h1>
+          <InviteOrganizationButton organization={organization} />
+        </div>
 
-      <div className="flex flex-col">
-        {members.map((member) => {
-          const isMe = member.user_id === me.user_id;
-          const name = member.user?.name ?? "알 수 없음";
-          return (
-            <Member
-              key={member.id}
-              userId={member.user_id}
-              name={name}
-              role={member.role}
-              isMe={isMe}
-              action={
-                isAdmin && !isMe && <MemberMenu member={member} name={name} />
-              }
-            />
-          );
-        })}
-      </div>
+        <div className="flex flex-col">
+          {members.map((member) => {
+            const isMe = member.user_id === me.user_id;
+            const name = member.user?.name ?? "알 수 없음";
+            return (
+              <Member
+                key={member.id}
+                userId={member.user_id}
+                name={name}
+                role={member.role}
+                isMe={isMe}
+                action={
+                  isAdmin && !isMe && <MemberMenu member={member} name={name} />
+                }
+              />
+            );
+          })}
+        </div>
+      </section>
+
+      <PendingInvitationList
+        organizationId={organization.id}
+        myUserId={me.user_id}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }
