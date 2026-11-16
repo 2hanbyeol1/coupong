@@ -111,6 +111,44 @@ export async function removeOrganizationMember(
   }
 }
 
+export interface LeaveOrganizationResult {
+  /** 마지막 그룹원이라 그룹이 삭제됐는지 */
+  deleted: boolean;
+  /** 마지막 관리자가 나가 새로 관리자가 된 사람 이름 */
+  newAdminName: string | null;
+}
+
+/**
+ * 그룹에서 나감
+ * - 마지막 관리자면 newAdminMemberId 그룹원이 관리자가 됨 (없으면 가장 먼저 들어온 그룹원)
+ * - 마지막 그룹원이면 그룹이 삭제됨
+ */
+export async function leaveOrganization(
+  orgId: OrganizationType["id"],
+  newAdminMemberId?: OrganizationMemberType["id"],
+): Promise<LeaveOrganizationResult> {
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase.rpc("leave_organization", {
+    p_organization_id: orgId,
+    p_new_admin_member_id: newAdminMemberId,
+  });
+
+  if (error) {
+    console.error(`그룹 나가기 중 에러 발생: ${error.message}`);
+    throw new Error(
+      error.code === RAISED_ERROR_CODE
+        ? error.message
+        : "그룹에서 나가지 못했어요",
+    );
+  }
+
+  const result = data as { deleted?: boolean; new_admin_name?: string | null };
+  return {
+    deleted: !!result?.deleted,
+    newAdminName: result?.new_admin_name ?? null,
+  };
+}
+
 // 사용자의 id와 그룹의 id를 이용하여 특정 사용자가 해당 그룹에 이미 소속되어 있는지 여부를 조회
 export async function checkIsDuplicateMember(
   userId: UserType["user_id"],

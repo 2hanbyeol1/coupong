@@ -259,6 +259,10 @@ export type Database = {
         Args: { p_organization_id: string };
         Returns: boolean;
       };
+      leave_organization: {
+        Args: { p_new_admin_member_id?: string; p_organization_id: string };
+        Returns: Json;
+      };
       notify_expiring_coupons: { Args: never; Returns: undefined };
       remove_organization_member: {
         Args: { p_member_id: string };

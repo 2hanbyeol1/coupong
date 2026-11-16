@@ -175,9 +175,9 @@ export class CouponImageUploadError extends Error {
   }
 }
 
-/** 등록이 실패했을 때 먼저 올라간 사진을 지움 (실패해도 등록 실패 안내는 그대로) */
+/** 사진을 지움 (실패해도 던지지 않고 false만 반환) */
 const removeCouponImages = async (paths: string[]) => {
-  if (paths.length === 0) return;
+  if (paths.length === 0) return true;
   const supabase = createBrowserClient();
   const { error } = await supabase.storage
     .from(COUPON_IMAGE_BUCKET)
@@ -186,6 +186,36 @@ const removeCouponImages = async (paths: string[]) => {
     console.error(
       `올라간 쿠폰 이미지를 정리하는 중 에러 발생: ${error.message}`,
     );
+    return false;
+  }
+  return true;
+};
+
+/**
+ * 그룹의 쿠폰 사진을 모두 지움 (마지막 그룹원이 나가 그룹이 삭제되기 전에 호출)
+ * 그룹이 삭제되면 사진에 접근할 권한도 사라지므로 미리 지움. 실패해도 나가기는 계속함
+ */
+export const removeOrganizationCouponImages = async (
+  orgId: OrganizationType["id"],
+) => {
+  const supabase = createBrowserClient();
+  const bucket = supabase.storage.from(COUPON_IMAGE_BUCKET);
+  const PAGE_SIZE = 1000;
+
+  // 지우면 목록이 줄어드므로 매번 처음부터 다시 조회
+  while (true) {
+    const { data, error } = await bucket.list(orgId, { limit: PAGE_SIZE });
+    if (error) {
+      console.error(`그룹 쿠폰 사진 조회 중 에러 발생: ${error.message}`);
+      return;
+    }
+    if (data.length === 0) return;
+
+    const removed = await removeCouponImages(
+      data.map((file) => `${orgId}/${file.name}`),
+    );
+    // 지우지 못하면 같은 목록이 계속 조회되므로 멈춤
+    if (!removed || data.length < PAGE_SIZE) return;
   }
 };
 

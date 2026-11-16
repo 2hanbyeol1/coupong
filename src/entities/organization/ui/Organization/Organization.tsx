@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Check, Users } from "lucide-react";
 import Link from "next/link";
 
@@ -10,9 +11,11 @@ import { useOrganizationStore } from "../../model/store";
 interface OrganizationProps {
   organization: OrganizationType;
   onSelect?: () => void;
+  /** 선택한 그룹에만 그룹원 관리 버튼 앞에 보여줄 버튼 (예: 그룹 나가기) */
+  actions?: ReactNode;
 }
 
-function Organization({ organization, onSelect }: OrganizationProps) {
+function Organization({ organization, onSelect, actions }: OrganizationProps) {
   const {
     selectedOrganizationId: selectedOrgId,
     setSelectedOrganizationId: setSelectedOrgId,
@@ -48,8 +51,7 @@ function Organization({ organization, onSelect }: OrganizationProps) {
       </button>
       {isSelectedOrganization && (
         <div className="flex items-center gap-3">
-          {/* // ! */}
-          {/* <LogOut className="stroke-dark" size={20} /> */}
+          {actions}
           <Link
             href={ROUTES.PROFILE_ORGANIZATION_MEMBER(organization.id)}
             aria-label="그룹원 관리"

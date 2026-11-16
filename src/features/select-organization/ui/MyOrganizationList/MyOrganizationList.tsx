@@ -11,6 +11,7 @@ import { InfoMessage } from "@/shared/ui/InfoMessage";
 import Iterator from "@/shared/ui/Iterator/Iterator";
 
 import AddOrganizationButton from "../../../add-organization/ui/AddOrganizationButton/AddOrganizationButton";
+import { LeaveOrganizationButton } from "../../../leave-organization/ui/LeaveOrganizationButton";
 
 interface MyOrganizationListProps {
   className?: string;
@@ -69,7 +70,12 @@ function MyOrganizationList({ className, onSelect }: MyOrganizationListProps) {
       isFetchingNextPage={isFetchingNextPage}
     >
       {organizations.map((org) => (
-        <Organization key={org.id} organization={org} onSelect={onSelect} />
+        <Organization
+          key={org.id}
+          organization={org}
+          onSelect={onSelect}
+          actions={<LeaveOrganizationButton organization={org} />}
+        />
       ))}
 
       <div className="mt-4 flex justify-center">
