@@ -9,6 +9,7 @@ import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import { CouponContextMenu } from "@/features/manage-coupon/ui/CouponMenu";
+import { SelectOrganizationPrompt } from "@/features/select-organization/ui/SelectOrganizationPrompt";
 import { InfiniteScroll } from "@/shared/ui/InfiniteScroll";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 import Iterator from "@/shared/ui/Iterator/Iterator";
@@ -31,13 +32,7 @@ function CouponListWidget({ keyword, stickyTabs }: CouponListWidgetProps) {
 
   if (!isHydrated) return <CouponListWidgetSkeleton />;
 
-  if (!selectedOrganizationId)
-    return (
-      <InfoMessage
-        title="그룹을 선택해 주세요"
-        description="쿠폰을 확인하려면 그룹을 선택해 주세요"
-      />
-    );
+  if (!selectedOrganizationId) return <SelectOrganizationPrompt />;
 
   const filter = { organizationId: selectedOrganizationId, keyword };
 
