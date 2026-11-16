@@ -12,9 +12,15 @@ import {
   getMyOrganizationRole,
   getOrganizationById,
   getOrganizationMembers,
+  removeOrganizationMember,
+  setOrganizationMemberRole,
 } from "./api";
 import { ORG_QUERY_KEY } from "./query-key";
-import { OrganizationType } from "./type";
+import {
+  OrganizationMemberType,
+  OrganizationRole,
+  OrganizationType,
+} from "./type";
 
 export const getOrganizationByIdOption = (orgId: OrganizationType["id"]) =>
   queryOptions({
@@ -56,3 +62,53 @@ export const addOrganizationOption = (
     onError,
   });
 };
+
+interface MutationCallbacks<TVariables> {
+  onSuccess?: (variables: TVariables) => void;
+  onError?: (error: Error) => void;
+}
+
+export const setOrganizationMemberRoleOption = (
+  queryClient: QueryClient,
+  orgId: OrganizationType["id"],
+  {
+    onSuccess,
+    onError,
+  }: MutationCallbacks<{
+    memberId: OrganizationMemberType["id"];
+    role: OrganizationRole;
+  }> = {},
+) =>
+  mutationOptions({
+    mutationFn: async ({
+      memberId,
+      role,
+    }: {
+      memberId: OrganizationMemberType["id"];
+      role: OrganizationRole;
+    }) => await setOrganizationMemberRole(memberId, role),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ORG_QUERY_KEY.ORGANIZATION_MEMBERS(orgId),
+      });
+      onSuccess?.(variables);
+    },
+    onError,
+  });
+
+export const removeOrganizationMemberOption = (
+  queryClient: QueryClient,
+  orgId: OrganizationType["id"],
+  { onSuccess, onError }: MutationCallbacks<OrganizationMemberType["id"]> = {},
+) =>
+  mutationOptions({
+    mutationFn: async (memberId: OrganizationMemberType["id"]) =>
+      await removeOrganizationMember(memberId),
+    onSuccess: (_, memberId) => {
+      queryClient.invalidateQueries({
+        queryKey: ORG_QUERY_KEY.ORGANIZATION_MEMBERS(orgId),
+      });
+      onSuccess?.(memberId);
+    },
+    onError,
+  });

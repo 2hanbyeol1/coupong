@@ -260,6 +260,10 @@ export type Database = {
         Returns: boolean;
       };
       notify_expiring_coupons: { Args: never; Returns: undefined };
+      remove_organization_member: {
+        Args: { p_member_id: string };
+        Returns: undefined;
+      };
       search_coupon_suggestions: {
         Args: {
           p_field: string;
@@ -275,6 +279,13 @@ export type Database = {
           use_count: number;
           value: string;
         }[];
+      };
+      set_organization_member_role: {
+        Args: {
+          p_member_id: string;
+          p_role: Database["public"]["Enums"]["organization_role"];
+        };
+        Returns: undefined;
       };
     };
     Enums: {

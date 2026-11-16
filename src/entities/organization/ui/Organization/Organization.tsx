@@ -1,6 +1,8 @@
-import { Check } from "lucide-react";
+import { Check, Users } from "lucide-react";
+import Link from "next/link";
 
 import { InviteOrganizationButton } from "@/features/invite-organization/ui/InviteOrganizationButton";
+import { ROUTES } from "@/shared/config/routes";
 import { cn } from "@/shared/lib/util/cn";
 
 import { OrganizationType } from "../../api/type";
@@ -48,8 +50,13 @@ function Organization({ organization, onSelect }: OrganizationProps) {
       {isSelectedOrganization && (
         <div className="flex items-center gap-3">
           {/* // ! */}
-          {/* <Users className="fill-dark stroke-dark" size={20} /> */}
           {/* <LogOut className="stroke-dark" size={20} /> */}
+          <Link
+            href={ROUTES.PROFILE_ORGANIZATION_MEMBER(organization.id)}
+            aria-label="그룹원 관리"
+          >
+            <Users className="fill-dark stroke-dark" size={20} />
+          </Link>
           <InviteOrganizationButton organization={organization} />
         </div>
       )}

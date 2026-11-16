@@ -1,10 +1,10 @@
 import { getAuthUser } from "@/entities/auth/api/api";
+import { RAISED_ERROR_CODE } from "@/shared/lib/constants/error-code";
 import createBrowserClient from "@/shared/lib/supabase/client";
 
 import { InsertInvitationType, InvitationType } from "./type";
 
 const INVITATION_TABLE = "invitations";
-const INVITATION_ERROR_CODE = "P0001";
 
 export async function getMyInvitations() {
   const user = await getAuthUser();
@@ -87,9 +87,9 @@ export const acceptInvitation = async (token: InvitationType["token"]) => {
 
   if (error) {
     console.error(`초대를 수락하는 중 에러 발생: ${error.message}`);
-    // P0001: 만료·이미 수락 등 사용자에게 보여줄 사유
+    // 만료·이미 수락 등 사용자에게 보여줄 사유
     throw new Error(
-      error.code === INVITATION_ERROR_CODE
+      error.code === RAISED_ERROR_CODE
         ? error.message
         : "초대 수락에 실패했어요",
     );

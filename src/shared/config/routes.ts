@@ -13,5 +13,7 @@ export const ROUTES = {
   SEARCH: "/search", // 검색
   PROFILE: "/profile", // 프로필
   PROFILE_ORGANIZATION: "/profile/organization", // 내 그룹 관리
+  PROFILE_ORGANIZATION_MEMBER: (organizationId: string) =>
+    `/profile/organization/${organizationId}`, // 그룹원 관리
   PROFILE_NOTIFICATION: "/profile/notification", // 알림 관리
 } as const;

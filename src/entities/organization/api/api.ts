@@ -1,12 +1,19 @@
 import { getAuthUser } from "@/entities/auth/api/api";
 import { UserType } from "@/entities/user/api/type";
 import { AddOrganizationFormValues } from "@/features/add-organization/lib/schema";
-import { NOT_FOUND_ERROR_CODE } from "@/shared/lib/constants/error-code";
+import {
+  NOT_FOUND_ERROR_CODE,
+  RAISED_ERROR_CODE,
+} from "@/shared/lib/constants/error-code";
 import createBrowserClient from "@/shared/lib/supabase/client";
 
 import { getOrganizationErrorMessage } from "../lib/error";
 
-import { OrganizationType } from "./type";
+import {
+  OrganizationMemberType,
+  OrganizationRole,
+  OrganizationType,
+} from "./type";
 
 const ORGANIZATION_TABLE = "organizations";
 const MEMBER_TABLE = "user_organization";
@@ -47,19 +54,61 @@ export async function getOrganizationById(orgId: OrganizationType["id"]) {
   return data;
 }
 
-// organization의 id를 이용하여 그룹에 소속된 멤버 정보를 조회
+// organization의 id를 이용하여 그룹에 소속된 멤버 정보를 조회 (관리자 → 먼저 들어온 순)
 export async function getOrganizationMembers(orgId: OrganizationType["id"]) {
   const supabase = createBrowserClient();
   const { data, error } = await supabase
     .from(MEMBER_TABLE)
-    .select("*")
-    .eq("organization_id", orgId);
+    .select("*, user:users(name)")
+    .eq("organization_id", orgId)
+    .order("role")
+    .order("created_at");
 
   if (error) {
     console.error(`조직 멤버 정보 조회 중 에러 발생: ${error.message}`);
     throw Error("조직 멤버 정보 조회에 실패했어요");
   }
   return data;
+}
+
+// 그룹원의 권한을 변경 (관리자만, 본인 제외)
+export async function setOrganizationMemberRole(
+  memberId: OrganizationMemberType["id"],
+  role: OrganizationRole,
+) {
+  const supabase = createBrowserClient();
+  const { error } = await supabase.rpc("set_organization_member_role", {
+    p_member_id: memberId,
+    p_role: role,
+  });
+
+  if (error) {
+    console.error(`그룹원 권한 변경 중 에러 발생: ${error.message}`);
+    throw new Error(
+      error.code === RAISED_ERROR_CODE
+        ? error.message
+        : "그룹원 권한을 바꾸지 못했어요",
+    );
+  }
+}
+
+// 그룹원을 그룹에서 내보냄 (관리자만, 본인 제외)
+export async function removeOrganizationMember(
+  memberId: OrganizationMemberType["id"],
+) {
+  const supabase = createBrowserClient();
+  const { error } = await supabase.rpc("remove_organization_member", {
+    p_member_id: memberId,
+  });
+
+  if (error) {
+    console.error(`그룹원 내보내기 중 에러 발생: ${error.message}`);
+    throw new Error(
+      error.code === RAISED_ERROR_CODE
+        ? error.message
+        : "그룹원을 내보내지 못했어요",
+    );
+  }
 }
 
 // 사용자의 id와 그룹의 id를 이용하여 특정 사용자가 해당 그룹에 이미 소속되어 있는지 여부를 조회
