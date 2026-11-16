@@ -101,3 +101,23 @@ export async function checkIsUserBelongsToOrganization(
   }
   return !!data?.[0];
 }
+
+// 로그인 된 사용자의 그룹 내 권한을 조회 (소속되지 않았으면 null)
+export async function getMyOrganizationRole(
+  organizationId: OrganizationType["id"],
+) {
+  const user = await getAuthUser();
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase
+    .from(MEMBER_TABLE)
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("organization_id", organizationId)
+    .maybeSingle();
+
+  if (error) {
+    console.error(`그룹 권한 조회 중 에러 발생: ${error.message}`);
+    throw Error("그룹 권한 조회에 실패했어요");
+  }
+  return data?.role ?? null;
+}

@@ -9,6 +9,7 @@ import { AddOrganizationFormValues } from "@/features/add-organization/lib/schem
 
 import {
   addOrganization,
+  getMyOrganizationRole,
   getOrganizationById,
   getOrganizationMembers,
 } from "./api";
@@ -25,6 +26,12 @@ export const getOrganizationMembersOption = (orgId: OrganizationType["id"]) =>
   queryOptions({
     queryKey: ORG_QUERY_KEY.ORGANIZATION_MEMBERS(orgId),
     queryFn: async () => await getOrganizationMembers(orgId),
+  });
+
+export const getMyOrganizationRoleOption = (orgId: OrganizationType["id"]) =>
+  queryOptions({
+    queryKey: ORG_QUERY_KEY.MY_ROLE(orgId),
+    queryFn: async () => await getMyOrganizationRole(orgId),
   });
 
 export const addOrganizationOption = (

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { deleteCouponOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
+import { getMyOrganizationRoleOption } from "@/entities/organization/api/query";
 import { getMyInfoOption } from "@/entities/user/api/query";
 import { EditCouponForm } from "@/features/manage-coupon/ui/EditCouponForm";
 import useModal from "@/shared/lib/hook/useModal";
@@ -20,6 +21,10 @@ export interface CouponMenuProps {
 function CouponMenu({ coupon, className, onDeleted }: CouponMenuProps) {
   const queryClient = useQueryClient();
   const { data: me } = useQuery(getMyInfoOption());
+  const { data: myRole } = useQuery({
+    ...getMyOrganizationRoleOption(coupon.organization_id ?? ""),
+    enabled: !!coupon.organization_id,
+  });
   const { showModal, hideModal, updateModal } = useModal();
 
   const { mutate: deleteCoupon, isPending: isDeletingCoupon } = useMutation({
@@ -38,7 +43,9 @@ function CouponMenu({ coupon, className, onDeleted }: CouponMenuProps) {
     updateModal({ confirmButtonDisabled: isDeletingCoupon });
   }, [isDeletingCoupon, updateModal]);
 
-  if (me?.user_id !== coupon.uploaded_by) return null;
+  // 올린 사람이거나 그룹 관리자면 수정·삭제 가능
+  const canManage = me?.user_id === coupon.uploaded_by || myRole === "admin";
+  if (!canManage) return null;
 
   const openEditModal = () => {
     showModal({

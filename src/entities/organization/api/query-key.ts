@@ -11,4 +11,9 @@ export const ORG_QUERY_KEY = {
     "members",
     organizationId,
   ],
+  MY_ROLE: (organizationId: OrganizationType["id"]) => [
+    "organization",
+    "my-role",
+    organizationId,
+  ],
 } as const;

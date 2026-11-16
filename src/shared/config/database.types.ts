@@ -191,18 +191,21 @@ export type Database = {
           created_at: string;
           id: string;
           organization_id: string;
+          role: Database["public"]["Enums"]["organization_role"];
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
           organization_id?: string;
+          role?: Database["public"]["Enums"]["organization_role"];
           user_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
           organization_id?: string;
+          role?: Database["public"]["Enums"]["organization_role"];
           user_id?: string;
         };
         Relationships: [
@@ -251,6 +254,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      is_organization_admin: {
+        Args: { p_organization_id: string };
+        Returns: boolean;
+      };
       notify_expiring_coupons: { Args: never; Returns: undefined };
       search_coupon_suggestions: {
         Args: {
@@ -270,7 +277,7 @@ export type Database = {
       };
     };
     Enums: {
-      [_ in never]: never;
+      organization_role: "admin" | "member";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -400,6 +407,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      organization_role: ["admin", "member"],
+    },
   },
 } as const;

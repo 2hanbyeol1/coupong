@@ -277,14 +277,19 @@ export const deleteCoupon = async (couponId: CouponType["id"]) => {
     throw new Error("쿠폰 정보를 가져오는 중 오류가 발생했어요");
   }
 
-  const { error: deleteError } = await supabase
+  const { data: deleted, error: deleteError } = await supabase
     .from(COUPON_TABLE)
     .delete()
-    .eq("id", couponId);
+    .eq("id", couponId)
+    .select("id");
 
   if (deleteError) {
     console.error(`쿠폰 삭제 중 에러 발생: ${deleteError.message}`);
     throw new Error("쿠폰 삭제 중 오류가 발생했어요");
+  }
+  // 권한이 없으면 RLS가 에러 없이 0건을 삭제하므로, 사진을 지우기 전에 확인
+  if (deleted.length === 0) {
+    throw new Error("쿠폰을 삭제할 권한이 없어요");
   }
 
   if (coupon.image_path) {
