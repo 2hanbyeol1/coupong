@@ -8,6 +8,7 @@ import { getMyOrganizationRoleOption } from "@/entities/organization/api/query";
 import { getMyInfoOption } from "@/entities/user/api/query";
 import { EditCouponForm } from "@/features/manage-coupon/ui/EditCouponForm";
 import useModal from "@/shared/lib/hook/useModal";
+import useToast from "@/shared/lib/hook/useToast";
 import { MoreMenuItem } from "@/shared/ui/MoreMenu";
 
 const EDIT_COUPON_FORM_ID = "edit-coupon";
@@ -27,6 +28,7 @@ function useCouponMenuItems(
     enabled: !!coupon.organization_id,
   });
   const { showModal, hideModal, updateModal } = useModal();
+  const { addToast } = useToast();
 
   const { mutate: deleteCoupon, isPending: isDeletingCoupon } = useMutation({
     ...deleteCouponOption(queryClient, {
@@ -34,8 +36,10 @@ function useCouponMenuItems(
         hideModal();
         onDeleted?.();
       },
-      onError: () => {
+      // 권한이 없거나 네트워크 오류 등으로 실패하면 이유를 알려줌
+      onError: (error) => {
         hideModal();
+        addToast({ message: error.message });
       },
     }),
   });
