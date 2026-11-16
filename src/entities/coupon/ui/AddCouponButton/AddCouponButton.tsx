@@ -12,6 +12,9 @@ import Link from "next/link";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import { ROUTES } from "@/shared/config/routes";
 
+/** 이만큼(px) 이상 내려야 버튼을 숨김 */
+const HIDE_SCROLL_THRESHOLD = 8;
+
 function AddCouponButton() {
   const { selectedOrganizationId } = useOrganizationStore();
   const { scrollY } = useScroll();
@@ -19,9 +22,17 @@ function AddCouponButton() {
 
   const [isHidden, setHidden] = useState(false);
 
+  // 관성 스크롤의 작은 흔들림에 버튼이 나타났다 사라졌다 하지 않도록,
+  // 일정 거리 이상 내릴 때만 숨기고 조금이라도 올리면 다시 보여줌
   useMotionValueEvent(scrollY, "change", (scrollY) => {
-    setHidden(scrollY > prevScrollY.current && scrollY > 0); // 스크롤 내리면 버튼 숨기기
-    prevScrollY.current = scrollY;
+    const delta = scrollY - prevScrollY.current;
+    if (scrollY <= 0 || delta < 0) {
+      setHidden(false);
+      prevScrollY.current = scrollY;
+    } else if (delta > HIDE_SCROLL_THRESHOLD) {
+      setHidden(true);
+      prevScrollY.current = scrollY;
+    }
   });
 
   if (!selectedOrganizationId) return null;
