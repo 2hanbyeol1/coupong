@@ -45,7 +45,12 @@ function Header({
     <header className="sticky top-0 z-50 flex h-12 min-h-12 w-full items-center justify-between bg-white px-4 py-1">
       <div className={cn("flex items-center gap-2", withBackButton && "-ml-2")}>
         {withBackButton && (
-          <button className="cursor-pointer" onClick={handleBack}>
+          <button
+            type="button"
+            aria-label="뒤로 가기"
+            className="cursor-pointer"
+            onClick={handleBack}
+          >
             <ChevronLeft className="stroke-dark" size={28} />
           </button>
         )}
@@ -57,11 +62,16 @@ function Header({
       </div>
       <div className="flex items-center gap-4">
         {withSearchButton && (
-          <button onClick={handleSearch} className="cursor-pointer">
+          <button
+            type="button"
+            aria-label="검색"
+            onClick={handleSearch}
+            className="cursor-pointer"
+          >
             <Search className="stroke-dark/90 stroke-[2.5]" size={24} />
           </button>
         )}
-        <Link href={ROUTES.PROFILE}>
+        <Link href={ROUTES.PROFILE} aria-label="내 프로필">
           <Avatar size={28} />
         </Link>
       </div>

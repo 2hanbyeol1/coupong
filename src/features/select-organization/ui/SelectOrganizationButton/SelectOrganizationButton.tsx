@@ -17,6 +17,8 @@ function SelectOrganizationButton() {
   return (
     <>
       <button
+        type="button"
+        aria-expanded={isOpen}
         className="flex cursor-pointer items-center gap-1"
         onClick={handleButtonClick}
       >

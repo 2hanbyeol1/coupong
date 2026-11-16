@@ -33,6 +33,8 @@ function NotificationSetting({
         )}
       </div>
       <ToggleButton
+        role="switch"
+        aria-label={title}
         disabled={!isNotificationEnabled}
         onChange={(isChecked) => {
           onChange(isChecked);
