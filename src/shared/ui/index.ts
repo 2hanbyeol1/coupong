@@ -9,3 +9,4 @@ export { Logo } from "./Logo";
 export { MoreMenu } from "./MoreMenu";
 export { TextInput } from "./TextInput";
 export { Toast } from "./Toast";
+export { ToggleChip } from "./ToggleChip";
