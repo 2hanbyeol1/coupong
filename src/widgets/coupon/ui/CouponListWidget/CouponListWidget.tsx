@@ -8,6 +8,7 @@ import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
 import { OrganizationType } from "@/entities/organization/api/type";
 import { useOrganizationStore } from "@/entities/organization/model/store";
+import { CouponContextMenu } from "@/features/manage-coupon/ui/CouponMenu";
 import { InfiniteScroll } from "@/shared/ui/InfiniteScroll";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 import Iterator from "@/shared/ui/Iterator/Iterator";
@@ -99,7 +100,10 @@ function SuspensedCouponList({
       isFetchingNextPage={isFetchingNextPage}
     >
       {filteredCoupons.map((coupon) => (
-        <Coupon key={coupon.id} coupon={coupon} keyword={keyword} />
+        // 우클릭하거나 길게 누르면 수정·삭제 메뉴
+        <CouponContextMenu key={coupon.id} coupon={coupon}>
+          <Coupon coupon={coupon} keyword={keyword} />
+        </CouponContextMenu>
       ))}
     </InfiniteScroll>
   );
