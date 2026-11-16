@@ -23,6 +23,7 @@ import { COUPON_USE_UNDO_DURATION } from "@/entities/coupon/constants";
 import { getCouponListStatus } from "@/entities/coupon/lib/status";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
+import useWakeLock from "@/shared/lib/hook/useWakeLock";
 
 import CouponDetailPanel from "./CouponDetailPanel";
 import { CouponDetailPanelSkeleton } from "./CouponDetailWidgetSkeleton";
@@ -67,6 +68,8 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const swiperRef = useRef<CouponSwiperHandle>(null);
+  // 매장에서 바코드를 보여주는 동안 화면이 어두워지지 않게
+  useWakeLock();
 
   const [currentId, setCurrentId] = useState(initialCoupon.id);
   const [isExpanded, setIsExpanded] = useState(false);
