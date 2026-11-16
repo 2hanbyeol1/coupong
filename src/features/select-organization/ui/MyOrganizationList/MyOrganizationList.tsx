@@ -23,6 +23,7 @@ function MyOrganizationList({ className, onSelect }: MyOrganizationListProps) {
     isPending,
     isError,
     fetchNextPage,
+    hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(getInfiniteOrganizationsOption());
 
@@ -64,6 +65,7 @@ function MyOrganizationList({ className, onSelect }: MyOrganizationListProps) {
         />
       }
       fetchNextPage={fetchNextPage}
+      hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
     >
       {organizations.map((org) => (

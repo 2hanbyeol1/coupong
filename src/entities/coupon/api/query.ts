@@ -24,11 +24,20 @@ import {
 import { COUPON_QUERY_KEY } from "./query-key";
 import { CouponType } from "./type";
 
-export const getInfiniteCouponsOption = (orgId: OrganizationType["id"]) =>
+/** keyword가 있으면 사용처·이름에 키워드가 포함된 쿠폰만 (서버에서 검색) */
+export const getInfiniteCouponsOption = (
+  orgId: OrganizationType["id"],
+  keyword?: string,
+) =>
   infiniteQueryOptions({
-    queryKey: COUPON_QUERY_KEY.LIST(orgId),
+    queryKey: COUPON_QUERY_KEY.LIST(orgId, keyword),
     queryFn: async ({ pageParam }) =>
-      await getCoupons({ organizationId: orgId, page: pageParam, limit: 10 }),
+      await getCoupons({
+        organizationId: orgId,
+        page: pageParam,
+        limit: 10,
+        keyword,
+      }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, pageParam) =>
       lastPage.hasNext ? pageParam + 1 : undefined,

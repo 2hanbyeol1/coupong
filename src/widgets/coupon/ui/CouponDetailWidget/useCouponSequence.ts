@@ -3,7 +3,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
-import { filterCouponsByKeyword } from "@/entities/coupon/lib/filter";
 
 // 현재 쿠폰 뒤에 남은 쿠폰이 이 개수 이하가 되면 다음 페이지를 미리 불러온다.
 const PREFETCH_THRESHOLD = 2;
@@ -32,16 +31,13 @@ function useCouponSequence({
     isFetchNextPageError,
     fetchNextPage,
   } = useInfiniteQuery({
-    ...getInfiniteCouponsOption(organizationId ?? ""),
+    ...getInfiniteCouponsOption(organizationId ?? "", keyword),
     enabled: !!organizationId,
   });
 
   const sequence = useMemo(
-    () =>
-      filterCouponsByKeyword(coupons ?? [], keyword).filter(
-        (coupon) => !excludedIds.includes(coupon.id),
-      ),
-    [coupons, keyword, excludedIds],
+    () => (coupons ?? []).filter((coupon) => !excludedIds.includes(coupon.id)),
+    [coupons, excludedIds],
   );
 
   const index = sequence.findIndex((coupon) => coupon.id === currentId);

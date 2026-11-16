@@ -1,9 +1,8 @@
 "use client";
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
 import { getInfiniteCouponsOption } from "@/entities/coupon/api/query";
-import { filterCouponsByKeyword } from "@/entities/coupon/lib/filter";
 import { Coupon } from "@/entities/coupon/ui/Coupon";
 import CouponSkeleton from "@/entities/coupon/ui/Coupon/CouponSkeleton";
 import { OrganizationType } from "@/entities/organization/api/type";
@@ -16,6 +15,7 @@ import Iterator from "@/shared/ui/Iterator/Iterator";
 import CouponListWidgetSkeleton from "./CouponListWidgetSkeleton";
 
 interface CouponListWidgetProps {
+  /** 사용처·이름에 이 키워드가 포함된 쿠폰만 (서버에서 검색) */
   keyword?: string;
 }
 interface SuspensedCouponListProps extends CouponListWidgetProps {
@@ -53,15 +53,11 @@ function SuspensedCouponList({
     data: coupons,
     isError,
     fetchNextPage,
+    hasNextPage,
     isFetchingNextPage,
   } = useSuspenseInfiniteQuery({
-    ...getInfiniteCouponsOption(selectedOrganizationId),
+    ...getInfiniteCouponsOption(selectedOrganizationId, keyword),
   });
-
-  const filteredCoupons = useMemo(
-    () => filterCouponsByKeyword(coupons ?? [], keyword),
-    [coupons, keyword],
-  );
 
   if (isError)
     return (
@@ -71,7 +67,7 @@ function SuspensedCouponList({
       />
     );
 
-  if (!!keyword && filteredCoupons.length === 0)
+  if (!!keyword && coupons.length === 0)
     return (
       <InfoMessage
         title="검색된 쿠폰이 없어요"
@@ -79,7 +75,7 @@ function SuspensedCouponList({
       />
     );
 
-  if (filteredCoupons.length === 0)
+  if (coupons.length === 0)
     return (
       <InfoMessage
         title="등록된 쿠폰이 없어요"
@@ -97,9 +93,10 @@ function SuspensedCouponList({
         />
       }
       fetchNextPage={fetchNextPage}
+      hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
     >
-      {filteredCoupons.map((coupon) => (
+      {coupons.map((coupon) => (
         // 우클릭하거나 길게 누르면 수정·삭제 메뉴
         <CouponContextMenu key={coupon.id} coupon={coupon}>
           <Coupon coupon={coupon} keyword={keyword} />

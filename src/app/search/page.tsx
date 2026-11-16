@@ -1,15 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 
+import useDebouncedValue from "@/shared/lib/hook/useDebouncedValue";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 import { SearchInput } from "@/shared/ui/SearchInput";
 import { Tag } from "@/shared/ui/Tag";
 import { CouponListWidget } from "@/widgets/coupon/ui/CouponListWidget";
 import { Header } from "@/widgets/header";
 
+const SEARCH_DEBOUNCE = 300; // ms
+
 function SearchPage() {
   const tags = ["스타벅스", "GS25", "푸라닭"];
   const [keyword, setKeyword] = useState("");
+  // 입력할 때마다 서버에 요청하지 않고, 새 결과를 받는 동안 이전 결과를 보여줌
+  const debouncedKeyword = useDebouncedValue(keyword.trim(), SEARCH_DEBOUNCE);
+  const searchKeyword = useDeferredValue(debouncedKeyword);
 
   return (
     <div className="relative">
@@ -42,13 +48,13 @@ function SearchPage() {
         </div>
       </div>
 
-      {keyword.length === 0 ? (
+      {searchKeyword.length === 0 ? (
         <InfoMessage
           title="입력된 키워드가 없어요"
           description="키워드를 입력해서 원하는 쿠폰을 찾아보세요"
         />
       ) : (
-        <CouponListWidget keyword={keyword.toUpperCase()} />
+        <CouponListWidget keyword={searchKeyword} />
       )}
     </div>
   );

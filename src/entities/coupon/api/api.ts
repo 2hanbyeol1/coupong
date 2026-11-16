@@ -11,21 +11,41 @@ const COUPON_IMAGE_BUCKET = "coupon-image";
 // 서명 URL이 바뀌면 같은 이미지도 다시 받아야 해서 길게 유지
 export const SIGNED_URL_EXPIRES_IN = 60 * 60; // 1 hour (seconds)
 
+/** 정규식 특수문자를 글자 그대로 찾도록 이스케이프 */
+const escapeRegExp = (value: string) =>
+  value.replace(/[\\^$.|?*+()[\]{}]/g, "\\$&");
+
+/** PostgREST 필터 값을 큰따옴표로 감쌈 (쉼표·괄호·점이 있어도 필터 문법이 깨지지 않게) */
+const quoteFilterValue = (value: string) =>
+  `"${value.replace(/["\\]/g, "\\$&")}"`;
+
 export const getCoupons = async ({
   organizationId,
   page,
   limit,
+  keyword,
 }: {
   organizationId: OrganizationType["id"];
   page: number;
   limit: number;
+  /** 사용처(place)나 이름(name)에 포함된 쿠폰만 (대소문자 무시) */
+  keyword?: string;
 }) => {
   const supabase = createBrowserClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from(COUPON_TABLE)
-    .select("*")
-    .eq("organization_id", organizationId)
+    .select("*", { count: "exact" })
+    .eq("organization_id", organizationId);
+
+  if (keyword) {
+    // ilike는 PostgREST가 값의 *를 %로 바꿔 버려 *를 글자 그대로 찾을 수 없으므로,
+    // 키워드를 그대로 찾는 정규식(imatch: 대소문자 무시)으로 검색
+    const pattern = quoteFilterValue(escapeRegExp(keyword));
+    query = query.or(`place.imatch.${pattern},name.imatch.${pattern}`);
+  }
+
+  const { data, count, error } = await query
     .order("used_by", { nullsFirst: true })
     .order("expire_at", { ascending: false })
     .order("created_at", { ascending: false })
@@ -34,16 +54,6 @@ export const getCoupons = async ({
   if (error) {
     console.error("쿠폰 목록 조회 에러:", error);
     throw new Error("쿠폰 목록을 가져오는 중 오류가 발생했어요");
-  }
-
-  const { count, error: countError } = await supabase
-    .from(COUPON_TABLE)
-    .select("*", { count: "exact", head: true })
-    .eq("organization_id", organizationId);
-
-  if (countError) {
-    console.error("쿠폰 목록 카운트 조회 에러:", countError);
-    throw new Error("쿠폰 목록의 개수를 가져오는 중 오류가 발생했어요");
   }
   return { data, hasNext: (count ?? 0) > page * limit };
 };
