@@ -10,6 +10,7 @@ import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
 
 import {
   addCoupons,
+  cancelCouponUse,
   changeCouponUse,
   CouponListFilter,
   CouponUploadStatus,
@@ -161,6 +162,32 @@ export const changeCouponToUsedOption = (queryClient: QueryClient) => {
         predicate: isNotCouponImageQuery,
       });
     },
+  });
+};
+
+/**
+ * 사용 완료 되돌리기
+ * 토스트 버튼으로 실행해 그사이 화면을 벗어날 수 있으므로,
+ * 결과 안내는 mutate 콜백 대신 여기(onSuccess/onError)로 받아 화면이 사라져도 실행되게 함
+ */
+export const cancelCouponUseOption = (
+  queryClient: QueryClient,
+  {
+    onSuccess,
+    onError,
+  }: { onSuccess?: () => void; onError?: (error: Error) => void } = {},
+) => {
+  return mutationOptions({
+    mutationFn: async (couponId: CouponType["id"]) =>
+      await cancelCouponUse(couponId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COUPON_QUERY_KEY.ALL,
+        predicate: isNotCouponImageQuery,
+      });
+      onSuccess?.();
+    },
+    onError,
   });
 };
 

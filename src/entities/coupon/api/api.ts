@@ -289,6 +289,28 @@ export const changeCouponUse = async (couponId: CouponType["id"]) => {
   }
 };
 
+/** 내가 사용 처리한 쿠폰을 다시 사용 전으로 되돌림 */
+export const cancelCouponUse = async (couponId: CouponType["id"]) => {
+  const user = await getAuthUser();
+  const supabase = createBrowserClient();
+
+  // 그사이 다른 사람이 바꾼 쿠폰은 건드리지 않도록 내가 사용한 경우에만 되돌림
+  const { data, error } = await supabase
+    .from(COUPON_TABLE)
+    .update({ used_by: null })
+    .eq("id", couponId)
+    .eq("used_by", user.id)
+    .select("id");
+
+  if (error) {
+    console.error(`쿠폰 사용 취소 중 에러 발생: ${error.message}`);
+    throw new Error("쿠폰 사용을 되돌리는 중 오류가 발생했어요");
+  }
+  if (data.length === 0) {
+    throw new Error("이미 바뀐 쿠폰이라 되돌릴 수 없어요");
+  }
+};
+
 export const updateCoupon = async (
   couponId: CouponType["id"],
   changes: Partial<Pick<CouponType, "name" | "place" | "expire_at">>,

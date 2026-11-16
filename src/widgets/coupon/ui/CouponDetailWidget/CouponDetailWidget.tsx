@@ -1,6 +1,7 @@
 "use client";
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
+  useMutation,
   useQuery,
   useQueryClient,
   useSuspenseQuery,
@@ -13,8 +14,12 @@ import {
   useSearchParams,
 } from "next/navigation";
 
-import { getCouponDetailOption } from "@/entities/coupon/api/query";
+import {
+  cancelCouponUseOption,
+  getCouponDetailOption,
+} from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
+import { COUPON_USE_UNDO_DURATION } from "@/entities/coupon/constants";
 import { getCouponListStatus } from "@/entities/coupon/lib/status";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
@@ -82,6 +87,12 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
   const { data: currentDetail } = useQuery(getCouponDetailOption(currentId));
   const currentSlide = current ?? currentDetail;
 
+  // 토스트 버튼처럼 나중에 실행되는 콜백에서 지금 보고 있는 쿠폰을 알 수 있게 함
+  const currentIdRef = useRef(currentId);
+  useEffect(() => {
+    currentIdRef.current = currentId;
+  }, [currentId]);
+
   // 자동으로 넘어갈 대상은 목록이 다시 정렬돼도 바뀌지 않도록 고정
   const slidePrev = pendingSlide?.direction === -1 ? pendingSlide.target : prev;
   const slideNext = pendingSlide?.direction === 1 ? pendingSlide.target : next;
@@ -113,8 +124,40 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
     window.history.replaceState(null, "", ROUTES.COUPON_DETAIL(id, keyword));
   };
 
+  const { mutate: cancelCouponUse } = useMutation(
+    cancelCouponUseOption(queryClient, {
+      onSuccess: () => addToast({ message: "쿠폰 사용을 되돌렸어요" }),
+      onError: (error) => addToast({ message: error.message }),
+    }),
+  );
+
+  /** 되돌린 쿠폰으로 다시 이동 (다음 쿠폰으로 넘어갔다면 되돌린 쿠폰 쪽으로 넘김) */
+  const returnToRestoredCoupon = (restored: CouponType) => {
+    // 아직 넘어가기 전이면 넘어가지 않고 그대로 머묾
+    if (currentIdRef.current === restored.id) {
+      setPendingSlide(null);
+      return;
+    }
+    setPendingSlide({ direction: -1, target: restored, delay: 0 });
+  };
+
   const handleUsed = () => {
-    addToast({ message: "쿠폰을 사용했어요" });
+    const usedCoupon = currentSlide;
+    // 잘못 눌렀을 때를 위해 잠시 동안 되돌릴 수 있게 함
+    addToast({
+      message: "쿠폰을 사용했어요",
+      duration: COUPON_USE_UNDO_DURATION,
+      action: {
+        label: "되돌리기",
+        onClick: () => {
+          if (!usedCoupon) return;
+          // 상세 화면을 벗어났으면 이 콜백은 실행되지 않고 안내 토스트만 뜸
+          cancelCouponUse(usedCoupon.id, {
+            onSuccess: () => returnToRestoredCoupon(usedCoupon),
+          });
+        },
+      },
+    });
     // next는 사용 버튼을 누른 시점(재정렬 전)의 다음 쿠폰
     if (next)
       setPendingSlide({

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { changeCouponToUsedOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
+import { COUPON_USE_UNDO_DURATION } from "@/entities/coupon/constants";
 import useModal from "@/shared/lib/hook/useModal";
 import { Button } from "@/shared/ui";
 
@@ -32,7 +33,7 @@ function UseCouponButton({
   const handleShowModal = () => {
     showModal({
       title: "쿠폰을 사용하셨나요?",
-      content: "한번 사용 버튼을 누르면 되돌릴 수 없어요.",
+      content: `사용 처리 후 ${COUPON_USE_UNDO_DURATION / 1000}초 안에만 되돌릴 수 있어요.`,
       onConfirm: () => {
         changeCouponToUsed(couponId, {
           onSuccess: () => onUsed?.(),

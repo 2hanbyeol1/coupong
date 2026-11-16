@@ -12,7 +12,9 @@ interface ToastProps {
   toast: ToastType;
 }
 
-function Toast({ toast: { id, message, duration = 3000 } }: ToastProps) {
+function Toast({
+  toast: { id, message, duration = 3000, action },
+}: ToastProps) {
   const { deleteToast } = useToast();
 
   useEffect(() => {
@@ -37,6 +39,18 @@ function Toast({ toast: { id, message, duration = 3000 } }: ToastProps) {
         <span className="flex-1 text-base leading-relaxed break-keep whitespace-pre-wrap text-slate-50">
           {message}
         </span>
+        {action && (
+          <button
+            type="button"
+            onClick={() => {
+              action.onClick();
+              deleteToast(id);
+            }}
+            className="shrink-0 cursor-pointer rounded-md px-2 py-1 text-sm font-semibold text-emerald-300 transition hover:bg-white/10"
+          >
+            {action.label}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => deleteToast(id)}
