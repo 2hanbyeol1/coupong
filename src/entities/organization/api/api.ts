@@ -149,6 +149,29 @@ export async function leaveOrganization(
   };
 }
 
+/**
+ * 내가 속한 그룹 id 목록 (로그인하지 않았으면 null)
+ * 저장해 둔 선택 그룹이 아직 유효한지 확인하는 데 씀
+ */
+export async function getMyOrganizationIds() {
+  const supabase = createBrowserClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) return null;
+
+  const { data, error } = await supabase
+    .from(MEMBER_TABLE)
+    .select("organization_id")
+    .eq("user_id", session.user.id);
+
+  if (error) {
+    console.error(`내 그룹 목록 조회 중 에러 발생: ${error.message}`);
+    throw Error("내 그룹 목록 조회에 실패했어요");
+  }
+  return data.map((row) => row.organization_id);
+}
+
 // 사용자의 id와 그룹의 id를 이용하여 특정 사용자가 해당 그룹에 이미 소속되어 있는지 여부를 조회
 export async function checkIsDuplicateMember(
   userId: UserType["user_id"],

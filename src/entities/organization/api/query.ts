@@ -9,6 +9,7 @@ import { AddOrganizationFormValues } from "@/features/add-organization/lib/schem
 
 import {
   addOrganization,
+  getMyOrganizationIds,
   getMyOrganizationRole,
   getOrganizationById,
   getOrganizationMembers,
@@ -32,6 +33,13 @@ export const getOrganizationMembersOption = (orgId: OrganizationType["id"]) =>
   queryOptions({
     queryKey: ORG_QUERY_KEY.ORGANIZATION_MEMBERS(orgId),
     queryFn: async () => await getOrganizationMembers(orgId),
+  });
+
+/** 내가 속한 그룹 id 목록 (그룹 목록을 다시 불러올 때 함께 갱신) */
+export const getMyOrganizationIdsOption = () =>
+  queryOptions({
+    queryKey: [...USER_QUERY_KEY.GROUP_LIST, "ids"],
+    queryFn: async () => await getMyOrganizationIds(),
   });
 
 export const getMyOrganizationRoleOption = (orgId: OrganizationType["id"]) =>

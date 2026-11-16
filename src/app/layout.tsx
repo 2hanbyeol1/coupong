@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import { SelectedOrganizationSync } from "@/features/select-organization/ui/SelectedOrganizationSync";
 import AuthStateProvider from "@/shared/lib/provider/AuthStateProvider";
 import NotificationProvider from "@/shared/lib/provider/NotificationProvider";
 import QueryProvider from "@/shared/lib/provider/QueryProvider";
@@ -37,7 +38,10 @@ export default function RootLayout({
           <AuthStateProvider>
             <NotificationProvider>
               <ToastProvider>
-                <ModalProvider>{children}</ModalProvider>
+                <ModalProvider>
+                  {children}
+                  <SelectedOrganizationSync />
+                </ModalProvider>
               </ToastProvider>
             </NotificationProvider>
           </AuthStateProvider>

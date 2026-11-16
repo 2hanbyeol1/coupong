@@ -59,10 +59,12 @@ function LeaveOrganizationButton({
             : `${organization.name}에서 나갔어요`,
       });
 
+      // 선택 그룹을 먼저 바꾼 뒤 목록을 갱신
+      // (반대로 하면 내 그룹 목록이 먼저 갱신돼, 선택 그룹을 확인하는 쪽에서 내보내진 것으로 오해함)
+      await selectAnotherOrganization();
       queryClient.invalidateQueries({ queryKey: ORG_QUERY_KEY.ALL });
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEY.GROUP_LIST });
       queryClient.invalidateQueries({ queryKey: COUPON_QUERY_KEY.ALL });
-      await selectAnotherOrganization();
     },
     onError: (error) => {
       hideModal();
