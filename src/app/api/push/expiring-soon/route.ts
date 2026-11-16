@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { ROUTES } from "@/shared/config/routes";
 import { filterUsersByPreference } from "@/shared/lib/push/prefs";
 import { sendPushToUsers } from "@/shared/lib/push/send";
 import createAdminClient from "@/shared/lib/supabase/admin";
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
     const result = await sendPushToUsers(recipientIds, {
       title: "쿠폰 마감이 1일 남았어요",
       body: `[${coupon.place}] ${coupon.name}`,
-      url: "/",
+      url: ROUTES.COUPON_DETAIL(coupon.id),
     });
     totalSent += result.sent;
     notifiedCouponIds.push(coupon.id);

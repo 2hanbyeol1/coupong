@@ -29,8 +29,11 @@ function Header({
   const handleBack = () => {
     if (onBack) {
       onBack();
-    } else {
+    } else if (window.history.length > 1) {
       router.back();
+    } else {
+      // 알림 등으로 이 화면부터 열려 돌아갈 기록이 없으면 홈으로
+      router.replace(ROUTES.HOME);
     }
   };
 
