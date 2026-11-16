@@ -15,6 +15,10 @@ interface BottomSheetProps {
   onClose: () => void;
   title?: ReactNode;
   children: ReactNode;
+  /** 내용이 길어 스크롤돼도 아래에 고정되는 영역 (버튼 등) */
+  footer?: ReactNode;
+  /** false면 손잡이·끌기·바깥·ESC로 닫히지 않음 (등록 중처럼 닫으면 안 될 때) */
+  dismissible?: boolean;
   className?: string;
 }
 
@@ -39,14 +43,19 @@ function BottomSheet({
   onClose,
   title,
   children,
+  footer,
+  dismissible = true,
   className,
 }: BottomSheetProps) {
   const titleId = useId();
   const dragControls = useDragControls();
   const [isMounted, setIsMounted] = useState(false);
+  const requestClose = () => {
+    if (dismissible) onClose();
+  };
   // 열려 있는 동안 onClose가 바뀌어도 아래 효과를 다시 걸지 않도록 최신 값만 참조
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+  const requestCloseRef = useRef(requestClose);
+  requestCloseRef.current = requestClose;
 
   useEffect(() => {
     setIsMounted(true);
@@ -60,7 +69,7 @@ function BottomSheet({
     document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onCloseRef.current();
+      if (event.key === "Escape") requestCloseRef.current();
     };
     window.addEventListener("keydown", handleKeyDown);
 
@@ -75,7 +84,7 @@ function BottomSheet({
       info.offset.y > CLOSE_DRAG_OFFSET ||
       info.velocity.y > CLOSE_DRAG_VELOCITY
     ) {
-      onClose();
+      requestClose();
     }
   };
 
@@ -93,7 +102,7 @@ function BottomSheet({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-50 bg-black/40"
-            onClick={onClose}
+            onClick={requestClose}
           />
           <motion.div
             key="bottom-sheet-panel"
@@ -105,7 +114,7 @@ function BottomSheet({
             exit={{ y: "100%" }}
             transition={SHEET_TRANSITION}
             // 내용을 스크롤할 때는 끌리지 않도록 손잡이·제목 영역에서만 끌기 시작
-            drag="y"
+            drag={dismissible ? "y" : false}
             dragControls={dragControls}
             dragListener={false}
             dragConstraints={{ top: 0, bottom: 0 }}
@@ -123,7 +132,8 @@ function BottomSheet({
               {/* 누르면 닫히는 손잡이 (누를 영역은 막대보다 넓게) */}
               <button
                 type="button"
-                onClick={onClose}
+                onClick={requestClose}
+                disabled={!dismissible}
                 aria-label="닫기"
                 className="mx-auto flex h-6 w-16 cursor-pointer items-center justify-center"
               >
@@ -144,9 +154,19 @@ function BottomSheet({
                 ))}
             </div>
             {/* 패딩 안쪽까지 스크롤 영역이라, 칸 바깥으로 그려지는 포커스 테두리도 잘리지 않음 */}
-            <div className="flex min-h-0 flex-col overflow-y-auto overscroll-contain px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+            <div
+              className={cn(
+                "flex min-h-0 flex-col overflow-y-auto overscroll-contain px-5 pt-3",
+                !footer && "pb-[max(1.25rem,env(safe-area-inset-bottom))]",
+              )}
+            >
               {children}
             </div>
+            {footer && (
+              <div className="shrink-0 px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+                {footer}
+              </div>
+            )}
           </motion.div>
         </>
       )}
