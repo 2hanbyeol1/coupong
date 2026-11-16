@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { LogoutButton } from "@/entities/auth/ui";
 import { ROUTES } from "@/shared/config/routes";
 import { FullView } from "@/shared/ui/FullView";
@@ -23,9 +21,6 @@ function ProfilePage() {
         </div>
 
         <LogoutButton className="mt-40" />
-        <Link className="mt-auto opacity-0" href="/test">
-          실험실
-        </Link>
       </FullView>
     </div>
   );
