@@ -26,15 +26,20 @@ function SearchPage() {
         withBackButton
       />
 
-      <div className="mb-5 flex flex-col gap-3.5 px-4">
+      {/* 스크롤해도 헤더(h-12) 바로 아래에 검색창을 고정
+          배경 없이 검색창만 띄워, 지나가는 목록이 유리 너머로 비치게 함
+          (검색창 바깥 여백은 아래 목록을 그대로 누를 수 있게 터치를 통과시킴) */}
+      <div className="pointer-events-none sticky top-12 z-40 px-4 pt-1 pb-3.5">
         <SearchInput
-          className="mt-1"
+          className="pointer-events-auto"
           placeholder="찾고 싶은 쿠폰의 키워드를 입력해 보세요"
           name="keyword"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           onXButtonClick={() => setKeyword("")}
         />
+      </div>
+      <div className="mb-5 px-4">
         <div className="flex gap-x-1.5 gap-y-2">
           {tags.map((tag) => (
             <button

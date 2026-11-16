@@ -1,5 +1,5 @@
 import { ComponentProps } from "react";
-import { X } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 import { cn } from "@/shared/lib/util/cn";
 
@@ -8,27 +8,65 @@ interface SearchInputProps extends ComponentProps<"input"> {
   onXButtonClick?: () => void;
 }
 
+/** 위·아래 테두리에 비치는 무지갯빛 하이라이트 */
+const IRIDESCENT_RIM =
+  "bg-[linear-gradient(90deg,transparent,rgb(244_198_230/0.9)_25%,rgb(170_240_140/1)_50%,rgb(244_198_230/0.9)_75%,transparent)]";
+
+/** 뒤의 콘텐츠가 흐리게 비치는 반투명(글래스) 검색창 */
 function SearchInput({
   className,
   onXButtonClick,
   ...props
 }: SearchInputProps) {
-  const handleXButtonClick = () => {
-    onXButtonClick?.();
-  };
-
   return (
-    <div className={cn("relative", className)}>
+    <div
+      className={cn(
+        "group relative flex items-center rounded-full",
+        // 옅은 흰빛(위가 조금 더 밝게) + 뒤 콘텐츠를 살짝만 블러해 형태가 비치게
+        "bg-linear-to-b from-white/30 to-white/10 backdrop-blur-md backdrop-saturate-[1.4]",
+        // 유리 가장자리: 흰 테두리, 위쪽 하이라이트, 아래쪽 안쪽 빛, 흰 배경에서도 보이는 외곽선·그림자
+        "border border-white/70 ring-1 ring-black/[0.07]",
+        "shadow-[inset_0_1px_1px_rgb(255_255_255/0.9),inset_0_-10px_16px_-10px_rgb(255_255_255/0.8),0_4px_12px_-6px_rgb(0_0_0/0.1)]",
+        "transition-[box-shadow,background-color] duration-200",
+        "focus-within:from-white/45 focus-within:to-white/20",
+        className,
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-x-8 -top-px h-px opacity-70 transition-opacity duration-200 group-focus-within:opacity-100",
+          IRIDESCENT_RIM,
+        )}
+      />
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-x-16 -bottom-px h-px opacity-50 transition-opacity duration-200 group-focus-within:opacity-90",
+          IRIDESCENT_RIM,
+        )}
+      />
+
+      <Search
+        aria-hidden
+        className="group-focus-within:stroke-primary pointer-events-none absolute left-4 size-4 stroke-neutral-500 stroke-[2.5] transition-colors duration-200"
+      />
       <input
-        className="border-light placeholder:text-dark w-full rounded-full border px-5 py-2 placeholder:text-sm"
+        type="search"
+        className="w-full appearance-none bg-transparent py-2.5 pr-11 pl-11 placeholder:text-neutral-500 [&::-webkit-search-cancel-button]:hidden"
         {...props}
       />
       {props.value && (
         <button
-          className="absolute top-1/2 right-5 -translate-y-1/2 cursor-pointer"
+          type="button"
+          aria-label="검색어 지우기"
+          // 누르는 영역은 32px로 유지하고, 보이는 원만 작고 옅게
+          className="group/clear absolute right-1.5 flex size-8 cursor-pointer items-center justify-center"
           onClick={onXButtonClick}
         >
-          <X className="stroke-dark h-4 w-4" onClick={handleXButtonClick} />
+          <span className="flex size-5.5 items-center justify-center rounded-full bg-black/15 transition-colors group-hover/clear:bg-black/25">
+            <X className="size-3 stroke-white stroke-3" />
+          </span>
         </button>
       )}
     </div>
