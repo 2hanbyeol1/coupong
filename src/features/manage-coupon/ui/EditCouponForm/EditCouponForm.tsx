@@ -8,6 +8,7 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Info } from "lucide-react";
 
 import {
   searchCouponSuggestionsOption,
@@ -33,7 +34,6 @@ import useCouponAutocomplete, {
 } from "@/entities/coupon/model/useCouponAutocomplete";
 import useModal from "@/shared/lib/hook/useModal";
 import useToast from "@/shared/lib/hook/useToast";
-import { cn } from "@/shared/lib/util/cn";
 import { getTodayDateInputValue } from "@/shared/lib/util/date";
 import { formatWon } from "@/shared/lib/util/money";
 import {
@@ -55,20 +55,30 @@ const MAX_PLACE_SUGGESTIONS = 5;
 const MAX_NAME_SUGGESTIONS = 10;
 
 /** 종류를 바꿀 수 없는 이유 (바꿀 수 있으면 null) */
-const getKindLockReason = (coupon: CouponType) => {
-  if (coupon.type === "amount" && coupon.used_amount > 0)
-    return "사용 내역이 있는 금액권은 종류를 바꿀 수 없어요";
-  if (coupon.type === "exchange" && coupon.used_by)
-    return "사용한 쿠폰은 종류를 바꿀 수 없어요";
-  return null;
-};
+/** 사용 내역이 있는 금액권, 사용한 교환권 (종류는 관리자만 바꿀 수 있음, DB에서도 막음) */
+const getHasUsage = (coupon: CouponType) =>
+  coupon.type === "amount" ? coupon.used_amount > 0 : !!coupon.used_by;
+
+/** 사용한 쿠폰의 종류를 바꾸면 사용 상태가 어떻게 옮겨 가는지 (DB의 sync_amount_coupon_used_by와 같게) */
+const getKindChangeNotice = (coupon: CouponType) =>
+  coupon.type === "exchange"
+    ? "이미 사용한 쿠폰이라 다 쓴 금액권이 돼요"
+    : coupon.used_amount >= (coupon.face_value ?? 0)
+      ? "사용 내역은 지워지고 사용한 교환권이 돼요"
+      : "사용 내역은 지워지고 아직 안 쓴 교환권이 돼요";
 
 export interface EditCouponFormProps {
   coupon: CouponType;
   formId: string;
+  /** 그룹 관리자면 사용한 쿠폰도 종류를 바꿀 수 있음 */
+  isAdmin?: boolean;
 }
 
-function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
+function EditCouponForm({
+  coupon,
+  formId,
+  isAdmin = false,
+}: EditCouponFormProps) {
   const queryClient = useQueryClient();
   const { hideModal, updateModal } = useModal();
   const { addToast } = useToast();
@@ -84,7 +94,8 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
       ),
     [coupon.used_amount],
   );
-  const kindLockReason = getKindLockReason(coupon);
+  const hasUsage = getHasUsage(coupon);
+  const isKindLocked = hasUsage && !isAdmin;
 
   const { register, control, handleSubmit, setValue, clearErrors } =
     useForm<CouponInfoValues>({
@@ -262,23 +273,17 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
             </div>
           );
         })}
-        {/* 유효 기간 바로 위: 금액권이면 체크하고 바로 아래에 금액 입력 */}
-        <div className="flex flex-col gap-1">
+        {/* 유효 기간 바로 위: 금액권이면 체크하고 바로 아래에 금액 입력
+            종류를 바꿀 수 없는 쿠폰은 체크박스를 보여주지 않음 (금액권이면 금액 칸만) */}
+        {!isKindLocked && (
           <Checkbox
             checked={currentType === "amount"}
             onChange={handleAmountCheck}
-            disabled={!!kindLockReason}
-            className={cn(
-              "self-start",
-              kindLockReason && "cursor-not-allowed opacity-60",
-            )}
+            className="self-start"
           >
             {AMOUNT_CHECK_LABEL}
           </Checkbox>
-          {kindLockReason && (
-            <p className="text-dark text-sm break-keep">{kindLockReason}</p>
-          )}
-        </div>
+        )}
         {currentType === "amount" && (
           <div className="flex flex-col gap-1">
             <Controller
@@ -323,8 +328,16 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
             />
           )}
         />
+        {/* 관리자가 사용한 쿠폰의 종류를 바꾸면 사용 상태가 어떻게 되는지 맨 아래 상자로 미리 알려줌 */}
+        {hasUsage && currentType !== coupon.type && (
+          <p className="bg-light/60 text-dark mt-1 flex items-start gap-2 rounded-xl px-4 py-3 text-sm break-keep">
+            <Info size={16} className="mt-0.5 shrink-0" aria-hidden />
+            {getKindChangeNotice(coupon)}
+          </p>
+        )}
         {/* 교환권이면 금액 칸만큼 맨 아래에 보이지 않는 자리를 남겨, 종류를 바꿔도 창 높이가 그대로 */}
-        {currentType !== "amount" && (
+        {/* 종류를 바꿀 수 없으면 높이가 바뀔 일이 없어 자리도 남기지 않음 */}
+        {!isKindLocked && currentType !== "amount" && (
           <KeepSpace visible={false}>
             <AmountInput
               label={COUPON_INFO.face_value.label}

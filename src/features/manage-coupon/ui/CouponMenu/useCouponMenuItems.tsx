@@ -57,7 +57,13 @@ function useCouponMenuItems(
   const openEditModal = () => {
     showModal({
       title: "쿠폰 수정",
-      content: <EditCouponForm coupon={coupon} formId={EDIT_COUPON_FORM_ID} />,
+      content: (
+        <EditCouponForm
+          coupon={coupon}
+          formId={EDIT_COUPON_FORM_ID}
+          isAdmin={myRole === "admin"}
+        />
+      ),
       confirmButtonText: "수정",
       formId: EDIT_COUPON_FORM_ID,
     });
