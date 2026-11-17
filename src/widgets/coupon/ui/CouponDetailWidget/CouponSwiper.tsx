@@ -58,6 +58,8 @@ function CouponSwiper({
 }: CouponSwiperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isSlidingRef = useRef(false);
+  // framer-motion은 끌기가 끝난 뒤 눌림을 판정해서, 끌어서 넘겨도 onTap이 불린다.
+  const didDragRef = useRef(false);
   const [isSliding, setIsSliding] = useState(false);
   const x = useMotionValue(0);
   const shouldReduceMotion = useReducedMotion();
@@ -105,6 +107,11 @@ function CouponSwiper({
     animate(x, 0, transition);
   };
 
+  const handleTap = () => {
+    if (didDragRef.current || isSlidingRef.current) return;
+    onTap?.();
+  };
+
   const isDraggable = !disabled && !isSliding;
   const slides = [
     { coupon: prev, position: -1 },
@@ -127,9 +134,15 @@ function CouponSwiper({
           right: prev ? 1 : EDGE_ELASTIC,
         }}
         dragMomentum={false}
+        onDragStart={() => {
+          didDragRef.current = true;
+        }}
         onDragEnd={handleDragEnd}
+        onTapStart={() => {
+          didDragRef.current = false;
+        }}
         // 끌어서 넘길 때는 눌림으로 치지 않음
-        onTap={onTap}
+        onTap={onTap ? handleTap : undefined}
         role={onTap ? "button" : undefined}
         aria-label={onTap ? tapLabel : undefined}
       >
