@@ -1,4 +1,3 @@
-import { CenteredView } from "@/shared/ui/CenteredView";
 import { LoginWidget } from "@/widgets/login";
 
 import AuthErrorToast from "./AuthErrorToast";
@@ -11,10 +10,10 @@ const LoginPage = async ({ searchParams }: LoginPageProps) => {
   const { auth_error } = await searchParams;
 
   return (
-    <CenteredView className="max-w-60">
+    <>
       <LoginWidget />
       {auth_error && <AuthErrorToast reason={auth_error} />}
-    </CenteredView>
+    </>
   );
 };
 
