@@ -15,6 +15,8 @@ interface BottomSheetProps {
   onClose: () => void;
   title?: ReactNode;
   children: ReactNode;
+  /** 제목 줄 오른쪽 끝에 놓이는 요소 (더보기 버튼 등) */
+  headerAction?: ReactNode;
   /** 내용이 길어 스크롤돼도 아래에 고정되는 영역 (버튼 등) */
   footer?: ReactNode;
   /** false면 손잡이·끌기·바깥·ESC로 닫히지 않음 (등록 중처럼 닫으면 안 될 때) */
@@ -42,6 +44,7 @@ function BottomSheet({
   open,
   onClose,
   title,
+  headerAction,
   children,
   footer,
   dismissible = true,
@@ -127,7 +130,7 @@ function BottomSheet({
           >
             <div
               onPointerDown={(event) => dragControls.start(event)}
-              className="shrink-0 cursor-grab touch-none px-5 active:cursor-grabbing"
+              className="relative shrink-0 cursor-grab touch-none px-5 active:cursor-grabbing"
             >
               {/* 누르면 닫히는 손잡이 (누를 영역은 막대보다 넓게) */}
               <button
@@ -152,6 +155,15 @@ function BottomSheet({
                     {title}
                   </div>
                 ))}
+              {headerAction && (
+                // 버튼을 누를 때 시트 끌기가 시작되지 않도록 막음
+                <div
+                  onPointerDown={(event) => event.stopPropagation()}
+                  className="absolute right-3 bottom-1 flex h-7 cursor-auto items-center"
+                >
+                  {headerAction}
+                </div>
+              )}
             </div>
             {/* 패딩 안쪽까지 스크롤 영역이라, 칸 바깥으로 그려지는 포커스 테두리도 잘리지 않음 */}
             <div

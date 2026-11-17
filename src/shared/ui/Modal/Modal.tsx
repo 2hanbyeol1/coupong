@@ -15,12 +15,13 @@ function Modal({ modal }: { modal: ModalType }) {
 
   return (
     // 닫힐 때도 배경이 흐려지며 패널이 내려가도록 배경·패널 모두 exit 애니메이션
+    // 바텀시트(z-50) 안의 메뉴에서 연 모달도 시트 위에 보이도록 한 단계 위에 그림
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/15 backdrop-blur-md dark:bg-black/50"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/15 backdrop-blur-md dark:bg-black/50"
     >
       <motion.div
         role="dialog"
