@@ -6,7 +6,6 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Maximize2, Minimize2 } from "lucide-react";
 import {
   notFound,
   useParams,
@@ -24,6 +23,7 @@ import { getCouponListStatus } from "@/entities/coupon/lib/status";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
 import useWakeLock from "@/shared/lib/hook/useWakeLock";
+import { ToastBottomAnchor } from "@/shared/ui";
 
 import CouponDetailPanel from "./CouponDetailPanel";
 import { CouponDetailPanelSkeleton } from "./CouponDetailWidgetSkeleton";
@@ -31,6 +31,7 @@ import CouponSwiper, {
   CouponSwiperHandle,
   SlideDirection,
 } from "./CouponSwiper";
+import TapToExpandHint from "./TapToExpandHint";
 import useCouponSequence from "./useCouponSequence";
 
 // 사용 처리 결과를 잠깐 보여준 뒤 다음 쿠폰으로 넘어가기까지의 시간
@@ -129,7 +130,8 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
 
   const { mutate: cancelCouponUse } = useMutation(
     cancelCouponUseOption(queryClient, {
-      onSuccess: () => addToast({ message: "쿠폰 사용을 되돌렸어요" }),
+      onSuccess: () =>
+        addToast({ message: "쿠폰 사용을 되돌렸어요", placement: "bottom" }),
       onError: (error) => addToast({ message: error.message }),
     }),
   );
@@ -150,6 +152,8 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
     addToast({
       message: "쿠폰을 사용했어요",
       duration: COUPON_USE_UNDO_DURATION,
+      // 방금 누른 사용 완료 버튼 가까이에 띄움
+      placement: "bottom",
       action: {
         label: "되돌리기",
         onClick: () => {
@@ -202,22 +206,17 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
             imageClassName={isExpanded ? "object-cover" : "object-contain"}
             disabled={!!pendingSlide}
             onChange={handleChange}
+            onTap={toggleExpanded}
+            tapLabel={
+              isExpanded ? "쿠폰 사진 작게 보기" : "쿠폰 사진 크게 보기"
+            }
           />
         )}
-        <button
-          type="button"
-          aria-label={
-            isExpanded ? "쿠폰 사진 작게 보기" : "쿠폰 사진 크게 보기"
-          }
-          className="bg-elevated absolute right-4 bottom-2 z-10 rounded-full p-2 shadow-lg"
-          onClick={toggleExpanded}
-        >
-          {isExpanded ? (
-            <Minimize2 className="stroke-dark size-6" />
-          ) : (
-            <Maximize2 className="stroke-dark size-6" />
-          )}
-        </button>
+        <TapToExpandHint
+          dismissed={isExpanded || currentId !== initialCoupon.id}
+        />
+        {/* 하단 패널 바로 위 */}
+        <ToastBottomAnchor className="absolute inset-x-4 bottom-3 z-20 mx-auto max-w-md" />
       </div>
       <Suspense fallback={<CouponDetailPanelSkeleton />}>
         <CouponDetailPanel

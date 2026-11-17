@@ -30,6 +30,10 @@ interface CouponSwiperProps {
   imageClassName?: string;
   disabled?: boolean;
   onChange: (couponId: CouponType["id"]) => void;
+  /** 끌지 않고 누르기만 했을 때 (Enter 키 포함) */
+  onTap?: () => void;
+  /** 누르면 일어나는 일을 화면 읽기 프로그램에 알려 줄 이름 */
+  tapLabel?: string;
 }
 
 const SWIPE_DISTANCE_RATIO = 0.2; // 너비의 20% 이상 끌면 넘김
@@ -49,6 +53,8 @@ function CouponSwiper({
   imageClassName,
   disabled,
   onChange,
+  onTap,
+  tapLabel,
 }: CouponSwiperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isSlidingRef = useRef(false);
@@ -122,6 +128,10 @@ function CouponSwiper({
         }}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
+        // 끌어서 넘길 때는 눌림으로 치지 않음
+        onTap={onTap}
+        role={onTap ? "button" : undefined}
+        aria-label={onTap ? tapLabel : undefined}
       >
         {slides.map(
           ({ coupon, position }) =>

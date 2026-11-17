@@ -12,5 +12,5 @@ export { Logo } from "./Logo";
 export { MoreMenu } from "./MoreMenu";
 export { SuggestionChips } from "./SuggestionChips";
 export { TextInput } from "./TextInput";
-export { Toast } from "./Toast";
+export { Toast, ToastBottomAnchor } from "./Toast";
 export { ToggleChip } from "./ToggleChip";
