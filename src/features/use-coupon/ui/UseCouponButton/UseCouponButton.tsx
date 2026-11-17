@@ -1,11 +1,9 @@
 "use client";
-import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { changeCouponToUsedOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
-import { COUPON_USE_UNDO_DURATION } from "@/entities/coupon/constants";
-import useModal from "@/shared/lib/hook/useModal";
+import useToast from "@/shared/lib/hook/useToast";
 import { Button } from "@/shared/ui";
 
 export interface UseCouponButtonProps {
@@ -14,37 +12,35 @@ export interface UseCouponButtonProps {
   onUsed?: () => void;
 }
 
+/**
+ * 누르면 바로 사용 완료로 바꿈
+ * 잘못 눌러도 바로 뜨는 토스트나 쿠폰 정보의 '사용 취소'로 되돌릴 수 있어 묻지 않음
+ */
 function UseCouponButton({
   className,
   couponId,
   onUsed,
 }: UseCouponButtonProps) {
   const queryClient = useQueryClient();
-  const { showModal, hideModal, updateModal } = useModal();
+  const { addToast } = useToast();
 
   const { mutate: changeCouponToUsed, isPending } = useMutation({
     ...changeCouponToUsedOption(queryClient),
   });
 
-  useEffect(() => {
-    updateModal({ confirmButtonDisabled: isPending });
-  }, [isPending, updateModal]);
-
-  const handleShowModal = () => {
-    showModal({
-      title: "쿠폰을 사용하셨나요?",
-      content: `사용 처리 후 ${COUPON_USE_UNDO_DURATION / 1000}초 안에만 되돌릴 수 있어요.`,
-      onConfirm: () => {
+  return (
+    <Button
+      className={className}
+      size="lg"
+      disabled={isPending}
+      onClick={() =>
         changeCouponToUsed(couponId, {
           onSuccess: () => onUsed?.(),
-          onSettled: () => hideModal(),
-        });
-      },
-    });
-  };
-
-  return (
-    <Button className={className} size="lg" onClick={handleShowModal}>
+          // 확인 창이 없으니 실패하면 알려줌
+          onError: (error) => addToast({ message: error.message }),
+        })
+      }
+    >
       사용 완료
     </Button>
   );

@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ReceiptText } from "lucide-react";
 
 import { getCouponDetailOption } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
@@ -12,6 +11,7 @@ import {
 import { Avatar } from "@/entities/user/ui/Avatar";
 import { CouponMenu } from "@/features/manage-coupon/ui/CouponMenu";
 import { CouponUsageHistory } from "@/features/use-coupon/ui/CouponUsageHistory";
+import { CouponUsedBy } from "@/features/use-coupon/ui/CouponUsedBy";
 import {
   AmountCouponUsage,
   UseAmountCouponButton,
@@ -39,79 +39,47 @@ function CouponDetailPanel({
 
   if (!coupon) return null;
 
-  const { isExpired, isUsed, isInvalid } = getCouponStatus(coupon);
+  const { isUsed, isInvalid } = getCouponStatus(coupon);
   const isAmount = isAmountCoupon(coupon);
   const remaining = getRemainingAmount(coupon);
+  // 다 쓴 금액권은 잔액 대신 '쿠폰 정보'
+  const hasRemaining = isAmount && remaining > 0;
 
   const openCouponInfo = () => setIsCouponInfoOpen(true);
   const closeCouponInfo = () => setIsCouponInfoOpen(false);
 
-  const getInvalidMessage = () => {
-    if (isUsed)
-      return isAmount
-        ? `${coupon.use_username?.name}님이 남은 금액을 모두 사용했어요`
-        : `${coupon.use_username?.name}님이 이미 사용한 쿠폰이예요`;
-    if (isExpired)
-      return isAmount
-        ? `${formatWon(remaining)}을 남기고 기간이 지났어요`
-        : "기간이 지나 사용할 수 없는 쿠폰이예요";
-    return "";
-  };
-
   return (
     <div className="bg-surface flex w-full flex-col gap-5 px-4 pt-3 pb-7">
       <div className="flex flex-col">
-        {isInvalid ? (
-          // 사용 가능한 쿠폰의 버튼 영역(h-12)과 높이를 맞춰 레이아웃이 흔들리지 않게 해요
-          <div className="relative flex h-12 items-center justify-center">
-            {/* 다 쓴 금액권도 사용 내역을 보고, 내 기록을 지워 되살릴 수 있게 함 */}
-            {isAmount && (
-              <button
-                type="button"
-                onClick={openCouponInfo}
-                aria-label="쿠폰 정보와 사용 내역 보기"
-                className="text-dark absolute top-1/2 left-0 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full"
-              >
-                <ReceiptText size={20} />
-              </button>
-            )}
-            <CouponMenu
-              coupon={coupon}
-              className="absolute top-1/2 right-0 -translate-y-1/2"
-              onDeleted={onDeleted}
-            />
-            <div className="text-dark px-10 text-center text-sm break-keep">
-              {getInvalidMessage()}
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              color="light"
-              size="lg"
-              onClick={openCouponInfo}
-              // 금액권은 남은 금액을 바로 보여주고, 누르면 쿠폰 정보·사용 내역이 열림
-              aria-label={
-                isAmount
-                  ? `쿠폰 정보 (남은 금액 ${formatWon(remaining)})`
-                  : undefined
-              }
-            >
-              {isAmount ? (
-                <span className="tabular-nums">
-                  잔액 {formatWon(remaining)}
-                </span>
-              ) : (
-                "쿠폰 정보"
-              )}
-            </Button>
-            {isAmount ? (
-              <UseAmountCouponButton coupon={coupon} onUsed={onUsed} />
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            color="light"
+            size="lg"
+            onClick={openCouponInfo}
+            // 금액권은 남은 금액을 바로 보여주고, 누르면 쿠폰 정보·사용 내역이 열림
+            aria-label={
+              hasRemaining
+                ? `쿠폰 정보 (남은 금액 ${formatWon(remaining)})`
+                : undefined
+            }
+          >
+            {hasRemaining ? (
+              <span className="tabular-nums">잔액 {formatWon(remaining)}</span>
             ) : (
-              <UseCouponButton couponId={coupon.id} onUsed={() => onUsed()} />
+              "쿠폰 정보"
             )}
-          </div>
-        )}
+          </Button>
+          {isInvalid ? (
+            // 쓸 수 없는 쿠폰도 같은 자리에 왜 못 쓰는지 (쿠폰 정보는 왼쪽 버튼으로 계속 볼 수 있음)
+            <Button size="lg" disabled>
+              {isUsed ? "사용 완료" : "기한 지남"}
+            </Button>
+          ) : isAmount ? (
+            <UseAmountCouponButton coupon={coupon} onUsed={onUsed} />
+          ) : (
+            <UseCouponButton couponId={coupon.id} onUsed={() => onUsed()} />
+          )}
+        </div>
       </div>
 
       <BottomSheet
@@ -148,6 +116,18 @@ function CouponDetailPanel({
               {getYYYYMMDD(coupon.expire_at)}까지
             </div>
           </div>
+
+          {/* 다 쓴 교환권은 금액권의 사용 내역과 같은 모양으로 누가 썼는지 */}
+          {isUsed && !isAmount && coupon.used_by && (
+            <>
+              <div aria-hidden className="bg-light -mx-5 h-2 shrink-0" />
+              <CouponUsedBy
+                couponId={coupon.id}
+                usedBy={coupon.used_by}
+                userName={coupon.use_username?.name}
+              />
+            </>
+          )}
 
           {isAmount && (
             <>
