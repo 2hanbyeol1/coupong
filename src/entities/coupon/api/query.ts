@@ -18,12 +18,11 @@ import {
   getCoupon,
   getCouponCount,
   getCoupons,
-  getImageSignedUrl,
   searchCouponSuggestions,
   SearchCouponSuggestionsParams,
-  SIGNED_URL_EXPIRES_IN,
   updateCoupon,
 } from "./api";
+import { getImageSignedUrl } from "./image-url";
 import { COUPON_QUERY_KEY } from "./query-key";
 import { CouponType } from "./type";
 
@@ -108,9 +107,10 @@ export const getCouponImageOption = ({
     queryKey: COUPON_QUERY_KEY.COUPON_IMAGE(imagePath),
     queryFn: async () => await getImageSignedUrl(imagePath),
     enabled: !!imagePath,
-    // 서명 URL이 만료되기 5분 전에 새로 발급
-    staleTime: SIGNED_URL_EXPIRES_IN * 1000 - 5 * 60 * 1000, // 55 minutes
-    gcTime: SIGNED_URL_EXPIRES_IN * 1000 - 5 * 60 * 1000, // 55 minutes
+    // 언제 새로 발급할지는 getImageSignedUrl이 만료 시각을 보고 정함
+    // (저장해 둔 URL은 남은 시간이 제각각이라 여기서 고정된 시간으로 정할 수 없음)
+    // 아직 유효하면 같은 URL을 바로 돌려주므로 다시 불러도 요청이 나가지 않음
+    staleTime: 0,
   });
 
 // 쿠폰 정보가 바뀌어도 이미지는 그대로이므로 서명 URL은 다시 발급하지 않음

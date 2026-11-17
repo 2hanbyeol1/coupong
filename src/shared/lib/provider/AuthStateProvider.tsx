@@ -1,6 +1,7 @@
 "use client";
 import { PropsWithChildren, useEffect } from "react";
 
+import { clearImageSignedUrls } from "@/entities/coupon/api/image-url";
 import { useOrganizationStore } from "@/entities/organization/model/store";
 import createClient from "@/shared/lib/supabase/client";
 
@@ -16,6 +17,7 @@ function AuthStateProvider({ children }: PropsWithChildren) {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || (event === "INITIAL_SESSION" && !session)) {
         resetSelectedOrganization();
+        clearImageSignedUrls();
       }
     });
 

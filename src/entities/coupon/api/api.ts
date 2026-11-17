@@ -7,12 +7,10 @@ import { getTodayDateInputValue } from "@/shared/lib/util/date";
 
 import { CouponListStatus } from "../lib/status";
 
+import { COUPON_IMAGE_BUCKET, prefetchImageSignedUrls } from "./image-url";
 import { CouponType, InsertCouponType } from "./type";
 
 const COUPON_TABLE = "coupons";
-const COUPON_IMAGE_BUCKET = "coupon-image";
-// 서명 URL이 바뀌면 같은 이미지도 다시 받아야 해서 길게 유지
-export const SIGNED_URL_EXPIRES_IN = 60 * 60; // 1 hour (seconds)
 
 /** 정규식 특수문자를 글자 그대로 찾도록 이스케이프 */
 const escapeRegExp = (value: string) =>
@@ -78,6 +76,8 @@ export const getCoupons = async ({
     console.error("쿠폰 목록 조회 에러:", error);
     throw new Error("쿠폰 목록을 가져오는 중 오류가 발생했어요");
   }
+  // 사진이 화면에 그려지기를 기다리지 않고 바로 사진 URL을 한 번에 발급받기 시작
+  prefetchImageSignedUrls(data.map(({ image_path }) => image_path));
   return { data, hasNext: (count ?? 0) > page * limit };
 };
 
@@ -288,20 +288,6 @@ export const uploadCouponImage = async (
     throw new Error("쿠폰 이미지 업로드 중 오류가 발생했어요");
   }
   return data.path;
-};
-
-export const getImageSignedUrl = async (path: string) => {
-  const supabase = createBrowserClient();
-
-  const { data, error } = await supabase.storage
-    .from(COUPON_IMAGE_BUCKET)
-    .createSignedUrl(path, SIGNED_URL_EXPIRES_IN);
-
-  if (error) {
-    console.error(`쿠폰 이미지 URL 조회 중 에러 발생: ${error.message}`);
-    throw new Error("쿠폰 이미지 URL 조회 중 오류가 발생했어요");
-  }
-  return data?.signedUrl;
 };
 
 export const changeCouponUse = async (couponId: CouponType["id"]) => {
