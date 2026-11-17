@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getMyOrganizationIdsOption } from "@/entities/organization/api/query";
+import { getInfiniteOrganizationsOption } from "@/entities/user/api/query";
 import { BottomSheet, Button } from "@/shared/ui";
 import { InfoMessage } from "@/shared/ui/InfoMessage";
 
@@ -22,6 +23,15 @@ function SelectOrganizationPrompt() {
   });
 
   const hasNoOrganization = myOrganizationIds?.length === 0;
+  const hasOrganization = !!myOrganizationIds?.length;
+  const queryClient = useQueryClient();
+
+  // 시트를 열자마자 목록이 보이도록 미리 불러둠
+  // (열고 나서 불러오면 스켈레톤 높이로 떴다가 실제 목록 높이로 줄어듦)
+  useEffect(() => {
+    if (hasOrganization)
+      queryClient.prefetchInfiniteQuery(getInfiniteOrganizationsOption());
+  }, [hasOrganization, queryClient]);
   const closeSheet = () => setIsSheetOpen(false);
 
   return (
@@ -42,11 +52,15 @@ function SelectOrganizationPrompt() {
 
       {/* 그룹이 있는지 확인하는 동안 버튼이 바뀌어 보이지 않도록 자리만 잡아둠 */}
       {isPending ? (
-        <div className="h-10" />
+        <div className="h-8" />
       ) : hasNoOrganization ? (
-        <Button onClick={openAddOrganizationModal}>그룹 만들기</Button>
+        <Button size="sm" onClick={openAddOrganizationModal}>
+          그룹 만들기
+        </Button>
       ) : (
-        <Button onClick={() => setIsSheetOpen(true)}>그룹 선택하기</Button>
+        <Button size="sm" onClick={() => setIsSheetOpen(true)}>
+          그룹 선택하기
+        </Button>
       )}
 
       <BottomSheet open={isSheetOpen} onClose={closeSheet} title="그룹 선택">

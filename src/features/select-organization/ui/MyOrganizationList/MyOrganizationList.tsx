@@ -1,7 +1,8 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
+import { getMyOrganizationIdsOption } from "@/entities/organization/api/query";
 import { Organization } from "@/entities/organization/ui/Organization";
 import OrganizationSkeleton from "@/entities/organization/ui/Organization/OrganizationSkeleton";
 import { getInfiniteOrganizationsOption } from "@/entities/user/api/query";
@@ -12,6 +13,8 @@ import Iterator from "@/shared/ui/Iterator/Iterator";
 
 import AddOrganizationButton from "../../../add-organization/ui/AddOrganizationButton/AddOrganizationButton";
 import { LeaveOrganizationButton } from "../../../leave-organization/ui/LeaveOrganizationButton";
+
+const PAGE_SIZE = 10;
 
 interface MyOrganizationListProps {
   className?: string;
@@ -27,18 +30,28 @@ function MyOrganizationList({ className, onSelect }: MyOrganizationListProps) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(getInfiniteOrganizationsOption());
+  const queryClient = useQueryClient();
 
-  if (isPending)
+  if (isPending) {
+    // 이미 알고 있는 그룹 수만큼만 스켈레톤을 그려, 불러온 뒤 높이가 크게 바뀌지 않게 함
+    const knownCount = queryClient.getQueryData(
+      getMyOrganizationIdsOption().queryKey,
+    )?.length;
+    const skeletonCount = knownCount
+      ? Math.min(knownCount, PAGE_SIZE)
+      : PAGE_SIZE;
+
     return (
       <div className={cn("flex flex-col pb-6", className)}>
         <Iterator
-          count={10}
+          count={skeletonCount}
           render={(idx) => (
             <OrganizationSkeleton key={`organization-skeleton-${idx}`} />
           )}
         />
       </div>
     );
+  }
   if (isError)
     return (
       <InfoMessage
