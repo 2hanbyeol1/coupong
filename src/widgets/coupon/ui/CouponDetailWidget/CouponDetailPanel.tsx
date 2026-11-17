@@ -73,13 +73,14 @@ function CouponDetailPanel({
         </AnimatePresence>
 
         {isInvalid ? (
-          <div className="flex flex-col">
+          // 사용 가능한 쿠폰의 버튼 영역(h-12)과 높이를 맞춰 레이아웃이 흔들리지 않게 해요
+          <div className="relative flex h-12 items-center justify-center">
             <CouponMenu
               coupon={coupon}
-              className="self-end"
+              className="absolute top-1/2 right-0 -translate-y-1/2"
               onDeleted={onDeleted}
             />
-            <div className="text-dark text-center text-sm">
+            <div className="text-dark px-8 text-center text-sm">
               {getInvalidMessage()}
             </div>
           </div>

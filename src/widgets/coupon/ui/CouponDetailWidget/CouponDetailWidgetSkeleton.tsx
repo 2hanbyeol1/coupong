@@ -29,8 +29,8 @@ export function CouponDetailPanelSkeleton({
         </div> */}
 
         <div className="grid grid-cols-2 gap-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
         </div>
       </div>
     </Skeleton>
