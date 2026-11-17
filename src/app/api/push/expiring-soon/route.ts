@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 import {
+  getRemainingAmount,
+  isAmountCoupon,
+} from "@/entities/coupon/lib/amount";
+import {
   EXPIRY_REMINDER_DAYS,
   ExpiryReminderDay,
   isExpiryReminderDay,
@@ -9,6 +13,7 @@ import { ROUTES } from "@/shared/config/routes";
 import { filterUsersByExpiryReminder } from "@/shared/lib/push/prefs";
 import { sendPushToUsers } from "@/shared/lib/push/send";
 import createAdminClient from "@/shared/lib/supabase/admin";
+import { formatWon } from "@/shared/lib/util/money";
 
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -39,7 +44,9 @@ export async function POST(request: Request) {
 
   const { data: candidates, error } = await supabase
     .from("coupons")
-    .select("id, name, place, organization_id, expire_at")
+    .select(
+      "id, name, place, organization_id, expire_at, type, face_value, used_amount",
+    )
     .gte("expire_at", getKstDate(1))
     .lt("expire_at", getKstDate(maxDays + 1))
     .is("used_by", null);
@@ -151,7 +158,10 @@ export async function POST(request: Request) {
 
     const result = await sendPushToUsers(recipientIds, {
       title: `쿠폰 마감이 ${coupon.daysBefore}일 남았어요`,
-      body: `[${coupon.place}] ${coupon.name}`,
+      // 금액권은 남은 금액을 함께 알려줌
+      body: isAmountCoupon(coupon)
+        ? `[${coupon.place}] ${coupon.name} (${formatWon(getRemainingAmount(coupon))} 남음)`
+        : `[${coupon.place}] ${coupon.name}`,
       url: ROUTES.COUPON_DETAIL(coupon.id),
     });
     totalSent += result.sent;

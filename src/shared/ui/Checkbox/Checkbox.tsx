@@ -30,7 +30,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       <label
         htmlFor={inputId}
         className={cn(
-          "flex cursor-pointer items-center gap-2 text-sm select-none",
+          // relative: 숨긴 input(sr-only)이 라벨 안에 있어야, 누를 때 포커스가 엉뚱한 곳으로 스크롤하지 않음
+          "relative flex cursor-pointer items-center gap-2 text-sm select-none",
           className,
         )}
       >

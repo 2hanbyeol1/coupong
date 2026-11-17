@@ -1,13 +1,17 @@
 import { z } from "zod";
 
-import { COUPON_SCHEMA } from "@/entities/coupon/lib/schema";
+import { COUPON_SCHEMA, refineFaceValue } from "@/entities/coupon/lib/schema";
 
 // 개별 쿠폰 정보 스키마 (이미지 1장당 1개)
-export const couponInfoSchema = z.object({
-  name: COUPON_SCHEMA.name,
-  place: COUPON_SCHEMA.place,
-  expire_at: COUPON_SCHEMA.expire_at,
-});
+export const couponInfoSchema = z
+  .object({
+    name: COUPON_SCHEMA.name,
+    place: COUPON_SCHEMA.place,
+    expire_at: COUPON_SCHEMA.expire_at,
+    type: COUPON_SCHEMA.type,
+    face_value: COUPON_SCHEMA.face_value,
+  })
+  .superRefine(refineFaceValue());
 
 export type CouponInfoFormValues = z.infer<typeof couponInfoSchema>;
 

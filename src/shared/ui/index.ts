@@ -1,3 +1,4 @@
+export { AmountInput } from "./AmountInput";
 export { AutocompleteList } from "./AutocompleteList";
 export { BottomSheet } from "./BottomSheet";
 export { Button } from "./Button";
@@ -8,6 +9,7 @@ export { ContextMenu } from "./ContextMenu";
 export { DateInput } from "./DateInput";
 export { Funnel, Step as FunnelStep } from "./Funnel";
 export { ImageInput } from "./ImageInput";
+export { KeepSpace } from "./KeepSpace";
 export { Logo } from "./Logo";
 export { MoreMenu } from "./MoreMenu";
 export { SuggestionChips } from "./SuggestionChips";

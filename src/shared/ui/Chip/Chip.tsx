@@ -8,6 +8,7 @@ import { cn } from "@/shared/lib/util/cn";
  * - muted: 옅은 회색 (선택되지 않은 항목, 추천 값)
  * - neutral: 회색 (선택된 항목)
  * - primary: 브랜드 색 (현재 위치 강조)
+ * - accent: 연한 브랜드 색 (금액권처럼 종류를 알려주는 라벨)
  * - danger: 연한 빨강 (곧 만료처럼 서둘러야 하는 상태)
  * - overlay: 반투명 검정 (사진 위에 얹을 때)
  * - white: 흰색 (흐리게 처리한 사진 위에 얹을 때)
@@ -26,6 +27,7 @@ export const chipVariants = cva(
         muted: "bg-dark/10 text-dark",
         neutral: "bg-ink/8 text-ink/70",
         primary: "bg-primary-fill text-white",
+        accent: "bg-primary/10 text-primary",
         danger: "bg-error/8 text-error",
         overlay: "bg-black/50 text-white",
         white: "bg-white text-black",

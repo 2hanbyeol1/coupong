@@ -11,9 +11,11 @@ import {
   getDaysLeft,
   getExpired,
 } from "@/shared/lib/util/date";
+import { formatWon } from "@/shared/lib/util/money";
 import { Chip } from "@/shared/ui";
 
 import { CouponType } from "../../api/type";
+import { getRemainingAmount, isAmountCoupon } from "../../lib/amount";
 import { CouponImage } from "../CouponImage";
 
 /** 남은 날이 이 이하면 빨갛게 강조 */
@@ -30,6 +32,10 @@ function Coupon({ coupon, keyword }: CouponProps) {
   const isUsed = !!coupon.used_by;
   const isInvalid = isExpired || isUsed;
   const daysLeft = getDaysLeft(coupon.expire_at);
+  const isAmount = isAmountCoupon(coupon);
+  const remaining = getRemainingAmount(coupon);
+  const isPartlyUsed =
+    isAmount && remaining > 0 && remaining < (coupon.face_value ?? 0);
 
   const getInvalidMessage = () => {
     if (isUsed) return "사용 완료";
@@ -68,18 +74,29 @@ function Coupon({ coupon, keyword }: CouponProps) {
           <div className="text-dark truncate text-xs font-medium">
             {coupon.place}
           </div>
+          {/* 금액권은 상세처럼 이름 뒤에 처음 금액 (이름이 길면 이름만 줄이고 금액은 항상 보임) */}
           <div
             className={cn(
-              "truncate text-[15px] font-semibold",
+              "flex min-w-0 items-baseline gap-1.5 text-[15px]",
               isInvalid && "text-dark",
             )}
           >
-            {coupon.name}
+            <span className="truncate font-semibold">{coupon.name}</span>
+            {isAmount && (
+              <span
+                className={cn(
+                  "shrink-0 font-bold tabular-nums",
+                  isInvalid && "font-semibold",
+                )}
+              >
+                {formatWon(coupon.face_value ?? 0)}
+              </span>
+            )}
           </div>
           {/* 사용 가능: 남은 날만 (정확한 날짜는 상세에서) / 지난 쿠폰: 남은 날이 없으므로 날짜 */}
-          <div className="mt-1 flex items-center">
+          <div className="mt-1 flex min-w-0 items-center gap-1.5">
             {isInvalid ? (
-              <span className="text-dark text-xs">
+              <span className="text-dark shrink-0 text-xs">
                 {formatShortDate(coupon.expire_at)}까지
               </span>
             ) : (
@@ -90,6 +107,19 @@ function Coupon({ coupon, keyword }: CouponProps) {
                 {formatDaysLeft(daysLeft)}
               </Chip>
             )}
+            {/* 남은 금액은 상태라 남은 날 옆에, 쓰기 시작한 금액권만
+                (안 쓴 건 이름 옆 금액과 같고, 다 쓴 건 사진 위 '사용 완료'로 충분) */}
+            {/* 남은 날과 같은 모양 (지난 쿠폰은 날짜처럼 글자로) */}
+            {isPartlyUsed &&
+              (isInvalid ? (
+                <span className="text-dark shrink-0 text-xs tabular-nums">
+                  {formatWon(remaining)} 남음
+                </span>
+              ) : (
+                <Chip color="muted" className="font-semibold">
+                  {formatWon(remaining)} 남음
+                </Chip>
+              ))}
           </div>
         </div>
       </Link>

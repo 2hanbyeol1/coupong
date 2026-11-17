@@ -146,7 +146,8 @@ function CouponImageCarousel({
   return (
     <div
       ref={viewportRef}
-      className="-mx-4 min-h-0 flex-1 overflow-hidden"
+      // 남는 공간을 채우되, 입력칸이 늘어나도 240px보다 작아지지 않음 (넘치면 바깥이 스크롤)
+      className="-mx-4 min-h-60 flex-1 overflow-hidden"
       // 크기를 재기 전에는 위치가 맞지 않으므로 숨김
       style={{ visibility: size ? "visible" : "hidden" }}
     >

@@ -10,6 +10,7 @@ import { formatKoreanDate } from "@/shared/lib/util/date";
 import { BottomSheet, Button } from "@/shared/ui";
 
 import { CouponInfoFormValues } from "../../lib/schema";
+import { encodeCouponKind, formatCouponKind } from "../../lib/util";
 
 /** confirm: 등록 전 확인, submitting: 등록 중, error: 등록 실패 */
 export type RegisterPhase = "confirm" | "submitting" | "error";
@@ -35,14 +36,14 @@ interface CouponGroup {
   count: number;
 }
 
-/** 사용처·이름·유효 기간이 모두 같은 쿠폰은 한 줄로 묶음 */
+/** 사용처·이름·유효 기간·종류(금액)가 모두 같은 쿠폰은 한 줄로 묶음 */
 const groupCoupons = (
   coupons: CouponInfoFormValues[],
   imagePreviews: string[],
 ): CouponGroup[] => {
   const groups = new Map<string, CouponGroup>();
   coupons.forEach((coupon, index) => {
-    const key = `${coupon.place}|${coupon.name}|${coupon.expire_at}`;
+    const key = `${coupon.place}|${coupon.name}|${coupon.expire_at}|${encodeCouponKind(coupon)}`;
     const group = groups.get(key);
     if (group) group.count += 1;
     else
@@ -76,6 +77,8 @@ function CouponSummary({ coupon }: { coupon: CouponInfoFormValues }) {
         [{coupon.place}] {coupon.name}
       </span>
       <span className="text-dark text-sm">
+        {/* 금액권만 종류를 함께 보여줌 (대부분인 교환권은 그대로) */}
+        {coupon.type === "amount" && `${formatCouponKind(coupon)} · `}
         {formatKoreanDate(coupon.expire_at)}까지
       </span>
     </div>

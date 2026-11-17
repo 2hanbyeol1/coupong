@@ -43,46 +43,101 @@ export type Database = {
           },
         ];
       };
+      coupon_usages: {
+        Row: {
+          amount: number;
+          coupon_id: string;
+          created_at: string;
+          id: string;
+          user_id: string | null;
+        };
+        Insert: {
+          amount: number;
+          coupon_id: string;
+          created_at?: string;
+          id?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          amount?: number;
+          coupon_id?: string;
+          created_at?: string;
+          id?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "coupon_usages_coupon_id_fkey";
+            columns: ["coupon_id"];
+            isOneToOne: false;
+            referencedRelation: "coupons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "coupon_usages_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
       coupons: {
         Row: {
           created_at: string;
           expire_at: string;
           expiry_notified_at: string | null;
+          face_value: number | null;
           id: string;
           image_path: string;
           name: string;
           organization_id: string | null;
           place: string;
+          type: Database["public"]["Enums"]["coupon_type"];
           uploaded_by: string;
+          used_amount: number;
           used_by: string | null;
         };
         Insert: {
           created_at?: string;
           expire_at: string;
           expiry_notified_at?: string | null;
+          face_value?: number | null;
           id?: string;
           image_path: string;
           name: string;
           organization_id?: string | null;
           place: string;
+          type?: Database["public"]["Enums"]["coupon_type"];
           uploaded_by: string;
+          used_amount?: number;
           used_by?: string | null;
         };
         Update: {
           created_at?: string;
           expire_at?: string;
           expiry_notified_at?: string | null;
+          face_value?: number | null;
           id?: string;
           image_path?: string;
           name?: string;
           organization_id?: string | null;
           place?: string;
+          type?: Database["public"]["Enums"]["coupon_type"];
           uploaded_by?: string;
+          used_amount?: number;
           used_by?: string | null;
         };
         Relationships: [
           {
             foreignKeyName: "coupons_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "coupons_organization_id_fkey1";
             columns: ["organization_id"];
             isOneToOne: false;
             referencedRelation: "organizations";
@@ -287,6 +342,7 @@ export type Database = {
     };
     Functions: {
       accept_invitation: { Args: { p_token: string }; Returns: string };
+      delete_coupon_usage: { Args: { p_usage_id: string }; Returns: undefined };
       is_organization_admin: {
         Args: { p_organization_id: string };
         Returns: boolean;
@@ -323,8 +379,13 @@ export type Database = {
         };
         Returns: undefined;
       };
+      use_amount_coupon: {
+        Args: { p_amount: number; p_coupon_id: string };
+        Returns: string;
+      };
     };
     Enums: {
+      coupon_type: "exchange" | "amount";
       organization_role: "admin" | "member";
     };
     CompositeTypes: {
@@ -456,6 +517,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      coupon_type: ["exchange", "amount"],
       organization_role: ["admin", "member"],
     },
   },

@@ -15,14 +15,17 @@ import {
 
 import {
   cancelCouponUseOption,
+  deleteCouponUsageOption,
   getCouponDetailOption,
 } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
 import { COUPON_USE_UNDO_DURATION } from "@/entities/coupon/constants";
 import { getCouponListStatus } from "@/entities/coupon/lib/status";
+import { AmountCouponUsage } from "@/features/use-coupon/ui/UseAmountCouponButton";
 import { ROUTES } from "@/shared/config/routes";
 import useToast from "@/shared/lib/hook/useToast";
 import useWakeLock from "@/shared/lib/hook/useWakeLock";
+import { formatWon } from "@/shared/lib/util/money";
 import { ToastBottomAnchor } from "@/shared/ui";
 
 import CouponDetailPanel from "./CouponDetailPanel";
@@ -146,11 +149,26 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
     setPendingSlide({ direction: -1, target: restored, delay: 0 });
   };
 
-  const handleUsed = () => {
+  const { mutate: deleteCouponUsage } = useMutation(
+    deleteCouponUsageOption(queryClient, {
+      onSuccess: () =>
+        addToast({ message: "쿠폰 사용을 되돌렸어요", placement: "bottom" }),
+      onError: (error) => addToast({ message: error.message }),
+    }),
+  );
+
+  /** 금액권이면 usage에 쓴 금액·남은 금액이 담겨 옴 */
+  const handleUsed = (usage?: AmountCouponUsage) => {
     const usedCoupon = currentSlide;
+    const getMessage = () => {
+      if (!usage) return "쿠폰을 사용했어요";
+      if (usage.remaining === 0)
+        return `${formatWon(usage.amount)} 사용, 남은 금액을 모두 썼어요`;
+      return `${formatWon(usage.amount)} 사용, ${formatWon(usage.remaining)} 남았어요`;
+    };
     // 잘못 눌렀을 때를 위해 잠시 동안 되돌릴 수 있게 함
     addToast({
-      message: "쿠폰을 사용했어요",
+      message: getMessage(),
       duration: COUPON_USE_UNDO_DURATION,
       // 방금 누른 사용 완료 버튼 가까이에 띄움
       placement: "bottom",
@@ -158,13 +176,15 @@ function CouponDetail({ initialCoupon, keyword }: CouponDetailProps) {
         label: "되돌리기",
         onClick: () => {
           if (!usedCoupon) return;
+          const onSuccess = () => returnToRestoredCoupon(usedCoupon);
           // 상세 화면을 벗어났으면 이 콜백은 실행되지 않고 안내 토스트만 뜸
-          cancelCouponUse(usedCoupon.id, {
-            onSuccess: () => returnToRestoredCoupon(usedCoupon),
-          });
+          if (usage) deleteCouponUsage(usage.usageId, { onSuccess });
+          else cancelCouponUse(usedCoupon.id, { onSuccess });
         },
       },
     });
+    // 금액권을 일부만 썼으면 아직 쓸 수 있으므로 그 쿠폰에 머묾
+    if (usage && usage.remaining > 0) return;
     // next는 사용 버튼을 누른 시점(재정렬 전)의 다음 쿠폰
     if (next)
       setPendingSlide({

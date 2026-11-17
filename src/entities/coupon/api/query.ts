@@ -12,19 +12,23 @@ import {
   addCoupons,
   cancelCouponUse,
   changeCouponUse,
+  CouponChanges,
   CouponListFilter,
   CouponUploadStatus,
   deleteCoupon,
+  deleteCouponUsage,
   getCoupon,
   getCouponCount,
   getCoupons,
+  getCouponUsages,
   searchCouponSuggestions,
   SearchCouponSuggestionsParams,
+  spendAmountCoupon,
   updateCoupon,
 } from "./api";
 import { getImageSignedUrl } from "./image-url";
 import { COUPON_QUERY_KEY } from "./query-key";
-import { CouponType } from "./type";
+import { CouponType, CouponUsageType } from "./type";
 
 /** 목록 탭(status)의 쿠폰. keyword가 있으면 사용처·이름에 키워드가 포함된 쿠폰만 (서버에서 검색) */
 export const getInfiniteCouponsOption = ({
@@ -64,6 +68,13 @@ export const getCouponDetailOption = (couponId: CouponType["id"]) =>
   queryOptions({
     queryKey: COUPON_QUERY_KEY.DETAIL(couponId),
     queryFn: async () => await getCoupon(couponId),
+  });
+
+/** 금액권 사용 내역 (최근에 쓴 순) */
+export const getCouponUsagesOption = (couponId: CouponType["id"]) =>
+  queryOptions({
+    queryKey: COUPON_QUERY_KEY.USAGES(couponId),
+    queryFn: async () => await getCouponUsages(couponId),
   });
 
 export const searchCouponSuggestionsOption = (
@@ -191,6 +202,51 @@ export const cancelCouponUseOption = (
   });
 };
 
+/** 금액권 사용 (쓴 금액을 기록하고 잔액에서 뺌), 결과는 사용 내역 id */
+export const spendAmountCouponOption = (queryClient: QueryClient) => {
+  return mutationOptions({
+    mutationFn: async ({
+      couponId,
+      amount,
+    }: {
+      couponId: CouponType["id"];
+      amount: number;
+    }) => await spendAmountCoupon(couponId, amount),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COUPON_QUERY_KEY.ALL,
+        predicate: isNotCouponImageQuery,
+      });
+    },
+  });
+};
+
+/**
+ * 금액권 사용 기록 삭제 (토스트의 되돌리기·사용 내역의 삭제)
+ * 토스트 버튼으로 실행해 그사이 화면을 벗어날 수 있으므로,
+ * 결과 안내는 mutate 콜백 대신 여기(onSuccess/onError)로 받아 화면이 사라져도 실행되게 함
+ */
+export const deleteCouponUsageOption = (
+  queryClient: QueryClient,
+  {
+    onSuccess,
+    onError,
+  }: { onSuccess?: () => void; onError?: (error: Error) => void } = {},
+) => {
+  return mutationOptions({
+    mutationFn: async (usageId: CouponUsageType["id"]) =>
+      await deleteCouponUsage(usageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COUPON_QUERY_KEY.ALL,
+        predicate: isNotCouponImageQuery,
+      });
+      onSuccess?.();
+    },
+    onError,
+  });
+};
+
 export const updateCouponOption = (
   queryClient: QueryClient,
   {
@@ -204,7 +260,7 @@ export const updateCouponOption = (
       changes,
     }: {
       couponId: CouponType["id"];
-      changes: Partial<Pick<CouponType, "name" | "place" | "expire_at">>;
+      changes: CouponChanges;
     }) => await updateCoupon(couponId, changes),
     onSuccess: () => {
       queryClient.invalidateQueries({

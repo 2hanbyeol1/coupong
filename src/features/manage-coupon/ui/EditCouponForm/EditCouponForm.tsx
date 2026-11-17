@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import {
   Controller,
   SubmitErrorHandler,
@@ -15,19 +15,33 @@ import {
 } from "@/entities/coupon/api/query";
 import { CouponType } from "@/entities/coupon/api/type";
 import {
+  AMOUNT_CHECK_LABEL,
+  FACE_VALUE_MAX_DIGITS,
+  FACE_VALUE_QUICK_ADD_AMOUNTS,
+  MAX_FACE_VALUE,
+  MIN_FACE_VALUE,
+} from "@/entities/coupon/lib/amount";
+import {
   COUPON_INFO,
   couponInfoObjectSchema,
   CouponInfoValues,
+  refineFaceValue,
+  toFaceValue,
 } from "@/entities/coupon/lib/schema";
 import useCouponAutocomplete, {
   CouponAutocompleteField,
 } from "@/entities/coupon/model/useCouponAutocomplete";
 import useModal from "@/shared/lib/hook/useModal";
 import useToast from "@/shared/lib/hook/useToast";
+import { cn } from "@/shared/lib/util/cn";
 import { getTodayDateInputValue } from "@/shared/lib/util/date";
+import { formatWon } from "@/shared/lib/util/money";
 import {
+  AmountInput,
   AutocompleteList,
+  Checkbox,
   DateInput,
+  KeepSpace,
   SuggestionChips,
   TextInput,
 } from "@/shared/ui";
@@ -40,6 +54,15 @@ const TEXT_INPUT_CONFIG = [
 const MAX_PLACE_SUGGESTIONS = 5;
 const MAX_NAME_SUGGESTIONS = 10;
 
+/** 종류를 바꿀 수 없는 이유 (바꿀 수 있으면 null) */
+const getKindLockReason = (coupon: CouponType) => {
+  if (coupon.type === "amount" && coupon.used_amount > 0)
+    return "사용 내역이 있는 금액권은 종류를 바꿀 수 없어요";
+  if (coupon.type === "exchange" && coupon.used_by)
+    return "사용한 쿠폰은 종류를 바꿀 수 없어요";
+  return null;
+};
+
 export interface EditCouponFormProps {
   coupon: CouponType;
   formId: string;
@@ -51,21 +74,41 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
   const { addToast } = useToast();
   const reactId = useId();
 
-  const { register, control, handleSubmit, setValue } =
+  // 금액권은 이미 쓴 금액보다 적게 바꿀 수 없음
+  const schema = useMemo(
+    () =>
+      couponInfoObjectSchema.superRefine(
+        refineFaceValue({
+          minFaceValue: Math.max(MIN_FACE_VALUE, coupon.used_amount),
+        }),
+      ),
+    [coupon.used_amount],
+  );
+  const kindLockReason = getKindLockReason(coupon);
+
+  const { register, control, handleSubmit, setValue, clearErrors } =
     useForm<CouponInfoValues>({
       mode: "onChange",
-      resolver: zodResolver(couponInfoObjectSchema),
+      resolver: zodResolver(schema),
       defaultValues: {
         place: coupon.place,
         name: coupon.name,
         expire_at: coupon.expire_at.slice(0, 10),
+        type: coupon.type,
+        face_value: coupon.face_value?.toString() ?? "",
       },
     });
 
-  const [currentPlace = "", currentName = ""] = useWatch({
+  const [currentPlace = "", currentName = "", currentType] = useWatch({
     control,
-    name: ["place", "name"],
+    name: ["place", "name", "type"],
   });
+
+  const handleAmountCheck = (isAmount: boolean) => {
+    setValue("type", isAmount ? "amount" : "exchange", { shouldDirty: true });
+    // 교환권은 금액을 보지 않으므로 남아 있던 금액 오류를 지움
+    if (!isAmount) clearErrors("face_value");
+  };
 
   // 자동완성 목록을 띄울 입력칸
   // 포커스만 했을 때는 검색하지 않고, 글자를 입력해야 열림 (포커스가 빠지면 닫힘)
@@ -134,14 +177,24 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
   }, [isPending, updateModal]);
 
   const onSubmit = (data: CouponInfoValues) => {
-    updateCoupon({ couponId: coupon.id, changes: data });
+    updateCoupon({
+      couponId: coupon.id,
+      changes: {
+        place: data.place,
+        name: data.name,
+        expire_at: data.expire_at,
+        type: data.type,
+        face_value: toFaceValue(data),
+      },
+    });
   };
 
   const onInvalid: SubmitErrorHandler<CouponInfoValues> = (errors) => {
     const first =
       errors.place?.message ??
       errors.name?.message ??
-      errors.expire_at?.message;
+      errors.expire_at?.message ??
+      errors.face_value?.message;
     if (first) addToast({ message: String(first) });
   };
 
@@ -209,6 +262,51 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
             </div>
           );
         })}
+        {/* 유효 기간 바로 위: 금액권이면 체크하고 바로 아래에 금액 입력 */}
+        <div className="flex flex-col gap-1">
+          <Checkbox
+            checked={currentType === "amount"}
+            onChange={handleAmountCheck}
+            disabled={!!kindLockReason}
+            className={cn(
+              "self-start",
+              kindLockReason && "cursor-not-allowed opacity-60",
+            )}
+          >
+            {AMOUNT_CHECK_LABEL}
+          </Checkbox>
+          {kindLockReason && (
+            <p className="text-dark text-sm break-keep">{kindLockReason}</p>
+          )}
+        </div>
+        {currentType === "amount" && (
+          <div className="flex flex-col gap-1">
+            <Controller
+              control={control}
+              name="face_value"
+              render={({ field, fieldState }) => (
+                <AmountInput
+                  ref={field.ref}
+                  name={field.name}
+                  label={COUPON_INFO.face_value.label}
+                  required
+                  maxDigits={FACE_VALUE_MAX_DIGITS}
+                  quickAddAmounts={FACE_VALUE_QUICK_ADD_AMOUNTS}
+                  maxAmount={MAX_FACE_VALUE}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  errorMessage={fieldState.error?.message}
+                />
+              )}
+            />
+            {coupon.used_amount > 0 && (
+              <p className="text-dark text-sm">
+                지금까지 {formatWon(coupon.used_amount)}을 썼어요
+              </p>
+            )}
+          </div>
+        )}
         <Controller
           control={control}
           name="expire_at"
@@ -225,6 +323,18 @@ function EditCouponForm({ coupon, formId }: EditCouponFormProps) {
             />
           )}
         />
+        {/* 교환권이면 금액 칸만큼 맨 아래에 보이지 않는 자리를 남겨, 종류를 바꿔도 창 높이가 그대로 */}
+        {currentType !== "amount" && (
+          <KeepSpace visible={false}>
+            <AmountInput
+              label={COUPON_INFO.face_value.label}
+              required
+              quickAddAmounts={FACE_VALUE_QUICK_ADD_AMOUNTS}
+              value=""
+              onChange={() => {}}
+            />
+          </KeepSpace>
+        )}
       </div>
     </form>
   );

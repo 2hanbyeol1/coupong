@@ -11,9 +11,10 @@ export function focusNextField(
   current: HTMLElement,
   container: HTMLElement,
 ): boolean {
+  // 자리만 남기고 숨긴 칸(inert)은 건너뜀
   const fields = Array.from(
     container.querySelectorAll<HTMLElement>(FIELD_SELECTOR),
-  );
+  ).filter((field) => field === current || !field.closest("[inert]"));
   const next = fields[fields.indexOf(current) + 1];
   if (!next) return false;
 

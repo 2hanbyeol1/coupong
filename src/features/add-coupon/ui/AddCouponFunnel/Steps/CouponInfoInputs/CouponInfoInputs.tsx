@@ -1,6 +1,7 @@
 "use client";
 import {
   Dispatch,
+  Fragment,
   SetStateAction,
   useEffect,
   useId,
@@ -16,6 +17,12 @@ import Image from "next/image";
 
 import { searchCouponSuggestionsOption } from "@/entities/coupon/api/query";
 import { COUPON_IMAGE_ASPECT_CLASS } from "@/entities/coupon/constants";
+import {
+  AMOUNT_CHECK_LABEL,
+  FACE_VALUE_MAX_DIGITS,
+  FACE_VALUE_QUICK_ADD_AMOUNTS,
+  MAX_FACE_VALUE,
+} from "@/entities/coupon/lib/amount";
 import { COUPON_INFO } from "@/entities/coupon/lib/schema";
 import useCouponAutocomplete, {
   CouponAutocompleteField,
@@ -26,7 +33,9 @@ import {
   CouponInfoFormValues,
 } from "@/features/add-coupon/lib/schema";
 import {
+  COUPON_INFO_ERROR_ORDER,
   COUPON_INFO_FIELD_ORDER,
+  EMPTY_COUPON_INFO,
   isCouponInfoIncomplete,
 } from "@/features/add-coupon/lib/util";
 import useIsKeyboardOpen from "@/shared/lib/hook/useIsKeyboardOpen";
@@ -38,21 +47,32 @@ import {
   getTodayDateInputValue,
   parseDateInputValue,
 } from "@/shared/lib/util/date";
+import { formatAmountDigits } from "@/shared/lib/util/money";
 import {
+  AmountInput,
   AutocompleteList,
   Button,
+  Checkbox,
   DateInput,
+  KeepSpace,
   SuggestionChips,
   TextInput,
 } from "@/shared/ui";
 
-import BatchCouponInputs, {
-  FIELD_LABELS,
-  InfoFieldName,
-} from "./BatchCouponInputs";
+import BatchCouponInputs from "./BatchCouponInputs";
 import CouponImageCarousel from "./CouponImageCarousel";
 import CouponListBottomSheet from "./CouponListBottomSheet";
 import { focusNextField } from "./fieldNavigation";
+import {
+  FIELD_LABELS,
+  formatInfoFieldValue,
+  getInfoFieldValue,
+  getLinkedSharedFields,
+  INFO_FIELD_ORDER,
+  InfoFieldName,
+  setInfoFieldValue,
+  TextFieldName,
+} from "./infoField";
 import { CouponInputMode, DEFAULT_SHARED_FIELDS } from "./inputMode";
 import SharedValueChoice, { SharedValueOption } from "./SharedValueChoice";
 import ValueSwapOverlay, { SwapText } from "./ValueSwapOverlay";
@@ -94,20 +114,41 @@ const withParticle = (word: string, withBatchim: string, without: string) => {
   return word + (hasBatchim ? withBatchim : without);
 };
 
-/** 쿠폰 한 장의 입력칸에 보이는 글자 (입력칸 순서대로) */
+type SwapFieldName = TextFieldName | "face_value";
+
+/** 쿠폰 한 장의 입력칸에 보이는 글자 */
 const getFieldTexts = (
   coupon: Partial<CouponInfoFormValues> | undefined,
-): SwapText[] =>
-  INPUT_CONFIG.map((config) => {
-    const name = config.name as InfoFieldName;
-    if (name === "expire_at") {
-      const value = coupon?.expire_at ?? "";
-      return parseDateInputValue(value)
-        ? { text: formatKoreanDate(value), isPlaceholder: false }
-        : { text: DATE_PLACEHOLDER, isPlaceholder: true };
-    }
-    return { text: coupon?.[name] ?? "", isPlaceholder: false };
-  });
+): Record<SwapFieldName, SwapText> => {
+  const expireAt = coupon?.expire_at ?? "";
+  return {
+    place: { text: coupon?.place ?? "", isPlaceholder: false },
+    name: { text: coupon?.name ?? "", isPlaceholder: false },
+    // 교환권은 금액 칸이 없으므로 남겨 둔 금액을 보여주지 않음
+    face_value: {
+      text:
+        coupon?.type === "amount"
+          ? formatAmountDigits(coupon.face_value ?? "")
+          : "",
+      isPlaceholder: false,
+    },
+    expire_at: parseDateInputValue(expireAt)
+      ? { text: formatKoreanDate(expireAt), isPlaceholder: false }
+      : { text: DATE_PLACEHOLDER, isPlaceholder: true },
+  };
+};
+
+/** 키보드가 열리는 입력칸인지 (금액권 체크박스는 아님) */
+const isTextInput = (target: EventTarget | null) =>
+  target instanceof HTMLInputElement && target.type !== "checkbox";
+
+/** 화면에 보이는 입력칸 순서 (금액권이면 유효 기간 바로 위에 금액) */
+const getSwapFieldOrder = (
+  coupon: Partial<CouponInfoFormValues> | undefined,
+): SwapFieldName[] =>
+  coupon?.type === "amount"
+    ? ["place", "name", "face_value", "expire_at"]
+    : ["place", "name", "expire_at"];
 
 /** 입력 방식 전환 버튼 (한 번에 입력이 기본이라 앞에) */
 const INPUT_MODE_OPTIONS = [
@@ -124,7 +165,7 @@ const INPUT_MODE_INDICATOR_SPRING = {
 
 type AutocompleteFieldName = CouponAutocompleteField;
 
-const AUTOCOMPLETE_FIELDS: InfoFieldName[] = ["place", "name"];
+const AUTOCOMPLETE_FIELDS: TextFieldName[] = ["place", "name"];
 const MAX_PLACE_SUGGESTIONS = 5;
 const MAX_NAME_SUGGESTIONS = 10;
 /** 다음 쿠폰으로 넘어가는 슬라이드가 끝난 뒤 첫 칸에 포커스 */
@@ -149,6 +190,7 @@ function CouponInfoInputs({
     trigger,
     setFocus,
     getFieldState,
+    clearErrors,
     control,
     formState: { errors },
   } = useFormContext<AddCouponFormValues>();
@@ -178,7 +220,7 @@ function CouponInfoInputs({
     if (current.length === imagePreviews.length) return;
 
     const next: CouponInfoFormValues[] = imagePreviews.map(
-      (_, index) => current[index] ?? { name: "", place: "", expire_at: "" },
+      (_, index) => current[index] ?? { ...EMPTY_COUPON_INFO },
     );
     setValue("coupons", next, { shouldValidate: false, shouldDirty: true });
 
@@ -204,9 +246,11 @@ function CouponInfoInputs({
     if (!shouldReduceMotion && !isModeChanged && inputMode === "single") {
       const from = getFieldTexts(couponsWatch?.[swapBase.index]);
       const to = getFieldTexts(couponsWatch?.[currentIndex]);
+      // 새 쿠폰의 입력칸 순서에 맞춰 겹침 (맨 아래 보이지 않는 금액 자리는 빼고)
+      const order = getSwapFieldOrder(couponsWatch?.[currentIndex]);
       setValueSwap((prev) => ({
         id: (prev?.id ?? 0) + 1,
-        items: from.map((text, index) => ({ from: text, to: to[index] })),
+        items: order.map((field) => ({ from: from[field], to: to[field] })),
       }));
     }
   }
@@ -222,7 +266,7 @@ function CouponInfoInputs({
   // 이번에 입력한 다른 쿠폰의 값을 자동완성 후보로 수집
   const sessionValues = useMemo(() => {
     const coupons = couponsWatch ?? [];
-    const collect = (field: InfoFieldName) => {
+    const collect = (field: AutocompleteFieldName) => {
       const set = new Set<string>();
       coupons.forEach((coupon, idx) => {
         if (idx === currentIndex) return; // 현재 입력 중인 항목 제외
@@ -328,7 +372,7 @@ function CouponInfoInputs({
     const valid = await trigger(`coupons.${currentIndex}`);
     if (!valid) {
       // 첫 번째로 잘못된 칸의 에러를 토스트로 알려주고 그 칸으로 포커스
-      for (const field of COUPON_INFO_FIELD_ORDER) {
+      for (const field of COUPON_INFO_ERROR_ORDER) {
         const name = `coupons.${currentIndex}.${field}` as const;
         const message = getFieldState(name).error?.message;
         if (message) {
@@ -361,6 +405,19 @@ function CouponInfoInputs({
   const handlePrevButtonClick = isFirst ? onBackToImages : handlePrev;
 
   const isCurrentDateFilled = !!couponsWatch?.[currentIndex]?.expire_at;
+  const isCurrentAmount = couponsWatch?.[currentIndex]?.type === "amount";
+
+  /** 지금 쿠폰의 종류를 바꿈 (금액권이면 금액 칸이 나타남) */
+  const handleAmountCheck = (isAmount: boolean) => {
+    setInfoFieldValue(
+      currentIndex,
+      "couponKind",
+      isAmount
+        ? `amount:${getValues(`coupons.${currentIndex}.face_value`) ?? ""}`
+        : "exchange",
+      { setValue, clearErrors },
+    );
+  };
 
   // 다음 쿠폰으로 넘어간 뒤 슬라이드가 끝나면 첫 칸에 포커스
   useEffect(() => {
@@ -374,7 +431,7 @@ function CouponInfoInputs({
   }, [currentIndex, setFocus]);
 
   /**
-   * 키보드의 다음(Enter)은 폼을 제출하지 않고 사용처 → 쿠폰 이름 → 유효 기간 → 다음 쿠폰 첫 칸 순서로 이동
+   * 키보드의 다음(Enter)은 폼을 제출하지 않고 사용처 → 쿠폰 이름 → (금액권이면 금액) → 유효 기간 → 다음 쿠폰 첫 칸 순서로 이동
    * 마지막 쿠폰을 다 입력했으면 등록 확인으로
    */
   const handleSingleKeyDown = async (
@@ -385,9 +442,13 @@ function CouponInfoInputs({
     event.preventDefault();
     const input = event.target;
     const isNameField = input.name === `coupons.${currentIndex}.name`;
+    const isFaceValueField =
+      input.name === `coupons.${currentIndex}.face_value`;
+    // 유효 기간 바로 앞 칸 (금액권이면 금액, 교환권이면 쿠폰 이름)
+    const isBeforeDateField = isCurrentAmount ? isFaceValueField : isNameField;
 
-    // 유효 기간까지 채웠으면 쿠폰 이름에서 바로 다음 쿠폰으로
-    if (!(isNameField && isCurrentDateFilled)) {
+    // 유효 기간까지 채웠으면 날짜 칸을 건너뛰고 바로 다음 쿠폰으로
+    if (!(isBeforeDateField && isCurrentDateFilled)) {
       if (focusNextField(input, event.currentTarget)) return;
     }
 
@@ -418,13 +479,13 @@ function CouponInfoInputs({
     const coupons = getValues("coupons") ?? [];
     const options = new Map<string, SharedValueOption>();
     coupons.forEach((coupon) => {
-      const value = coupon?.[field] ?? "";
+      const value = getInfoFieldValue(coupon, field);
       if (!value.trim()) return;
       const option = options.get(value);
       if (option) {
         option.count += 1;
       } else {
-        const label = field === "expire_at" ? formatKoreanDate(value) : value;
+        const label = formatInfoFieldValue(field, value);
         options.set(value, { value, label, count: 1 });
       }
     });
@@ -443,7 +504,7 @@ function CouponInfoInputs({
     fields.forEach((field) => {
       const shared = getSharedSourceValue(field);
       coupons.forEach((coupon, index) => {
-        const value = coupon?.[field] ?? "";
+        const value = getInfoFieldValue(coupon, field);
         if (value.trim() && value !== shared) indexes.add(index);
       });
     });
@@ -454,9 +515,10 @@ function CouponInfoInputs({
   const setValueForAll = (field: InfoFieldName, value: string) => {
     const coupons = getValues("coupons") ?? [];
     coupons.forEach((_, index) => {
-      setValue(`coupons.${index}.${field}`, value, {
+      setInfoFieldValue(index, field, value, {
+        setValue,
+        clearErrors,
         shouldValidate: !!value,
-        shouldDirty: true,
       });
     });
   };
@@ -475,9 +537,12 @@ function CouponInfoInputs({
    * 쿠폰마다 다른 값을 입력한 항목은 '모두 같게'를 끈 채로 두고, 나머지만 같이 씀
    */
   const switchToBatch = () => {
-    const shared = DEFAULT_SHARED_FIELDS.filter(
-      (field) => getConflictingIndexes([field]).length === 0,
-    );
+    // 함께 켜지는 항목(쿠폰 이름 + 종류)은 모두 값이 같을 때만 같이 씀
+    const shared = INFO_FIELD_ORDER.filter(
+      (field) =>
+        DEFAULT_SHARED_FIELDS.includes(field) &&
+        getConflictingIndexes(getLinkedSharedFields(field)).length === 0,
+    ).flatMap(getLinkedSharedFields);
     applySharedValues(shared);
     onSharedFieldsChange(shared);
     onInputModeChange("batch");
@@ -485,13 +550,25 @@ function CouponInfoInputs({
 
   /** 같이 쓸 항목을 켜고 끔. 켤 때 쿠폰마다 입력한 값이 다르면 어떤 값으로 같게 할지 고름 */
   const toggleSharedField = (field: InfoFieldName) => {
+    // 쿠폰 이름의 모두 같게는 그 아래 금액권 체크도 함께 켜고 끔
+    const [, ...linkedFields] = getLinkedSharedFields(field);
     if (sharedFields.includes(field)) {
-      onSharedFieldsChange((prev) => prev.filter((f) => f !== field));
+      onSharedFieldsChange((prev) =>
+        prev.filter((f) => f !== field && !linkedFields.includes(f)),
+      );
       return;
     }
     const share = (value: string) => {
       setValueForAll(field, value);
-      onSharedFieldsChange((prev) => [...prev, field]);
+      // 함께 켜지는 항목은 묻지 않고 가장 많은 값으로 (같으면 앞 쿠폰의 값)
+      linkedFields.forEach((linked) =>
+        setValueForAll(linked, getSharedSourceValue(linked)),
+      );
+      onSharedFieldsChange((prev) => [
+        ...prev.filter((f) => f !== field && !linkedFields.includes(f)),
+        field,
+        ...linkedFields,
+      ]);
     };
     const options = getValueOptions(field);
     if (options.length <= 1) {
@@ -636,7 +713,8 @@ function CouponInfoInputs({
           <h1 className="shrink-0 text-2xl leading-snug font-semibold break-keep">
             {imagePreviews.length}개 쿠폰을 한 번에 입력해요
           </h1>
-          <div className="-mx-4 min-h-0 flex-1 overflow-y-auto px-4 pb-1">
+          {/* 종류를 바꿔 금액 칸이 끼어들어도 브라우저가 스크롤을 옮기지 않게 (누른 버튼이 제자리에) */}
+          <div className="-mx-4 min-h-0 flex-1 overflow-y-auto px-4 pb-1 [overflow-anchor:none]">
             <BatchCouponInputs
               imagePreviews={imagePreviews}
               onSelectCoupon={handleEditCouponSeparately}
@@ -677,160 +755,213 @@ function CouponInfoInputs({
             )}
           </div>
 
-          {/* 키보드가 열리면 사진을 작은 카드로 접음 */}
-          {isImageCompact ? (
-            <CompactCouponImage
-              url={imagePreviews[currentIndex]}
-              label={hasMultiple ? `${currentIndex + 1}번째 쿠폰` : "쿠폰"}
-            />
-          ) : (
-            <CouponImageCarousel
-              imagePreviews={imagePreviews}
-              currentIndex={currentIndex}
-              onSelect={handleGoTo}
-            />
-          )}
+          {/* 사진은 일정 크기 아래로 줄이지 않고, 입력칸까지 넘치면 이 영역을 스크롤 */}
+          {/* 종류를 바꿔 금액 칸이 끼어들어도 브라우저가 스크롤을 옮기지 않게 (누른 버튼이 제자리에) */}
+          <div className="-mx-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-1 [overflow-anchor:none]">
+            {/* 키보드가 열리면 사진을 작은 카드로 접음 */}
+            {isImageCompact ? (
+              <CompactCouponImage
+                url={imagePreviews[currentIndex]}
+                label={hasMultiple ? `${currentIndex + 1}번째 쿠폰` : "쿠폰"}
+              />
+            ) : (
+              <CouponImageCarousel
+                imagePreviews={imagePreviews}
+                currentIndex={currentIndex}
+                onSelect={handleGoTo}
+              />
+            )}
 
-          {/* 사진은 캐러셀이 옮기고, 입력칸은 박스·라벨은 그대로 둔 채 값 글자만 위로 바뀜 */}
-          <div ref={fieldsRef} className="relative shrink-0">
-            <div
-              // 아래 겹침 레이어와 같은 부모라 키가 겹치지 않도록 접두어를 붙임
-              key={`fields-${currentIndex}`}
-              className={cn(
-                "flex flex-col gap-3",
-                // 글자가 바뀌는 동안은 겹쳐 그린 글자만 보이도록 실제 글자를 숨김
-                valueSwap &&
-                  "[&_[aria-haspopup=dialog]>span]:opacity-0 [&_input]:text-transparent",
-              )}
-              onKeyDown={handleSingleKeyDown}
-              onFocus={(event) =>
-                setIsTyping(event.target instanceof HTMLInputElement)
-              }
-              onBlur={(event) => {
-                // 다음 입력칸으로 옮겨 가는 중이면 접힌 사진을 유지
-                if (!(event.relatedTarget instanceof HTMLInputElement))
-                  setIsTyping(false);
-              }}
-            >
-              {INPUT_CONFIG.map(({ name, type, placeholder, ...props }) => {
-                const fieldName = name as InfoFieldName;
-                if (fieldName === "expire_at") {
+            {/* 사진은 캐러셀이 옮기고, 입력칸은 박스·라벨은 그대로 둔 채 값 글자만 위로 바뀜 */}
+            <div ref={fieldsRef} className="relative shrink-0">
+              <div
+                // 아래 겹침 레이어와 같은 부모라 키가 겹치지 않도록 접두어를 붙임
+                key={`fields-${currentIndex}`}
+                className={cn(
+                  "flex flex-col gap-3",
+                  // 글자가 바뀌는 동안은 겹쳐 그린 글자만 보이도록 실제 글자를 숨김
+                  valueSwap &&
+                    "[&_[aria-haspopup=dialog]>span]:opacity-0 [&_input]:text-transparent",
+                )}
+                onKeyDown={handleSingleKeyDown}
+                onFocus={(event) => setIsTyping(isTextInput(event.target))}
+                onBlur={(event) => {
+                  // 다음 입력칸으로 옮겨 가는 중이면 접힌 사진을 유지
+                  if (!isTextInput(event.relatedTarget)) setIsTyping(false);
+                }}
+              >
+                {INPUT_CONFIG.map(({ name, type, placeholder, ...props }) => {
+                  const fieldName = name as TextFieldName;
+                  if (fieldName === "expire_at") {
+                    return (
+                      <Fragment key={fieldName}>
+                        {/* 유효 기간 바로 위: 금액권이면 체크하고 바로 아래에 금액 입력 */}
+                        <Checkbox
+                          checked={isCurrentAmount}
+                          onChange={handleAmountCheck}
+                          className="self-start"
+                        >
+                          {AMOUNT_CHECK_LABEL}
+                        </Checkbox>
+                        {isCurrentAmount && (
+                          <Controller
+                            control={control}
+                            name={`coupons.${currentIndex}.face_value`}
+                            render={({ field, fieldState }) => (
+                              <AmountInput
+                                ref={field.ref}
+                                name={field.name}
+                                label={COUPON_INFO.face_value.label}
+                                required
+                                maxDigits={FACE_VALUE_MAX_DIGITS}
+                                quickAddAmounts={FACE_VALUE_QUICK_ADD_AMOUNTS}
+                                maxAmount={MAX_FACE_VALUE}
+                                enterKeyHint={
+                                  isLast && isCurrentDateFilled
+                                    ? "done"
+                                    : "next"
+                                }
+                                value={field.value ?? ""}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                errorMessage={fieldState.error?.message}
+                              />
+                            )}
+                          />
+                        )}
+                        <Controller
+                          control={control}
+                          name={`coupons.${currentIndex}.expire_at`}
+                          render={({ field }) => (
+                            <DateInput
+                              ref={field.ref}
+                              name={field.name}
+                              label={COUPON_INFO.expire_at.label}
+                              required={COUPON_INFO.expire_at.required}
+                              value={field.value ?? ""}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              min={today}
+                            />
+                          )}
+                        />
+                      </Fragment>
+                    );
+                  }
+                  const isAutocompleteField =
+                    AUTOCOMPLETE_FIELDS.includes(fieldName);
+                  // 입력칸이 비어 있으면 목록을 띄우지 않음
+                  const isAutocompleteOpen =
+                    autocompleteField === fieldName && autocompleteQuery !== "";
+                  // 다른 칸에서 검색한 결과는 보여주지 않음
+                  const autocompleteItems =
+                    isAutocompleteOpen && autocompleteResultField === fieldName
+                      ? autocompleteResult
+                      : [];
+                  const showAutocomplete =
+                    isAutocompleteOpen &&
+                    (autocompleteItems.length > 0 || isAutocompleteLoading);
+                  const listId = `${reactId}-${fieldName}-autocomplete`;
                   return (
-                    <Controller
-                      key={fieldName}
-                      control={control}
-                      name={`coupons.${currentIndex}.expire_at`}
-                      render={({ field }) => (
-                        <DateInput
-                          ref={field.ref}
-                          name={field.name}
-                          label={COUPON_INFO.expire_at.label}
-                          required={COUPON_INFO.expire_at.required}
-                          value={field.value ?? ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          min={today}
+                    <div key={fieldName}>
+                      <div className="relative">
+                        <TextInput
+                          type={type}
+                          placeholder={placeholder}
+                          autoComplete={isAutocompleteField ? "off" : undefined}
+                          // 마지막 쿠폰의 마지막 칸에서만 '완료', 나머지는 '다음'
+                          enterKeyHint={
+                            fieldName === "name" &&
+                            isLast &&
+                            isCurrentDateFilled &&
+                            !isCurrentAmount
+                              ? "done"
+                              : "next"
+                          }
+                          aria-controls={showAutocomplete ? listId : undefined}
+                          onKeyDown={
+                            isAutocompleteField
+                              ? (event) => {
+                                  if (event.key === "Escape")
+                                    setAutocompleteField(null);
+                                }
+                              : undefined
+                          }
+                          {...props}
+                          {...register(`coupons.${currentIndex}.${fieldName}`, {
+                            onChange: () => {
+                              if (isAutocompleteField)
+                                setAutocompleteField(
+                                  fieldName as AutocompleteFieldName,
+                                );
+                            },
+                            onBlur: () => {
+                              if (isAutocompleteField)
+                                setAutocompleteField(null);
+                            },
+                          })}
+                        />
+                        {showAutocomplete && (
+                          <AutocompleteList
+                            id={listId}
+                            items={autocompleteItems}
+                            query={autocompleteQuery}
+                            isLoading={isAutocompleteLoading}
+                            onSelect={(value) =>
+                              handleAutocompleteSelect(
+                                fieldName as AutocompleteFieldName,
+                                value,
+                              )
+                            }
+                          />
+                        )}
+                      </div>
+                      {/* 사용처를 아직 입력하지 않았을 때만 많이 쓴 사용처 추천 */}
+                      {fieldName === "place" && (
+                        <SuggestionChips
+                          show={currentPlace.trim() === ""}
+                          items={placeSuggestions}
+                          onSelect={(value) =>
+                            handleSuggestionClick("place", value)
+                          }
                         />
                       )}
-                    />
-                  );
-                }
-                const isAutocompleteField =
-                  AUTOCOMPLETE_FIELDS.includes(fieldName);
-                // 입력칸이 비어 있으면 목록을 띄우지 않음
-                const isAutocompleteOpen =
-                  autocompleteField === fieldName && autocompleteQuery !== "";
-                // 다른 칸에서 검색한 결과는 보여주지 않음
-                const autocompleteItems =
-                  isAutocompleteOpen && autocompleteResultField === fieldName
-                    ? autocompleteResult
-                    : [];
-                const showAutocomplete =
-                  isAutocompleteOpen &&
-                  (autocompleteItems.length > 0 || isAutocompleteLoading);
-                const listId = `${reactId}-${fieldName}-autocomplete`;
-                return (
-                  <div key={fieldName}>
-                    <div className="relative">
-                      <TextInput
-                        type={type}
-                        placeholder={placeholder}
-                        autoComplete={isAutocompleteField ? "off" : undefined}
-                        // 마지막 쿠폰의 마지막 칸에서만 '완료', 나머지는 '다음'
-                        enterKeyHint={
-                          fieldName === "name" && isLast && isCurrentDateFilled
-                            ? "done"
-                            : "next"
-                        }
-                        aria-controls={showAutocomplete ? listId : undefined}
-                        onKeyDown={
-                          isAutocompleteField
-                            ? (event) => {
-                                if (event.key === "Escape")
-                                  setAutocompleteField(null);
-                              }
-                            : undefined
-                        }
-                        {...props}
-                        {...register(`coupons.${currentIndex}.${fieldName}`, {
-                          onChange: () => {
-                            if (isAutocompleteField)
-                              setAutocompleteField(
-                                fieldName as AutocompleteFieldName,
-                              );
-                          },
-                          onBlur: () => {
-                            if (isAutocompleteField) setAutocompleteField(null);
-                          },
-                        })}
-                      />
-                      {showAutocomplete && (
-                        <AutocompleteList
-                          id={listId}
-                          items={autocompleteItems}
-                          query={autocompleteQuery}
-                          isLoading={isAutocompleteLoading}
+                      {/* 사용처 입력을 마치면, 그 사용처로 등록했던 쿠폰 이름 추천 */}
+                      {fieldName === "name" && (
+                        <SuggestionChips
+                          show={isPlaceEntered && currentName.trim() === ""}
+                          items={nameSuggestions}
                           onSelect={(value) =>
-                            handleAutocompleteSelect(
-                              fieldName as AutocompleteFieldName,
-                              value,
-                            )
+                            handleSuggestionClick("name", value)
                           }
                         />
                       )}
                     </div>
-                    {/* 사용처를 아직 입력하지 않았을 때만 많이 쓴 사용처 추천 */}
-                    {fieldName === "place" && (
-                      <SuggestionChips
-                        show={currentPlace.trim() === ""}
-                        items={placeSuggestions}
-                        onSelect={(value) =>
-                          handleSuggestionClick("place", value)
-                        }
-                      />
-                    )}
-                    {/* 사용처 입력을 마치면, 그 사용처로 등록했던 쿠폰 이름 추천 */}
-                    {fieldName === "name" && (
-                      <SuggestionChips
-                        show={isPlaceEntered && currentName.trim() === ""}
-                        items={nameSuggestions}
-                        onSelect={(value) =>
-                          handleSuggestionClick("name", value)
-                        }
-                      />
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
+                {/* 교환권이면 금액 칸만큼 맨 아래에 보이지 않는 자리를 남겨,
+                    종류를 바꿔도 전체 높이(사진 크기)가 그대로 */}
+                {!isCurrentAmount && (
+                  <KeepSpace visible={false}>
+                    <AmountInput
+                      label={COUPON_INFO.face_value.label}
+                      required
+                      quickAddAmounts={FACE_VALUE_QUICK_ADD_AMOUNTS}
+                      value=""
+                      onChange={() => {}}
+                    />
+                  </KeepSpace>
+                )}
+              </div>
+              {valueSwap && (
+                <ValueSwapOverlay
+                  key={`swap-${valueSwap.id}`}
+                  containerRef={fieldsRef}
+                  items={valueSwap.items}
+                  onDone={() => setValueSwap(null)}
+                />
+              )}
             </div>
-            {valueSwap && (
-              <ValueSwapOverlay
-                key={`swap-${valueSwap.id}`}
-                containerRef={fieldsRef}
-                items={valueSwap.items}
-                onDone={() => setValueSwap(null)}
-              />
-            )}
           </div>
 
           <div className="flex shrink-0 gap-2">

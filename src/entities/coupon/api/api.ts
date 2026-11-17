@@ -1,16 +1,21 @@
 import { getAuthUser } from "@/entities/auth/api/api";
 import { OrganizationType } from "@/entities/organization/api/type";
 import { AddCouponFormValues } from "@/features/add-coupon/lib/schema";
-import { NOT_FOUND_ERROR_CODE } from "@/shared/lib/constants/error-code";
+import {
+  NOT_FOUND_ERROR_CODE,
+  RAISED_ERROR_CODE,
+} from "@/shared/lib/constants/error-code";
 import createBrowserClient from "@/shared/lib/supabase/client";
 import { getTodayDateInputValue } from "@/shared/lib/util/date";
 
+import { toFaceValue } from "../lib/schema";
 import { CouponListStatus } from "../lib/status";
 
 import { COUPON_IMAGE_BUCKET, prefetchImageSignedUrls } from "./image-url";
-import { CouponType, InsertCouponType } from "./type";
+import { CouponType, CouponUsageType, InsertCouponType } from "./type";
 
 const COUPON_TABLE = "coupons";
+const COUPON_USAGE_TABLE = "coupon_usages";
 
 /** 정규식 특수문자를 글자 그대로 찾도록 이스케이프 */
 const escapeRegExp = (value: string) =>
@@ -257,6 +262,8 @@ export const addCoupons = async (
     name: coupon.name,
     place: coupon.place,
     expire_at: coupon.expire_at,
+    type: coupon.type,
+    face_value: toFaceValue(coupon),
     image_path: imagePaths[index],
     uploaded_by: user.id,
     organization_id: orgId,
@@ -327,9 +334,13 @@ export const cancelCouponUse = async (couponId: CouponType["id"]) => {
   }
 };
 
+export type CouponChanges = Partial<
+  Pick<CouponType, "name" | "place" | "expire_at" | "type" | "face_value">
+>;
+
 export const updateCoupon = async (
   couponId: CouponType["id"],
-  changes: Partial<Pick<CouponType, "name" | "place" | "expire_at">>,
+  changes: CouponChanges,
 ) => {
   const supabase = createBrowserClient();
 
@@ -340,8 +351,72 @@ export const updateCoupon = async (
 
   if (error) {
     console.error(`쿠폰 수정 중 에러 발생: ${error.message}`);
-    throw new Error("쿠폰 수정 중 오류가 발생했어요");
+    // 사용 내역이 있어 종류를 바꿀 수 없는 경우처럼 이유를 알려줌
+    throw new Error(
+      error.code === RAISED_ERROR_CODE
+        ? error.message
+        : "쿠폰 수정 중 오류가 발생했어요",
+    );
   }
+};
+
+/** 금액권 사용: 쓴 금액을 기록하고 잔액에서 뺌. 반환: 사용 내역 id (되돌릴 때 씀) */
+export const spendAmountCoupon = async (
+  couponId: CouponType["id"],
+  amount: number,
+) => {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase.rpc("use_amount_coupon", {
+    p_coupon_id: couponId,
+    p_amount: amount,
+  });
+
+  if (error) {
+    console.error(`금액권 사용 처리 중 에러 발생: ${error.message}`);
+    // 남은 금액보다 많이 쓴 경우처럼 이유를 알려줌
+    throw new Error(
+      error.code === RAISED_ERROR_CODE
+        ? error.message
+        : "쿠폰 사용 처리 중 오류가 발생했어요",
+    );
+  }
+  return data;
+};
+
+/** 금액권 사용 기록 삭제 (내가 남긴 기록만): 쓴 금액만큼 잔액을 되돌림 */
+export const deleteCouponUsage = async (usageId: CouponUsageType["id"]) => {
+  const supabase = createBrowserClient();
+
+  const { error } = await supabase.rpc("delete_coupon_usage", {
+    p_usage_id: usageId,
+  });
+
+  if (error) {
+    console.error(`금액권 사용 기록 삭제 중 에러 발생: ${error.message}`);
+    throw new Error(
+      error.code === RAISED_ERROR_CODE
+        ? error.message
+        : "사용 기록을 지우는 중 오류가 발생했어요",
+    );
+  }
+};
+
+/** 금액권 사용 내역 (최근에 쓴 순) */
+export const getCouponUsages = async (couponId: CouponType["id"]) => {
+  const supabase = createBrowserClient();
+
+  const { data, error } = await supabase
+    .from(COUPON_USAGE_TABLE)
+    .select("*, user:users!user_id(name)")
+    .eq("coupon_id", couponId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("금액권 사용 내역 조회 에러:", error);
+    throw new Error("사용 내역을 가져오는 중 오류가 발생했어요");
+  }
+  return data;
 };
 
 export const deleteCoupon = async (couponId: CouponType["id"]) => {
